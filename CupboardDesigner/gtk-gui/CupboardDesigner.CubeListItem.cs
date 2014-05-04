@@ -49,6 +49,7 @@ namespace CupboardDesigner
 			}
 			this.Show ();
 			this.drawCube.ExposeEvent += new global::Gtk.ExposeEventHandler (this.OnDrawCubeExposeEvent);
+			this.drawCube.DragBegin += new global::Gtk.DragBeginHandler (this.OnDrawCubeDragBegin);
 		}
 	}
 }

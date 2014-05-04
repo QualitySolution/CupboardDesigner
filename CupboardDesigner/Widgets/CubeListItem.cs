@@ -1,6 +1,7 @@
 ﻿using System;
 using NLog;
 using Cairo;
+using Gdk;
 
 namespace CupboardDesigner
 {
@@ -9,10 +10,15 @@ namespace CupboardDesigner
 	{
 		private static Logger logger = LogManager.GetCurrentClassLogger();
 		public Cube CubeItem;
+		public DragInformation DragInfo;
 
 		public CubeListItem()
 		{
 			this.Build();
+			Gtk.TargetEntry[] source_table = new Gtk.TargetEntry[] {
+				new Gtk.TargetEntry ("application/cube", Gtk.TargetFlags.App, 0)
+			};
+			Gtk.Drag.SourceSet(drawCube, Gdk.ModifierType.Button1Mask, source_table, Gdk.DragAction.Move);
 		}
 
 		int _CubePxSize;
@@ -40,17 +46,24 @@ namespace CupboardDesigner
 				return;
 			using (Context cr = Gdk.CairoHelper.Create (args.Event.Window)) 
 			{
-				int MaxWidth, MaxHeight;
-				args.Event.Window.GetSize(out MaxWidth, out MaxHeight);
-				logger.Debug("Image widget size W: {0} H: {1}", MaxWidth, MaxHeight);
-
-				Rsvg.Handle svg = new Rsvg.Handle(CubeItem.ImageFile);
-				double vratio = (double) MaxHeight / svg.Dimensions.Height;
-				double hratio = (double) MaxWidth / svg.Dimensions.Width;
-				double ratio = Math.Min(vratio, hratio);
-				cr.Scale(ratio, ratio);
-				svg.RenderCairo(cr);
+				CubeItem.DrawCube(cr, CubePxSize);
 			}
+		}
+
+		protected void OnDrawCubeDragBegin(object o, Gtk.DragBeginArgs args)
+		{
+			Pixmap pix = new Pixmap(drawCube.GdkWindow, CubeItem.CubesH * CubePxSize, CubeItem.CubesV * CubePxSize);
+
+			using (Context cr = Gdk.CairoHelper.Create(pix))
+			{
+				CubeItem.DrawCube(cr, CubePxSize);
+			}
+			Gdk.Pixbuf pixbuf = Gdk.Pixbuf.FromDrawable(pix, Gdk.Colormap.System, 0, 0, 0, 0, CubeItem.CubesH * CubePxSize, CubeItem.CubesV * CubePxSize);
+
+			((Gtk.DrawingArea)o).GetPointer(out DragInfo.IconPosX, out DragInfo.IconPosY);
+			Gtk.Drag.SetIconPixbuf(args.Context, pixbuf, DragInfo.IconPosX, DragInfo.IconPosY);
+			DragInfo.FromList = true;
+			DragInfo.cube = CubeItem;
 		}
 	}
 }

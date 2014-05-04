@@ -1035,7 +1035,7 @@
           <widget class="Gtk.Notebook" id="notebook1">
             <property name="MemberName" />
             <property name="CanFocus">True</property>
-            <property name="CurrentPage">0</property>
+            <property name="CurrentPage">1</property>
             <child>
               <widget class="Gtk.VBox" id="vbox4">
                 <property name="MemberName" />
@@ -1431,6 +1431,12 @@
                         <property name="MemberName" />
                         <signal name="ExposeEvent" handler="OnDrawCupboardExposeEvent" />
                         <signal name="SizeAllocated" handler="OnDrawCupboardSizeAllocated" />
+                        <signal name="DragMotion" handler="OnDrawCupboardDragMotion" />
+                        <signal name="DragDrop" handler="OnDrawCupboardDragDrop" />
+                        <signal name="DragBegin" handler="OnDrawCupboardDragBegin" />
+                        <signal name="DragDataDelete" handler="OnDrawCupboardDragDataDelete" />
+                        <signal name="MotionNotifyEvent" handler="OnDrawCupboardMotionNotifyEvent" />
+                        <signal name="ButtonPressEvent" handler="OnDrawCupboardButtonPressEvent" />
                       </widget>
                       <packing>
                         <property name="Position">0</property>
@@ -1547,6 +1553,7 @@
               <widget class="Gtk.DrawingArea" id="drawCube">
                 <property name="MemberName" />
                 <signal name="ExposeEvent" handler="OnDrawCubeExposeEvent" />
+                <signal name="DragBegin" handler="OnDrawCubeDragBegin" />
               </widget>
               <packing>
                 <property name="Position">0</property>

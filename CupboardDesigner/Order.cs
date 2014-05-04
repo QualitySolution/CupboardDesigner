@@ -5,6 +5,7 @@ using Mono.Data.Sqlite;
 using QSProjectsLib;
 using System.Collections.Generic;
 using Cairo;
+using Gdk;
 
 namespace CupboardDesigner
 {
@@ -18,8 +19,10 @@ namespace CupboardDesigner
 		private List<Cube> CubeList;
 		private int CubePxSize = 100;
 		private int BorderPxSize = 30;
+		private int CupboardZeroX, CupboardZeroY;
 		private VBox vboxCubeList;
 		private Cupboard OrderCupboard;
+		private DragInformation CurrentDrag;
 
 		private enum ComponentCol{
 			row_id,
@@ -30,6 +33,10 @@ namespace CupboardDesigner
 			facing_id,
 			facing
 		}
+
+		Gtk.TargetEntry[] TargetTable = new Gtk.TargetEntry[] {
+			new Gtk.TargetEntry ("application/cube", Gtk.TargetFlags.App, 0)
+		};
 
 		public Order()
 		{
@@ -94,6 +101,7 @@ namespace CupboardDesigner
 				}
 			}
 
+			CurrentDrag = new DragInformation();
 			//Загрузка списка кубов
 			CubeList = new List<Cube>();
 			vboxCubeList = new VBox(false, 6);
@@ -121,6 +129,7 @@ namespace CupboardDesigner
 					TempCube.Widget = TempWidget;
 					TempWidget.CubeItem = TempCube;
 					TempWidget.CubePxSize = CubePxSize;
+					TempWidget.DragInfo = CurrentDrag;
 					vboxCubeList.PackEnd(TempWidget);
 				}
 				vboxCubeList.ShowAll();
@@ -128,10 +137,10 @@ namespace CupboardDesigner
 			}
 
 			OrderCupboard = new Cupboard();
-			Cube temp = CubeList[9].Clone();
-			temp.BoardPositionX = 1;
-			temp.BoardPositionY = 4;
-			OrderCupboard.Cubes.Add(temp);
+
+			//Настраиваем DND
+			Gtk.Drag.DestSet(drawCupboard, DestDefaults.Motion, TargetTable, Gdk.DragAction.Move);
+			Gtk.Drag.SourceSet(drawCupboard, ModifierType.Button1Mask, TargetTable, Gdk.DragAction.Move);
 		}
 
 		public void Fill(int id)
@@ -331,12 +340,14 @@ namespace CupboardDesigner
 		protected void OnComboCubeHChanged(object sender, EventArgs e)
 		{
 			SetInfo();
+			OrderCupboard.CubesH = int.Parse(comboCubeH.ActiveText);
 			CalculateCubePxSize(drawCupboard.Allocation);
 		}
 
 		protected void OnComboCubeVChanged(object sender, EventArgs e)
 		{
 			SetInfo();
+			OrderCupboard.CubesV = int.Parse(comboCubeV.ActiveText);
 			CalculateCubePxSize(drawCupboard.Allocation);
 		}
 
@@ -357,14 +368,17 @@ namespace CupboardDesigner
 			int ShiftX = (width - CupboardPxSizeH) / 2;
 			int ShiftY = (height - CupboardPxSizeV) / 2;
 
-			cr.Translate(ShiftX + BorderPxSize, ShiftY + BorderPxSize);
+			CupboardZeroX = ShiftX + BorderPxSize;
+			CupboardZeroY = ShiftY + BorderPxSize;
+
+			cr.Translate(CupboardZeroX, CupboardZeroY);
 			DrawGrid(cr);
 
 			foreach(Cube cube in OrderCupboard.Cubes)
 			{
 				cr.Save();
 				cr.Translate(cube.BoardPositionX * CubePxSize, cube.BoardPositionY * CubePxSize);
-				DrawCube(cr, cube);
+				cube.DrawCube(cr, CubePxSize);
 				cr.Restore();
 			}
 		}
@@ -373,7 +387,7 @@ namespace CupboardDesigner
 		{
 			int CubesH = int.Parse(comboCubeH.ActiveText);
 			int CubesV = int.Parse(comboCubeV.ActiveText);
-			cr.SetSourceRGB(155, 157, 158);
+			cr.SetSourceRGB(1, 1, 1);
 			cr.SetDash(new double[]{2.0, 3.0}, 0.0);
 			for (int x = 0; x <= CubesH; x++)
 			{
@@ -387,20 +401,7 @@ namespace CupboardDesigner
 			}
 			cr.Stroke();
 		}
-
-		void DrawCube(Context cr, Cube cube)
-		{
-			int MaxWidth = cube.CubesH * CubePxSize;
-			int MaxHeight = cube.CubesV * CubePxSize;
-
-			Rsvg.Handle svg = new Rsvg.Handle(cube.ImageFile);
-			double vratio = (double) MaxHeight / svg.Dimensions.Height;
-			double hratio = (double) MaxWidth / svg.Dimensions.Width;
-			double ratio = Math.Min(vratio, hratio);
-			cr.Scale(ratio, ratio);
-			svg.RenderCairo(cr);
-		}
-
+			
 		protected void OnDrawCupboardSizeAllocated(object o, SizeAllocatedArgs args)
 		{
 			CalculateCubePxSize(args.Allocation);
@@ -430,6 +431,122 @@ namespace CupboardDesigner
 					((CubeListItem)cube.Widget).CubePxSize = CubePxSize;
 				}
 			}
+		}
+
+		protected void OnDrawCupboardDragMotion(object o, DragMotionArgs args)
+		{
+			logger.Debug ("Drag motion x={0} y={1}", args.X, args.Y);
+			int CubePosX = (args.X + (int)(CubePxSize * 1.5) - CurrentDrag.IconPosX - CupboardZeroX) / CubePxSize;
+			int CubePosY = (args.Y + (int)(CubePxSize * 1.5) - CurrentDrag.IconPosY - CupboardZeroY) / CubePxSize;
+			//Для того что бы корректно посчитать 0 ячейку добавли 1, сейчас онимаем.
+			CubePosX--; CubePosY--;
+			logger.Debug ("CupBoard pos x={0} y={1}", CubePosX, CubePosY);
+			bool CanDrag = OrderCupboard.TestPutCube(CurrentDrag.cube, CubePosX, CubePosY);
+			if (CanDrag)
+				Gdk.Drag.Status(args.Context, args.Context.SuggestedAction,	args.Time);
+			else
+				Gdk.Drag.Status(args.Context, Gdk.DragAction.Private, args.Time);
+			args.RetVal = true;
+		}
+
+		protected void OnDrawCupboardDragDrop(object o, DragDropArgs args)
+		{
+			logger.Debug ("Drop");
+			int CubePosX = (args.X + (int)(CubePxSize * 1.5) - CurrentDrag.IconPosX - CupboardZeroX) / CubePxSize;
+			int CubePosY = (args.Y + (int)(CubePxSize * 1.5) - CurrentDrag.IconPosY - CupboardZeroY) / CubePxSize;
+			//Для того что бы корректно посчитать 0 ячейку добавли 1, сейчас онимаем.
+			CubePosX--; CubePosY--;
+			logger.Debug ("CupBoard pos x={0} y={1}", CubePosX, CubePosY);
+			bool CanDrag = OrderCupboard.TestPutCube(CurrentDrag.cube, CubePosX, CubePosY);
+			if (CanDrag)
+			{
+				if(CurrentDrag.FromList)
+				{
+					Cube NewCube = CurrentDrag.cube.Clone();
+					NewCube.BoardPositionX = CubePosX;
+					NewCube.BoardPositionY = CubePosY;
+					OrderCupboard.Cubes.Add(NewCube);
+				} 
+				else
+				{
+					CurrentDrag.cube.BoardPositionX = CubePosX;
+					CurrentDrag.cube.BoardPositionY = CubePosY;
+				}
+				Gtk.Drag.Finish(args.Context, true, false, args.Time);
+			}
+			else
+				Gtk.Drag.Finish(args.Context, false, true, args.Time);
+			drawCupboard.QueueDraw();
+		}
+
+		protected void OnDrawCupboardDragBegin(object o, DragBeginArgs args)
+		{
+			int MousePosX, MousePosY;
+			drawCupboard.GetPointer(out MousePosX, out MousePosY);
+
+			int CubePosX = (MousePosX - CupboardZeroX) / CubePxSize;
+			int CubePosY = (MousePosY - CupboardZeroY) / CubePxSize;
+			Cube cube = OrderCupboard.GetCube(CubePosX, CubePosY);
+
+			if(cube == null)
+			{
+				args.RetVal = false;
+				Gdk.Drag.Abort(args.Context, args.Context.StartTime);
+				return;
+			}
+
+			Pixmap pix = new Pixmap(drawCupboard.GdkWindow, cube.CubesH * CubePxSize, cube.CubesV * CubePxSize);
+
+			using (Context cr = Gdk.CairoHelper.Create(pix))
+			{
+				cube.DrawCube(cr, CubePxSize);
+			}
+			Gdk.Pixbuf pixbuf = Gdk.Pixbuf.FromDrawable(pix, Gdk.Colormap.System, 0, 0, 0, 0, cube.CubesH * CubePxSize, cube.CubesV * CubePxSize);
+			CurrentDrag.IconPosX = MousePosX - CupboardZeroX - (cube.BoardPositionX * CubePxSize);
+			CurrentDrag.IconPosY = MousePosY - CupboardZeroY - (cube.BoardPositionY * CubePxSize);
+
+			Gtk.Drag.SetIconPixbuf(args.Context, pixbuf, CurrentDrag.IconPosX, CurrentDrag.IconPosY);
+			CurrentDrag.FromList = false;
+			CurrentDrag.cube = cube;
+		}
+
+		protected void OnDrawCupboardDragDataDelete(object o, DragDataDeleteArgs args)
+		{
+			OrderCupboard.Cubes.Remove(CurrentDrag.cube);
+			args.RetVal = true;
+		}
+
+		protected void OnDrawCupboardMotionNotifyEvent(object o, MotionNotifyEventArgs args)
+		{
+			/*int CubePosX = ((int)args.Event.X - CupboardZeroX) / CubePxSize;
+			int CubePosY = ((int)args.Event.Y - CupboardZeroY) / CubePxSize;
+			Cube cube = OrderCupboard.GetCube(CubePosX, CubePosY);
+			logger.Debug("Moition x={0} y={1}", CubePosX, CubePosY);
+
+			if(cube == null)
+				Gtk.Drag.SourceUnset(drawCupboard);
+			else
+			{
+				Gtk.Drag.SourceSet(drawCupboard, ModifierType.Button1Mask, TargetTable, Gdk.DragAction.Move);
+			} */
+		}
+
+		protected void OnDrawCupboardButtonPressEvent(object o, ButtonPressEventArgs args)
+		{
+			/*logger.Debug("Button");
+			if(args.Event.Button == 1)
+			{
+				int CubePosX = ((int)args.Event.X - CupboardZeroX) / CubePxSize;
+				int CubePosY = ((int)args.Event.Y - CupboardZeroY) / CubePxSize;
+				Cube cube = OrderCupboard.GetCube(CubePosX, CubePosY);
+				if(cube != null)
+				{
+					Gtk.Drag.SourceSet(drawCupboard, ModifierType.Button1Mask, TargetTable, Gdk.DragAction.Move);
+					//Drag.Begin(drawCupboard, TargetTable, DragAction.Move, 1, )
+				}
+				else
+					Gtk.Drag.SourceUnset(drawCupboard);
+			} */
 		}
 
 	}
