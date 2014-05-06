@@ -2,16 +2,23 @@
 using System.Collections.Generic;
 using Cairo;
 using NLog;
+using System.Xml.Serialization;
+using System.IO;
 
 namespace CupboardDesigner
 {
 	public class Cube
 	{
+		[XmlIgnore]
 		public string Name;
+		[XmlIgnore]
 		public int Widht;
+		[XmlIgnore]
 		public int Height;
+		[XmlIgnore]
 		public byte[] ImageFile;
 		public int NomenclatureId;
+		[XmlIgnore]
 		public Gtk.Widget Widget;
 
 		public int BoardPositionX;
@@ -64,6 +71,7 @@ namespace CupboardDesigner
 
 	public class Cupboard
 	{
+		[XmlIgnore]
 		private static Logger logger = LogManager.GetCurrentClassLogger();
 		public int CubesV = 1;
 		public int CubesH = 1;
@@ -104,6 +112,40 @@ namespace CupboardDesigner
 					return item;
 			}
 			return null;
+		}
+
+		public string SaveToString()
+		{
+			XmlSerializer serializer = new XmlSerializer(typeof(Cupboard));
+			TextWriter Writer = new StringWriter();
+			serializer.Serialize(Writer, this);
+			return Writer.ToString();
+		}
+
+		public static Cupboard Load(string xml, List<Cube> cubesinfo)
+		{
+			XmlSerializer serializer = new XmlSerializer(typeof(Cupboard));
+			TextReader Reader = new StringReader(xml);
+			Cupboard board = (Cupboard)serializer.Deserialize(Reader);
+			foreach(Cube cube in board.Cubes)
+			{
+				Cube found = cubesinfo.Find(delegate(Cube obj) {
+					return obj.NomenclatureId == cube.NomenclatureId;
+				});
+				if(found != null)
+				{
+					cube.Height = found.Height;
+					cube.ImageFile = found.ImageFile;
+					cube.Name = found.Name;
+					cube.Widht = found.Widht;
+				}
+				else
+				{
+					board.Cubes.Remove(cube);
+					logger.Warn("Куб с id={0} удален из конфигурации шкафа так как, не найден в справочнике кубов");
+				}
+			}
+			return board;
 		}
 	}
 

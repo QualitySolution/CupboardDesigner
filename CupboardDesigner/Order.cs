@@ -166,6 +166,11 @@ namespace CupboardDesigner
 					dateDelivery.Date = DBWorks.GetDateTime(rdr, "delivery", new DateTime());
 					ComboWorks.SetActiveItem(comboBasis, rdr.GetInt32(rdr.GetOrdinal("basis_id")));
 					textviewComments.Buffer.Text = rdr["comment"].ToString();
+					OrderCupboard = Cupboard.Load(rdr["cupboard"].ToString(), CubeList);
+					comboCubeH.Active = OrderCupboard.CubesH - 1;
+					comboCubeV.Active = OrderCupboard.CubesV - 1;
+					SetInfo();
+					CalculateCubePxSize(drawCupboard.Allocation);
 				}
 
 				sql = "SELECT order_components.*, materials.name as material, facing.name as facing FROM order_components " +
@@ -253,13 +258,13 @@ namespace CupboardDesigner
 			string sql;
 			if (NewItem)
 			{
-				sql = "INSERT INTO orders (customer, basis_id, arrval, delivery, comment) " +
-					"VALUES (@customer, @basis_id, @arrval, @delivery, @comment)";
+				sql = "INSERT INTO orders (customer, basis_id, arrval, delivery, comment, cupboard) " +
+					"VALUES (@customer, @basis_id, @arrval, @delivery, @comment, @cupboard)";
 			}
 			else
 			{
 				sql = "UPDATE orders SET customer = @customer, basis_id = @basis_id, arrval = @arrval, " +
-					"delivery = @delivery, comment = @comment WHERE id = @id";
+					"delivery = @delivery, comment = @comment, cupboard = @cupboard WHERE id = @id";
 			}
 			SqliteTransaction trans = ((SqliteConnection)QSMain.ConnectionDB).BeginTransaction();
 			MainClass.StatusMessage("Запись заказа...");
@@ -273,6 +278,7 @@ namespace CupboardDesigner
 				cmd.Parameters.AddWithValue("@delivery", DBWorks.ValueOrNull(!dateDelivery.IsEmpty, dateDelivery.Date));
 				cmd.Parameters.AddWithValue("basis_id", ComboWorks.GetActiveIdOrNull(comboBasis));
 				cmd.Parameters.AddWithValue("@comment", DBWorks.ValueOrNull(textviewComments.Buffer.Text != "", textviewComments.Buffer.Text));
+				cmd.Parameters.AddWithValue("@cupboard", OrderCupboard.SaveToString());
 
 				cmd.ExecuteNonQuery();
 
