@@ -12,6 +12,7 @@ namespace CupboardDesigner
 	{
 		public static Label StatusBarLabel;
 		public static MainWindow MainWin;
+		public static QSSupportLib.BaseParam Parameters;
 		private static Logger logger = LogManager.GetCurrentClassLogger();
 
 		public static void Main(string[] args)
@@ -100,6 +101,8 @@ namespace CupboardDesigner
 				QSMain.ConnectionDB.ConnectionString = String.Format("Data Source={0};Version=3;", DataBase);
 				QSMain.ConnectionDB.Open();
 				logger.Info("Открытие базы данных прошло успешно.");
+				logger.Info("Читаем параметры");
+				Parameters = new QSSupportLib.BaseParam(QSMain.ConnectionDB);
 			}
 			catch (Exception ex)
 			{

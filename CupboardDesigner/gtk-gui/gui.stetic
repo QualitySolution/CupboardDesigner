@@ -9,8 +9,9 @@
     <widget-library name="../../../QSProjects/QSProjectsLib/bin/Debug/QSProjectsLib.dll" />
     <widget-library name="../../../QSProjects/QSWidgetLib/bin/Debug/QSWidgetLib.dll" />
     <widget-library name="glade-sharp, Version=2.12.0.0, Culture=neutral, PublicKeyToken=35e10195dab3c99f" />
+    <widget-library name="../../../QSProjects/QSSupportLib/bin/Debug/QSSupportLib.dll" />
   </import>
-  <widget class="Gtk.Window" id="MainWindow" design-size="609 300">
+  <widget class="Gtk.Window" id="MainWindow" design-size="626 300">
     <action-group name="Default">
       <action id="Action">
         <property name="Type">Action</property>
@@ -22,6 +23,7 @@
         <property name="Label" translatable="yes">В_ыход</property>
         <property name="ShortLabel" translatable="yes">В_ыход</property>
         <property name="StockId">gtk-quit</property>
+        <signal name="Activated" handler="OnQuitActionActivated" />
       </action>
       <action id="Action1">
         <property name="Type">Action</property>
@@ -70,6 +72,22 @@
         <property name="ShortLabel" translatable="yes">Отделка</property>
         <signal name="Activated" handler="OnAction7Activated" />
       </action>
+      <action id="dialogAuthenticationAction">
+        <property name="Type">Toggle</property>
+        <property name="Label" translatable="yes">Административный режим</property>
+        <property name="ShortLabel" translatable="yes">Административный режим</property>
+        <property name="StockId">gtk-dialog-authentication</property>
+        <property name="DrawAsRadio">False</property>
+        <property name="Active">False</property>
+        <signal name="Toggled" handler="OnDialogAuthenticationActionToggled" />
+      </action>
+      <action id="ActionPassword">
+        <property name="Type">Action</property>
+        <property name="Label" translatable="yes">Изменить пароль</property>
+        <property name="ShortLabel" translatable="yes">Изменить пароль</property>
+        <property name="StockId">gtk-dialog-authentication</property>
+        <signal name="Activated" handler="OnActionPasswordActivated" />
+      </action>
     </action-group>
     <property name="MemberName" />
     <property name="Title" translatable="yes">MainWindow</property>
@@ -84,6 +102,9 @@
             <property name="MemberName" />
             <node name="menubar1" type="Menubar">
               <node type="Menu" action="Action">
+                <node type="Menuitem" action="dialogAuthenticationAction" />
+                <node type="Menuitem" action="ActionPassword" />
+                <node type="Separator" />
                 <node type="Menuitem" action="quitAction" />
               </node>
               <node type="Menu" action="Action1">
@@ -1635,6 +1656,115 @@
           <packing>
             <property name="Position">1</property>
             <property name="AutoSize">True</property>
+            <property name="Expand">False</property>
+            <property name="Fill">False</property>
+          </packing>
+        </child>
+      </widget>
+    </child>
+  </widget>
+  <widget class="Gtk.Dialog" id="CupboardDesigner.AdminModePassword" design-size="264 159">
+    <property name="MemberName" />
+    <property name="WindowPosition">CenterOnParent</property>
+    <property name="Buttons">2</property>
+    <property name="HelpButton">False</property>
+    <child internal-child="VBox">
+      <widget class="Gtk.VBox" id="dialog1_VBox">
+        <property name="MemberName" />
+        <property name="BorderWidth">2</property>
+        <child>
+          <widget class="Gtk.Label" id="label2">
+            <property name="MemberName" />
+            <property name="LabelProp" translatable="yes">Для входа в административный
+режим, введите пароль.</property>
+          </widget>
+          <packing>
+            <property name="Position">0</property>
+            <property name="AutoSize">True</property>
+            <property name="Expand">False</property>
+            <property name="Fill">False</property>
+          </packing>
+        </child>
+        <child>
+          <widget class="Gtk.HBox" id="hbox1">
+            <property name="MemberName" />
+            <property name="Spacing">6</property>
+            <property name="BorderWidth">18</property>
+            <child>
+              <widget class="Gtk.Label" id="label3">
+                <property name="MemberName" />
+                <property name="Xalign">1</property>
+                <property name="LabelProp" translatable="yes">Пароль:</property>
+              </widget>
+              <packing>
+                <property name="Position">0</property>
+                <property name="AutoSize">True</property>
+                <property name="Expand">False</property>
+                <property name="Fill">False</property>
+              </packing>
+            </child>
+            <child>
+              <widget class="Gtk.Entry" id="entryPassword">
+                <property name="MemberName" />
+                <property name="CanFocus">True</property>
+                <property name="IsEditable">True</property>
+                <property name="ActivatesDefault">True</property>
+                <property name="Visibility">False</property>
+                <property name="InvisibleChar">●</property>
+                <signal name="Activated" handler="OnEntryPasswordActivated" />
+              </widget>
+              <packing>
+                <property name="Position">1</property>
+                <property name="AutoSize">True</property>
+              </packing>
+            </child>
+          </widget>
+          <packing>
+            <property name="Position">1</property>
+            <property name="AutoSize">True</property>
+            <property name="Expand">False</property>
+            <property name="Fill">False</property>
+          </packing>
+        </child>
+      </widget>
+    </child>
+    <child internal-child="ActionArea">
+      <widget class="Gtk.HButtonBox" id="dialog1_ActionArea">
+        <property name="MemberName" />
+        <property name="Spacing">10</property>
+        <property name="BorderWidth">5</property>
+        <property name="Size">2</property>
+        <property name="LayoutStyle">End</property>
+        <child>
+          <widget class="Gtk.Button" id="buttonCancel">
+            <property name="MemberName" />
+            <property name="CanDefault">True</property>
+            <property name="CanFocus">True</property>
+            <property name="UseStock">True</property>
+            <property name="Type">StockItem</property>
+            <property name="StockId">gtk-cancel</property>
+            <property name="ResponseId">-6</property>
+            <property name="label">gtk-cancel</property>
+          </widget>
+          <packing>
+            <property name="Expand">False</property>
+            <property name="Fill">False</property>
+          </packing>
+        </child>
+        <child>
+          <widget class="Gtk.Button" id="buttonOk">
+            <property name="MemberName" />
+            <property name="CanDefault">True</property>
+            <property name="CanFocus">True</property>
+            <property name="UseStock">True</property>
+            <property name="Type">StockItem</property>
+            <property name="StockId">gtk-ok</property>
+            <property name="ResponseId">-5</property>
+            <signal name="Clicked" handler="OnButtonOkClicked" />
+            <property name="label">gtk-ok</property>
+          </widget>
+          <packing>
+            <property name="Position">1</property>
             <property name="Expand">False</property>
             <property name="Fill">False</property>
           </packing>

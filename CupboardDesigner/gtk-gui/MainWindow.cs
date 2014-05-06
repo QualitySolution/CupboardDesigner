@@ -14,6 +14,8 @@ public partial class MainWindow
 	private global::Gtk.Action Action10;
 	private global::Gtk.Action Action8;
 	private global::Gtk.Action Action7;
+	private global::Gtk.ToggleAction dialogAuthenticationAction;
+	private global::Gtk.Action ActionPassword;
 	private global::Gtk.VBox vbox1;
 	private global::Gtk.MenuBar menubar1;
 	private global::Gtk.HBox hbox5;
@@ -65,6 +67,12 @@ public partial class MainWindow
 		this.Action7 = new global::Gtk.Action ("Action7", global::Mono.Unix.Catalog.GetString ("Отделка"), null, null);
 		this.Action7.ShortLabel = global::Mono.Unix.Catalog.GetString ("Отделка");
 		w1.Add (this.Action7, null);
+		this.dialogAuthenticationAction = new global::Gtk.ToggleAction ("dialogAuthenticationAction", global::Mono.Unix.Catalog.GetString ("Административный режим"), null, "gtk-dialog-authentication");
+		this.dialogAuthenticationAction.ShortLabel = global::Mono.Unix.Catalog.GetString ("Административный режим");
+		w1.Add (this.dialogAuthenticationAction, null);
+		this.ActionPassword = new global::Gtk.Action ("ActionPassword", global::Mono.Unix.Catalog.GetString ("Изменить пароль"), null, "gtk-dialog-authentication");
+		this.ActionPassword.ShortLabel = global::Mono.Unix.Catalog.GetString ("Изменить пароль");
+		w1.Add (this.ActionPassword, null);
 		this.UIManager.InsertActionGroup (w1, 0);
 		this.AddAccelGroup (this.UIManager.AccelGroup);
 		this.Name = "MainWindow";
@@ -75,7 +83,7 @@ public partial class MainWindow
 		this.vbox1.Name = "vbox1";
 		this.vbox1.Spacing = 6;
 		// Container child vbox1.Gtk.Box+BoxChild
-		this.UIManager.AddUiFromString ("<ui><menubar name='menubar1'><menu name='Action' action='Action'><menuitem name='quitAction' action='quitAction'/></menu><menu name='Action1' action='Action1'><menuitem name='Action9' action='Action9'/><menuitem name='Action4' action='Action4'/><separator/><menuitem name='Action10' action='Action10'/><separator/><menuitem name='Action8' action='Action8'/><menuitem name='Action7' action='Action7'/></menu><menu name='Action2' action='Action2'><menuitem name='aboutAction' action='aboutAction'/></menu></menubar></ui>");
+		this.UIManager.AddUiFromString ("<ui><menubar name='menubar1'><menu name='Action' action='Action'><menuitem name='dialogAuthenticationAction' action='dialogAuthenticationAction'/><menuitem name='ActionPassword' action='ActionPassword'/><separator/><menuitem name='quitAction' action='quitAction'/></menu><menu name='Action1' action='Action1'><menuitem name='Action9' action='Action9'/><menuitem name='Action4' action='Action4'/><separator/><menuitem name='Action10' action='Action10'/><separator/><menuitem name='Action8' action='Action8'/><menuitem name='Action7' action='Action7'/></menu><menu name='Action2' action='Action2'><menuitem name='aboutAction' action='aboutAction'/></menu></menubar></ui>");
 		this.menubar1 = ((global::Gtk.MenuBar)(this.UIManager.GetWidget ("/menubar1")));
 		this.menubar1.Name = "menubar1";
 		this.vbox1.Add (this.menubar1);
@@ -210,16 +218,19 @@ public partial class MainWindow
 		if ((this.Child != null)) {
 			this.Child.ShowAll ();
 		}
-		this.DefaultWidth = 609;
+		this.DefaultWidth = 626;
 		this.DefaultHeight = 300;
 		this.Show ();
 		this.DeleteEvent += new global::Gtk.DeleteEventHandler (this.OnDeleteEvent);
+		this.quitAction.Activated += new global::System.EventHandler (this.OnQuitActionActivated);
 		this.aboutAction.Activated += new global::System.EventHandler (this.OnAboutActionActivated);
 		this.Action9.Activated += new global::System.EventHandler (this.OnAction9Activated);
 		this.Action4.Activated += new global::System.EventHandler (this.OnAction4Activated);
 		this.Action10.Activated += new global::System.EventHandler (this.OnAction5Activated);
 		this.Action8.Activated += new global::System.EventHandler (this.OnAction8Activated);
 		this.Action7.Activated += new global::System.EventHandler (this.OnAction7Activated);
+		this.dialogAuthenticationAction.Toggled += new global::System.EventHandler (this.OnDialogAuthenticationActionToggled);
+		this.ActionPassword.Activated += new global::System.EventHandler (this.OnActionPasswordActivated);
 		this.entrySearch.Changed += new global::System.EventHandler (this.OnEntrySearchChanged);
 		this.buttonClearSearch.Clicked += new global::System.EventHandler (this.OnButtonClearSearchClicked);
 		this.treeviewOrders.RowActivated += new global::Gtk.RowActivatedHandler (this.OnTreeviewOrdersRowActivated);

@@ -18,6 +18,7 @@ public partial class MainWindow: Gtk.Window
 		QSMain.ReferenceUpdated += OnReferenceUpdate;
 
 		PrerareOrders();
+		SetAdminMode(false); 
 	}
 
 	protected void OnReferenceUpdate(object sender, QSMain.ReferenceUpdatedEventArgs e)
@@ -71,6 +72,11 @@ public partial class MainWindow: Gtk.Window
 		e.Result = Result;
 	}
 
+	protected void SetAdminMode(bool admin)
+	{
+		ActionPassword.Sensitive = Action9.Sensitive = Action4.Sensitive = Action10.Sensitive 
+			= Action8.Sensitive = Action7.Sensitive = admin;
+	}
 
 	protected void OnDeleteEvent(object sender, DeleteEventArgs a)
 	{
@@ -153,6 +159,38 @@ public partial class MainWindow: Gtk.Window
 		winref.Run();
 		winref.Destroy();
 	}
+		
+	protected void OnDialogAuthenticationActionToggled(object sender, EventArgs e)
+	{
+		if(dialogAuthenticationAction.Active && MainClass.Parameters.All["admin_password"] != "")
+		{
+			AdminModePassword WinPass = new AdminModePassword();
+			WinPass.Show();
+			WinPass.Run();
+			if(MainClass.Parameters.All["admin_password"] != WinPass.Password)
+			{
+				dialogAuthenticationAction.Active = false;
+			}
+			WinPass.Destroy();
+		}
+		SetAdminMode(dialogAuthenticationAction.Active);
+	}
+		
+	protected void OnQuitActionActivated(object sender, EventArgs e)
+	{
+		Application.Quit();
+	}
 
-
+	protected void OnActionPasswordActivated(object sender, EventArgs e)
+	{
+		ChangePassword WinPass = new ChangePassword();
+		WinPass.WorkMode = ChangePassword.Mode.Manual;
+		WinPass.Show();
+		if(WinPass.Run() == (int) Gtk.ResponseType.Ok)
+		{
+			MainClass.Parameters.UpdateParameter(QSMain.ConnectionDB, "admin_password", WinPass.NewPassword);
+		}
+		WinPass.Destroy();
+	}
+		
 }
