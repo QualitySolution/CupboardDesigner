@@ -43,6 +43,7 @@ namespace CupboardDesigner
 			this.Build();
 
 			ComboWorks.ComboFillReference(comboBasis, "basis", ComboWorks.ListMode.OnlyItems);
+			ComboWorks.ComboFillReference(comboExhibition, "exhibition", ComboWorks.ListMode.WithNo);
 
 			ComboBox TempCombo = new ComboBox();
 			ComboWorks.ComboFillReference(TempCombo, "materials", ComboWorks.ListMode.WithNo);
@@ -162,9 +163,11 @@ namespace CupboardDesigner
 
 					this.Title = String.Format("Заказ №{0}", rdr["id"].ToString());
 					entryCustomer.Text = rdr["customer"].ToString();
+
 					dateArrval.Date = DBWorks.GetDateTime(rdr, "arrval", new DateTime());
 					dateDelivery.Date = DBWorks.GetDateTime(rdr, "delivery", new DateTime());
 					ComboWorks.SetActiveItem(comboBasis, rdr.GetInt32(rdr.GetOrdinal("basis_id")));
+					ComboWorks.SetActiveItem(comboExhibition, DBWorks.GetInt(rdr, "exhibition_id", -1));
 					textviewComments.Buffer.Text = rdr["comment"].ToString();
 					OrderCupboard = Cupboard.Load(rdr["cupboard"].ToString(), CubeList);
 					comboCubeH.Active = OrderCupboard.CubesH - 1;
@@ -258,12 +261,12 @@ namespace CupboardDesigner
 			string sql;
 			if (NewItem)
 			{
-				sql = "INSERT INTO orders (customer, basis_id, arrval, delivery, comment, cupboard) " +
-					"VALUES (@customer, @basis_id, @arrval, @delivery, @comment, @cupboard)";
+				sql = "INSERT INTO orders (customer, exhibition_id, basis_id, arrval, delivery, comment, cupboard) " +
+					"VALUES (@customer, @exhibition_id, @basis_id, @arrval, @delivery, @comment, @cupboard)";
 			}
 			else
 			{
-				sql = "UPDATE orders SET customer = @customer, basis_id = @basis_id, arrval = @arrval, " +
+				sql = "UPDATE orders SET customer = @customer, exhibition_id = @exhibition_id, basis_id = @basis_id, arrval = @arrval, " +
 					"delivery = @delivery, comment = @comment, cupboard = @cupboard WHERE id = @id";
 			}
 			SqliteTransaction trans = ((SqliteConnection)QSMain.ConnectionDB).BeginTransaction();
@@ -277,6 +280,7 @@ namespace CupboardDesigner
 				cmd.Parameters.AddWithValue("@arrval", DBWorks.ValueOrNull(!dateArrval.IsEmpty, dateArrval.Date));
 				cmd.Parameters.AddWithValue("@delivery", DBWorks.ValueOrNull(!dateDelivery.IsEmpty, dateDelivery.Date));
 				cmd.Parameters.AddWithValue("basis_id", ComboWorks.GetActiveIdOrNull(comboBasis));
+				cmd.Parameters.AddWithValue("exhibition_id", ComboWorks.GetActiveIdOrNull(comboExhibition));
 				cmd.Parameters.AddWithValue("@comment", DBWorks.ValueOrNull(textviewComments.Buffer.Text != "", textviewComments.Buffer.Text));
 				cmd.Parameters.AddWithValue("@cupboard", OrderCupboard.SaveToString());
 

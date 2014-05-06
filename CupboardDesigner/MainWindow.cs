@@ -82,7 +82,7 @@ public partial class MainWindow: Gtk.Window
 	{
 		Reference winref = new Reference();
 		winref.SetMode(true,false,true,true,true);
-		winref.FillList("components","тип компонента", "Типы компонентов");
+		winref.FillList("exhibition","выставка", "Выставки");
 		winref.Show();
 		winref.Run();
 		winref.Destroy();
