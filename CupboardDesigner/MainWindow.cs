@@ -185,6 +185,7 @@ public partial class MainWindow: Gtk.Window
 	{
 		ChangePassword WinPass = new ChangePassword();
 		WinPass.WorkMode = ChangePassword.Mode.Manual;
+		WinPass.CanSetEmptyPassword = true;
 		WinPass.Show();
 		if(WinPass.Run() == (int) Gtk.ResponseType.Ok)
 		{
