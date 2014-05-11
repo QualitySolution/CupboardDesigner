@@ -4,8 +4,7 @@ namespace CupboardDesigner
 {
 	public partial class CubeListItem
 	{
-		private global::Gtk.VBox vbox2;
-		private global::Gtk.HBox hbox1;
+		private global::Gtk.Table table1;
 		private global::Gtk.DrawingArea drawCube;
 		private global::Gtk.Label labelName;
 
@@ -16,34 +15,27 @@ namespace CupboardDesigner
 			global::Stetic.BinContainer.Attach (this);
 			this.Name = "CupboardDesigner.CubeListItem";
 			// Container child CupboardDesigner.CubeListItem.Gtk.Container+ContainerChild
-			this.vbox2 = new global::Gtk.VBox ();
-			this.vbox2.Name = "vbox2";
-			this.vbox2.Spacing = 6;
-			this.vbox2.BorderWidth = ((uint)(6));
-			// Container child vbox2.Gtk.Box+BoxChild
-			this.hbox1 = new global::Gtk.HBox ();
-			this.hbox1.Name = "hbox1";
-			this.hbox1.Spacing = 6;
-			// Container child hbox1.Gtk.Box+BoxChild
+			this.table1 = new global::Gtk.Table (((uint)(2)), ((uint)(1)), false);
+			this.table1.Name = "table1";
+			this.table1.RowSpacing = ((uint)(6));
+			this.table1.ColumnSpacing = ((uint)(6));
+			// Container child table1.Gtk.Table+TableChild
 			this.drawCube = new global::Gtk.DrawingArea ();
 			this.drawCube.Name = "drawCube";
-			this.hbox1.Add (this.drawCube);
-			global::Gtk.Box.BoxChild w1 = ((global::Gtk.Box.BoxChild)(this.hbox1 [this.drawCube]));
-			w1.Position = 0;
-			w1.Fill = false;
-			this.vbox2.Add (this.hbox1);
-			global::Gtk.Box.BoxChild w2 = ((global::Gtk.Box.BoxChild)(this.vbox2 [this.hbox1]));
-			w2.Position = 0;
-			// Container child vbox2.Gtk.Box+BoxChild
+			this.table1.Add (this.drawCube);
+			global::Gtk.Table.TableChild w1 = ((global::Gtk.Table.TableChild)(this.table1 [this.drawCube]));
+			w1.XOptions = ((global::Gtk.AttachOptions)(1));
+			w1.YOptions = ((global::Gtk.AttachOptions)(1));
+			// Container child table1.Gtk.Table+TableChild
 			this.labelName = new global::Gtk.Label ();
 			this.labelName.Name = "labelName";
 			this.labelName.LabelProp = global::Mono.Unix.Catalog.GetString ("label1");
-			this.vbox2.Add (this.labelName);
-			global::Gtk.Box.BoxChild w3 = ((global::Gtk.Box.BoxChild)(this.vbox2 [this.labelName]));
-			w3.Position = 1;
-			w3.Expand = false;
-			w3.Fill = false;
-			this.Add (this.vbox2);
+			this.table1.Add (this.labelName);
+			global::Gtk.Table.TableChild w2 = ((global::Gtk.Table.TableChild)(this.table1 [this.labelName]));
+			w2.TopAttach = ((uint)(1));
+			w2.BottomAttach = ((uint)(2));
+			w2.YOptions = ((global::Gtk.AttachOptions)(4));
+			this.Add (this.table1);
 			if ((this.Child != null)) {
 				this.Child.ShowAll ();
 			}

@@ -18,7 +18,7 @@ namespace CupboardDesigner
 			this.table1 = new global::Gtk.Table (((uint)(2)), ((uint)(1)), false);
 			this.table1.Name = "table1";
 			this.table1.ColumnSpacing = ((uint)(6));
-			this.table1.BorderWidth = ((uint)(5));
+			this.table1.BorderWidth = ((uint)(2));
 			// Container child table1.Gtk.Table+TableChild
 			this.drawImage = new global::Gtk.DrawingArea ();
 			this.drawImage.Name = "drawImage";

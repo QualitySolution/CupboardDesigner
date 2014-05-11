@@ -2,6 +2,7 @@
 using NLog;
 using Cairo;
 using Gdk;
+using Gtk;
 
 namespace CupboardDesigner
 {
@@ -38,6 +39,8 @@ namespace CupboardDesigner
 
 			labelName.LabelProp = CubeItem.Name;
 			drawCube.SetSizeRequest(CubeItem.CubesH * CubePxSize, CubeItem.CubesV * CubePxSize);
+			logger.Debug("Update Size w={0} h={1}", CubeItem.CubesH * CubePxSize, CubeItem.CubesV * CubePxSize);
+			this.CheckResize();
 		}
 
 		protected void OnDrawCubeExposeEvent(object o, Gtk.ExposeEventArgs args)
@@ -64,6 +67,12 @@ namespace CupboardDesigner
 			Gtk.Drag.SetIconPixbuf(args.Context, pixbuf, DragInfo.IconPosX, DragInfo.IconPosY);
 			DragInfo.FromList = true;
 			DragInfo.cube = CubeItem;
+		}
+
+		protected override void OnSizeRequested(ref Requisition requisition)
+		{
+			base.OnSizeRequested(ref requisition);
+			logger.Debug("Size requested w={0} h={1}", requisition.Width, requisition.Height);
 		}
 	}
 }

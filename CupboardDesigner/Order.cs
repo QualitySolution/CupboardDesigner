@@ -22,7 +22,11 @@ namespace CupboardDesigner
 		private int CupboardZeroX, CupboardZeroY;
 		private VBox vboxCubeList, vboxTypeList;
 		private HBox hboxCubeList, hboxTypeList;
+		private int MaxCubeVSize;
+		private bool VerticalTypeList = false;
+		private bool VerticalCubeList = false;
 		private List<CupboardListItem> TypeWidgetList;
+		private List<CubeListItem> CubeWidgetList;
 		private Cupboard OrderCupboard;
 		private DragInformation CurrentDrag;
 
@@ -106,7 +110,9 @@ namespace CupboardDesigner
 			CurrentDrag = new DragInformation();
 			//Загрузка списка кубов
 			CubeList = new List<Cube>();
-			vboxCubeList = new VBox(false, 6);
+			CubeWidgetList = new List<CubeListItem>();
+			vboxCubeList = new VBox(false, 5);
+			hboxCubeList = new HBox(false, 5);
 			sql = "SELECT * FROM nomenclature WHERE type = @type";
 			cmd = new SqliteCommand(sql, (SqliteConnection)QSMain.ConnectionDB);
 			cmd.Parameters.AddWithValue("@type", Nomenclature.NomType.cube.ToString());
@@ -125,6 +131,7 @@ namespace CupboardDesigner
 					TempCube.ImageFile = new byte[size];
 					rdr.GetBytes(rdr.GetOrdinal("image"), 0, TempCube.ImageFile, 0, size);
 					CubeList.Add(TempCube);
+					MaxCubeVSize = Math.Max(MaxCubeVSize, TempCube.CubesV);
 
 					//Добавляем виджеты в лист
 					CubeListItem TempWidget = new CubeListItem();
@@ -132,15 +139,18 @@ namespace CupboardDesigner
 					TempWidget.CubeItem = TempCube;
 					TempWidget.CubePxSize = CubePxSize;
 					TempWidget.DragInfo = CurrentDrag;
-					vboxCubeList.PackEnd(TempWidget);
+					CubeWidgetList.Add(TempWidget);
 				}
-				vboxCubeList.ShowAll();
-				scrolledCubeList.AddWithViewport(vboxCubeList);
+				//hboxCubeList.Add(new Label("Ntcn dscjns"));
+				UpdateCubeList();
+				scrolledCubeListV.AddWithViewport(vboxCubeList);
+				scrolledCubeListH.AddWithViewport(hboxCubeList);
 			}
 
 			//Загрузка Списка типов шкафов
 			TypeWidgetList = new List<CupboardListItem>();
-			hboxTypeList = new HBox(false, 6);
+			hboxTypeList = new HBox(false, 3);
+			vboxTypeList = new VBox(false, 3);
 			sql = "SELECT * FROM basis";
 			cmd = new SqliteCommand(sql, (SqliteConnection)QSMain.ConnectionDB);
 			using (SqliteDataReader rdr = cmd.ExecuteReader())
@@ -168,10 +178,10 @@ namespace CupboardDesigner
 						continue;
 					TempWidget.Button.Clicked += OnBasisChanged;
 					TypeWidgetList.Add(TempWidget);
-					hboxTypeList.PackEnd(TempWidget);
 				}
-				hboxTypeList.ShowAll();
-				scrolledTypes.AddWithViewport(hboxTypeList);
+				UpdateTypeList();
+				scrolledTypesV.AddWithViewport(vboxTypeList);
+				scrolledTypesH.AddWithViewport(hboxTypeList);
 			}
 
 			OrderCupboard = new Cupboard();
@@ -473,12 +483,22 @@ namespace CupboardDesigner
 
 		private void CalculateCubePxSize(Gdk.Rectangle CupboardPlace)
 		{
+
 			int WidhtWithoutGrid = CupboardPlace.Width ;
 			int HeightWithoutGrid = CupboardPlace.Height;
+			int HeightTable = tableConstructor.Allocation.Height;
+
+			//Добавляем высоту листа кубов с низу, что бы ресайз не зацикливался.
+			int ListCybesV = !VerticalCubeList ? MaxCubeVSize : 0;
+			int ListPixelAdd = !VerticalCubeList ? scrolledCubeListH.HScrollbar.HeightRequest + 48 : 0;
+			if(!VerticalCubeList)
+			{
+				HeightWithoutGrid = HeightTable - ListPixelAdd;
+			}
 
 			// 1.2 это 2 бортика по караям которые равны 60% от куба
 			int MinCubeSizeForH = Convert.ToInt32(WidhtWithoutGrid / (double.Parse(comboCubeH.ActiveText) + 1.2));
-			int MinCubeSizeForV = Convert.ToInt32(HeightWithoutGrid / (double.Parse(comboCubeV.ActiveText) + 1.2));
+			int MinCubeSizeForV = Convert.ToInt32(HeightWithoutGrid / (double.Parse(comboCubeV.ActiveText) + 1.2 + ListCybesV));
 
 			int NeedCubePxSize = Math.Min(MinCubeSizeForH, MinCubeSizeForV);
 
@@ -490,10 +510,18 @@ namespace CupboardDesigner
 				CubePxSize = NeedCubePxSize;
 				BorderPxSize = Convert.ToInt32(CubePxSize * 0.3);
 
+				int MaxHeight = 0;
 				foreach(Cube cube in CubeList)
 				{
 					((CubeListItem)cube.Widget).CubePxSize = CubePxSize;
+					Requisition req = ((CubeListItem)cube.Widget).SizeRequest();
+					MaxHeight = Math.Max(MaxHeight, req.Height);
 				}
+				hboxCubeList.HeightRequest = MaxHeight;
+				int h = hboxCubeList.HeightRequest;
+				logger.Debug("h={0}", MaxHeight);
+				((Viewport)scrolledCubeListH.Child).CheckResize();
+				scrolledCubeListH.CheckResize();
 			}
 		}
 
@@ -611,6 +639,50 @@ namespace CupboardDesigner
 				else
 					Gtk.Drag.SourceUnset(drawCupboard);
 			} */
+		}
+
+		protected void OnButtonTypeListOrientClicked(object sender, EventArgs e)
+		{
+			VerticalTypeList = !VerticalTypeList;
+			UpdateTypeList();
+		}
+
+		void UpdateTypeList()
+		{
+			scrolledTypesV.Visible = VerticalTypeList;
+			scrolledTypesH.Visible = !VerticalTypeList;
+			Box boxTypeList = VerticalTypeList ? (Box)vboxTypeList : (Box) hboxTypeList;
+			Box ForRemove = !VerticalTypeList ? (Box)vboxTypeList : (Box) hboxTypeList;
+
+			foreach( CupboardListItem item in TypeWidgetList)
+			{
+				if(item.Parent != null)
+					ForRemove.Remove(item);
+				boxTypeList.PackEnd(item);
+			}
+			boxTypeList.ShowAll();
+		}
+
+		void UpdateCubeList()
+		{
+			scrolledCubeListV.Visible = VerticalCubeList;
+			scrolledCubeListH.Visible = !VerticalCubeList;
+			Box boxCubeList = VerticalCubeList ? (Box)vboxCubeList : (Box) hboxCubeList;
+			Box ForRemove = !VerticalCubeList ? (Box)vboxCubeList : (Box) hboxCubeList;
+
+			foreach(CubeListItem item in CubeWidgetList)
+			{
+				if(item.Parent != null)
+					ForRemove.Remove(item);
+				boxCubeList.Add(item);
+			}
+			boxCubeList.ShowAll();
+		}
+
+		protected void OnButtonCubeListOrientationClicked(object sender, EventArgs e)
+		{
+			VerticalCubeList = !VerticalCubeList;
+			UpdateCubeList();
 		}
 
 	}
