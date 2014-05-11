@@ -20,7 +20,8 @@ namespace CupboardDesigner
 		private int CubePxSize = 100;
 		private int BorderPxSize = 30;
 		private int CupboardZeroX, CupboardZeroY;
-		private VBox vboxCubeList;
+		private VBox vboxCubeList, vboxTypeList;
+		private HBox hboxCubeList, hboxTypeList;
 		private Cupboard OrderCupboard;
 		private DragInformation CurrentDrag;
 
@@ -137,7 +138,38 @@ namespace CupboardDesigner
 				scrolledCubeList.AddWithViewport(vboxCubeList);
 			}
 
+			//Загрузка Списка типов шкафов
+			//CubeList = new List<Cube>();
+			hboxTypeList = new HBox(false, 6);
+			sql = "SELECT * FROM basis";
+			cmd = new SqliteCommand(sql, (SqliteConnection)QSMain.ConnectionDB);
+			using (SqliteDataReader rdr = cmd.ExecuteReader())
+			{
+				while(rdr.Read())
+				{
+					if (rdr["image"] == DBNull.Value)
+						continue;
+
+					//Добавляем виджеты в лист
+					CupboardListItem TempWidget = new CupboardListItem();
+					TempWidget.id = rdr.GetInt32(rdr.GetOrdinal("id"));
+					TempWidget.ItemName = DBWorks.GetString(rdr, "name", "");
+					TempWidget.CubePxSize = CubePxSize;
+					int size = DBWorks.GetInt(rdr, "image_size", 0);
+					byte[] ImageFile = new byte[size];
+					rdr.GetBytes(rdr.GetOrdinal("image"), 0, ImageFile, 0, size);
+					TempWidget.Image = new SVGHelper();
+					if (!TempWidget.Image.LoadImage(ImageFile))
+						continue;
+					hboxTypeList.PackEnd(TempWidget);
+				}
+				hboxTypeList.ShowAll();
+				scrolledTypes.AddWithViewport(hboxTypeList);
+			}
+
 			OrderCupboard = new Cupboard();
+			OrderCupboard.BorderImage = new SVGHelper();
+			OrderCupboard.BorderImage.LoadImage(((CupboardListItem)hboxTypeList.Children[0]).Image.OriginalFile);
 
 			//Настраиваем DND
 			Gtk.Drag.DestSet(drawCupboard, DestDefaults.Motion, TargetTable, Gdk.DragAction.Move);
@@ -351,6 +383,8 @@ namespace CupboardDesigner
 		{
 			SetInfo();
 			OrderCupboard.CubesH = int.Parse(comboCubeH.ActiveText);
+			if(OrderCupboard.BorderImage != null)
+				OrderCupboard.BorderImage.ModifyDrawingImage();
 			CalculateCubePxSize(drawCupboard.Allocation);
 		}
 
@@ -358,6 +392,8 @@ namespace CupboardDesigner
 		{
 			SetInfo();
 			OrderCupboard.CubesV = int.Parse(comboCubeV.ActiveText);
+			if(OrderCupboard.BorderImage != null)
+				OrderCupboard.BorderImage.ModifyDrawingImage();
 			CalculateCubePxSize(drawCupboard.Allocation);
 		}
 
@@ -383,6 +419,10 @@ namespace CupboardDesigner
 
 			cr.Translate(CupboardZeroX, CupboardZeroY);
 			DrawGrid(cr);
+			cr.Save();
+			if (OrderCupboard.BorderImage != null)
+				OrderCupboard.BorderImage.DrawBasis(cr, CubePxSize);
+			cr.Restore();
 
 			foreach(Cube cube in OrderCupboard.Cubes)
 			{
@@ -411,7 +451,7 @@ namespace CupboardDesigner
 			}
 			cr.Stroke();
 		}
-			
+						
 		protected void OnDrawCupboardSizeAllocated(object o, SizeAllocatedArgs args)
 		{
 			CalculateCubePxSize(args.Allocation);

@@ -56,6 +56,11 @@
     <Reference Include="rsvg2-sharp, Version=2.18.0.0, Culture=neutral, PublicKeyToken=35e10195dab3c99f" />
     <Reference Include="Mono.Cairo" />
     <Reference Include="System.Xml" />
+    <Reference Include="Svg">
+      <HintPath>..\packages\Svg.1.6.1\lib\Svg.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Web" />
+    <Reference Include="System.Drawing" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="gtk-gui\gui.stetic">
@@ -80,6 +85,9 @@
     <Compile Include="gtk-gui\CupboardDesigner.CubeListItem.cs" />
     <Compile Include="AdminModePassword.cs" />
     <Compile Include="gtk-gui\CupboardDesigner.AdminModePassword.cs" />
+    <Compile Include="SVGHelper.cs" />
+    <Compile Include="Widgets\CupboardListItem.cs" />
+    <Compile Include="gtk-gui\CupboardDesigner.CupboardListItem.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>
@@ -96,6 +104,7 @@
     <None Include="NLog.config">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
+    <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Widgets\" />

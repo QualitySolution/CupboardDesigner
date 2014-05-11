@@ -73,14 +73,46 @@ namespace CupboardDesigner
 	{
 		[XmlIgnore]
 		private static Logger logger = LogManager.GetCurrentClassLogger();
-		public int CubesV = 1;
-		public int CubesH = 1;
+		[XmlIgnore]
+		private int cubesV = 1;
+		[XmlIgnore]
+		private int cubesH = 1;
+		[XmlIgnore]
+		public SVGHelper BorderImage;
 
 		public List<Cube> Cubes;
 
 		public Cupboard()
 		{
 			Cubes = new List<Cube>();
+		}
+
+		public int CubesV
+		{
+			get
+			{
+				return cubesV;
+			}
+			set
+			{
+				cubesV = value;
+				if (BorderImage != null)
+					BorderImage.CubesV = value;
+			}
+		}
+
+		public int CubesH
+		{
+			get
+			{
+				return cubesH;
+			}
+			set
+			{
+				cubesH = value;
+				if (BorderImage != null)
+					BorderImage.CubesH = value;
+			}
 		}
 
 		public bool TestPutCube(Cube cube, int x, int y)

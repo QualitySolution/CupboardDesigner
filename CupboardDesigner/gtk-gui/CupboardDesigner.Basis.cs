@@ -11,6 +11,8 @@ namespace CupboardDesigner
 		private global::Gtk.Label label1;
 		private global::Gtk.Label label2;
 		private global::Gtk.Label labelId;
+		private global::Gtk.DrawingArea drawBasis;
+		private global::Gtk.Button buttonLoadImage;
 		private global::Gtk.VBox vbox2;
 		private global::Gtk.Label label4;
 		private global::QSWidgetLib.CheckList checksNom;
@@ -90,11 +92,30 @@ namespace CupboardDesigner
 			w6.Position = 0;
 			w6.Expand = false;
 			w6.Fill = false;
+			// Container child vbox3.Gtk.Box+BoxChild
+			this.drawBasis = new global::Gtk.DrawingArea ();
+			this.drawBasis.Name = "drawBasis";
+			this.vbox3.Add (this.drawBasis);
+			global::Gtk.Box.BoxChild w7 = ((global::Gtk.Box.BoxChild)(this.vbox3 [this.drawBasis]));
+			w7.Position = 1;
+			// Container child vbox3.Gtk.Box+BoxChild
+			this.buttonLoadImage = new global::Gtk.Button ();
+			this.buttonLoadImage.CanFocus = true;
+			this.buttonLoadImage.Name = "buttonLoadImage";
+			this.buttonLoadImage.UseUnderline = true;
+			this.buttonLoadImage.Label = global::Mono.Unix.Catalog.GetString ("Загрузить изображени");
+			global::Gtk.Image w8 = new global::Gtk.Image ();
+			w8.Pixbuf = global::Stetic.IconLoader.LoadIcon (this, "gtk-harddisk", global::Gtk.IconSize.Menu);
+			this.buttonLoadImage.Image = w8;
+			this.vbox3.Add (this.buttonLoadImage);
+			global::Gtk.Box.BoxChild w9 = ((global::Gtk.Box.BoxChild)(this.vbox3 [this.buttonLoadImage]));
+			w9.Position = 2;
+			w9.Expand = false;
+			w9.Fill = false;
 			this.hbox3.Add (this.vbox3);
-			global::Gtk.Box.BoxChild w7 = ((global::Gtk.Box.BoxChild)(this.hbox3 [this.vbox3]));
-			w7.Position = 0;
-			w7.Expand = false;
-			w7.Fill = false;
+			global::Gtk.Box.BoxChild w10 = ((global::Gtk.Box.BoxChild)(this.hbox3 [this.vbox3]));
+			w10.Position = 0;
+			w10.Expand = false;
 			// Container child hbox3.Gtk.Box+BoxChild
 			this.vbox2 = new global::Gtk.VBox ();
 			this.vbox2.Name = "vbox2";
@@ -106,34 +127,34 @@ namespace CupboardDesigner
 			this.label4.LabelProp = global::Mono.Unix.Catalog.GetString ("<b>Список номенклатуры:</b>");
 			this.label4.UseMarkup = true;
 			this.vbox2.Add (this.label4);
-			global::Gtk.Box.BoxChild w8 = ((global::Gtk.Box.BoxChild)(this.vbox2 [this.label4]));
-			w8.Position = 0;
-			w8.Expand = false;
-			w8.Fill = false;
+			global::Gtk.Box.BoxChild w11 = ((global::Gtk.Box.BoxChild)(this.vbox2 [this.label4]));
+			w11.Position = 0;
+			w11.Expand = false;
+			w11.Fill = false;
 			// Container child vbox2.Gtk.Box+BoxChild
 			this.checksNom = new global::QSWidgetLib.CheckList ();
 			this.checksNom.Name = "checksNom";
 			this.vbox2.Add (this.checksNom);
-			global::Gtk.Box.BoxChild w9 = ((global::Gtk.Box.BoxChild)(this.vbox2 [this.checksNom]));
-			w9.Position = 1;
-			w9.Expand = false;
-			w9.Fill = false;
+			global::Gtk.Box.BoxChild w12 = ((global::Gtk.Box.BoxChild)(this.vbox2 [this.checksNom]));
+			w12.Position = 1;
+			w12.Expand = false;
+			w12.Fill = false;
 			this.hbox3.Add (this.vbox2);
-			global::Gtk.Box.BoxChild w10 = ((global::Gtk.Box.BoxChild)(this.hbox3 [this.vbox2]));
-			w10.Position = 1;
-			w10.Expand = false;
-			w10.Fill = false;
+			global::Gtk.Box.BoxChild w13 = ((global::Gtk.Box.BoxChild)(this.hbox3 [this.vbox2]));
+			w13.Position = 1;
+			w13.Expand = false;
+			w13.Fill = false;
 			w1.Add (this.hbox3);
-			global::Gtk.Box.BoxChild w11 = ((global::Gtk.Box.BoxChild)(w1 [this.hbox3]));
-			w11.Position = 0;
-			w11.Expand = false;
-			w11.Fill = false;
+			global::Gtk.Box.BoxChild w14 = ((global::Gtk.Box.BoxChild)(w1 [this.hbox3]));
+			w14.Position = 0;
+			w14.Expand = false;
+			w14.Fill = false;
 			// Internal child CupboardDesigner.Basis.ActionArea
-			global::Gtk.HButtonBox w12 = this.ActionArea;
-			w12.Name = "dialog1_ActionArea";
-			w12.Spacing = 10;
-			w12.BorderWidth = ((uint)(5));
-			w12.LayoutStyle = ((global::Gtk.ButtonBoxStyle)(4));
+			global::Gtk.HButtonBox w15 = this.ActionArea;
+			w15.Name = "dialog1_ActionArea";
+			w15.Spacing = 10;
+			w15.BorderWidth = ((uint)(5));
+			w15.LayoutStyle = ((global::Gtk.ButtonBoxStyle)(4));
 			// Container child dialog1_ActionArea.Gtk.ButtonBox+ButtonBoxChild
 			this.buttonCancel = new global::Gtk.Button ();
 			this.buttonCancel.CanDefault = true;
@@ -143,9 +164,9 @@ namespace CupboardDesigner
 			this.buttonCancel.UseUnderline = true;
 			this.buttonCancel.Label = "gtk-cancel";
 			this.AddActionWidget (this.buttonCancel, -6);
-			global::Gtk.ButtonBox.ButtonBoxChild w13 = ((global::Gtk.ButtonBox.ButtonBoxChild)(w12 [this.buttonCancel]));
-			w13.Expand = false;
-			w13.Fill = false;
+			global::Gtk.ButtonBox.ButtonBoxChild w16 = ((global::Gtk.ButtonBox.ButtonBoxChild)(w15 [this.buttonCancel]));
+			w16.Expand = false;
+			w16.Fill = false;
 			// Container child dialog1_ActionArea.Gtk.ButtonBox+ButtonBoxChild
 			this.buttonOk = new global::Gtk.Button ();
 			this.buttonOk.CanDefault = true;
@@ -154,17 +175,19 @@ namespace CupboardDesigner
 			this.buttonOk.UseStock = true;
 			this.buttonOk.UseUnderline = true;
 			this.buttonOk.Label = "gtk-ok";
-			w12.Add (this.buttonOk);
-			global::Gtk.ButtonBox.ButtonBoxChild w14 = ((global::Gtk.ButtonBox.ButtonBoxChild)(w12 [this.buttonOk]));
-			w14.Position = 1;
-			w14.Expand = false;
-			w14.Fill = false;
+			w15.Add (this.buttonOk);
+			global::Gtk.ButtonBox.ButtonBoxChild w17 = ((global::Gtk.ButtonBox.ButtonBoxChild)(w15 [this.buttonOk]));
+			w17.Position = 1;
+			w17.Expand = false;
+			w17.Fill = false;
 			if ((this.Child != null)) {
 				this.Child.ShowAll ();
 			}
 			this.DefaultWidth = 539;
 			this.DefaultHeight = 300;
 			this.Show ();
+			this.drawBasis.ExposeEvent += new global::Gtk.ExposeEventHandler (this.OnDrawBasisExposeEvent);
+			this.buttonLoadImage.Clicked += new global::System.EventHandler (this.OnButtonLoadImageClicked);
 			this.buttonOk.Clicked += new global::System.EventHandler (this.OnButtonOkClicked);
 		}
 	}

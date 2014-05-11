@@ -1,9 +1,11 @@
 ﻿using System;
+using System.IO;
+using System.Collections.Generic;
 using NLog;
 using Mono.Data.Sqlite;
 using QSProjectsLib;
-using System.Collections.Generic;
 using Gtk;
+using Cairo;
 
 namespace CupboardDesigner
 {
@@ -13,11 +15,14 @@ namespace CupboardDesigner
 		public bool NewItem;
 		private int ItemId;
 		private Dictionary<string, bool> NomenclatureInDB;
+		private byte[] ImageFile;
+		private SVGHelper ImageHelper;
+		private bool ImageChanged = false;
 
 		public Basis()
 		{
 			this.Build();
-
+			drawBasis.SetSizeRequest(250, 250);
 			//Загрузка списка номенклатур
 			string sql = "SELECT id, name FROM nomenclature WHERE type = 'construct'";
 			SqliteCommand cmd = new SqliteCommand(sql, (SqliteConnection)QSMain.ConnectionDB);
@@ -52,6 +57,16 @@ namespace CupboardDesigner
 
 					labelId.Text = rdr["id"].ToString();
 					entryName.Text = rdr["name"].ToString();
+
+					if(rdr["image"] != DBNull.Value)
+					{
+						int size = DBWorks.GetInt(rdr, "image_size", 0);
+						ImageFile = new byte[size];
+						rdr.GetBytes(rdr.GetOrdinal("image"), 0, ImageFile, 0, size);
+						ImageHelper = new SVGHelper();
+						ImageHelper.LoadImage(ImageFile);
+						drawBasis.QueueDraw();
+					}
 				}
 
 				sql = "SELECT * FROM basis_items WHERE basis_id = @id";
@@ -137,6 +152,23 @@ namespace CupboardDesigner
 					}
 				}
 
+				if(ImageChanged)
+				{
+					if(NewItem)
+					{
+						sql = @"select last_insert_rowid()";
+						cmd = new SqliteCommand(sql, (SqliteConnection)QSMain.ConnectionDB, trans);
+						ItemId = Convert.ToInt32(cmd.ExecuteScalar());
+					}
+
+					sql = "UPDATE basis SET image_size = @image_size, image = @image WHERE id = @id";
+					cmd = new SqliteCommand(sql, (SqliteConnection)QSMain.ConnectionDB, trans);
+					cmd.Parameters.AddWithValue("@id", ItemId);
+					cmd.Parameters.AddWithValue("@image_size", ImageFile.Length);
+					cmd.Parameters.AddWithValue("@image", ImageFile);
+					cmd.ExecuteNonQuery();
+				}
+
 				trans.Commit();
 				MainClass.StatusMessage("Ok");
 				Respond(Gtk.ResponseType.Ok);
@@ -144,9 +176,79 @@ namespace CupboardDesigner
 			catch (Exception ex)
 			{
 				trans.Rollback();
-				MainClass.StatusMessage("Ошибка записи основы!");
-				logger.Error(ex.ToString());
+				logger.ErrorException("Ошибка записи основы!", ex);
 				QSMain.ErrorMessage(this, ex);
+			}
+		}
+
+		protected void OnButtonLoadImageClicked(object sender, EventArgs e)
+		{
+			FileChooserDialog Chooser = new FileChooserDialog("Выберите svg для загрузки...", 
+				this,
+				FileChooserAction.Open,
+				"Отмена", ResponseType.Cancel,
+				"Загрузить", ResponseType.Accept );
+
+			FileFilter Filter = new FileFilter();
+			Filter.AddMimeType("image/svg+xml");
+			Filter.Name = "SVG изображение";
+			Chooser.AddFilter(Filter);
+
+			if((ResponseType) Chooser.Run () == ResponseType.Accept)
+			{
+				Chooser.Hide();
+				MainClass.StatusMessage("Загрузка изображения основы...");
+				if(entryName.Text == "")
+				{
+					entryName.Text = System.IO.Path.GetFileNameWithoutExtension(Chooser.Filename);
+				}
+				using (FileStream fs = new FileStream(Chooser.Filename, FileMode.Open, FileAccess.Read))
+				{
+					using (MemoryStream ms = new MemoryStream())
+					{
+						fs.CopyTo(ms);
+						SVGHelper FrameTest = new SVGHelper();
+						byte[] NewFile = ms.ToArray();
+						if(FrameTest.LoadImage(NewFile))
+						{
+							ImageFile =  NewFile;
+							ImageHelper = FrameTest;
+							ImageChanged = true;
+						}
+						else
+						{
+							MessageDialog md = new MessageDialog ( this, DialogFlags.DestroyWithParent,
+								MessageType.Warning, 
+								ButtonsType.Ok, 
+								"Не удалось загрузить изображение основы. Для успешной загрузки формат файла должен быть svg. " +
+								"В файле изображения должен быть прямоугольник(rect) с id=framework указывающий положение рамки в которую вставлюятся кубы. " +
+								"Размерность исходного изображения должна быть 1 куб.");
+							md.Run ();
+							md.Destroy();
+						}
+					}
+				}
+				drawBasis.QueueDraw();
+				MainClass.StatusMessage("Ok");
+			}
+			Chooser.Destroy ();
+		}
+
+		protected void OnDrawBasisExposeEvent(object o, ExposeEventArgs args)
+		{
+			if (ImageHelper == null)
+				return;
+			logger.Debug("Render Cairo");
+			using (Context cr = Gdk.CairoHelper.Create (args.Event.Window)) 
+			{
+				int MaxWidth = args.Event.Area.Width;
+				int MaxHeight = args.Event.Area.Height;
+				logger.Debug("Image widget size W: {0} H: {1}", MaxWidth, MaxHeight);
+
+				int CubeSize = (int)(args.Event.Area.Height / 2.2);
+
+				cr.Translate((MaxWidth - CubeSize) / 2, (MaxHeight - CubeSize) / 2 );
+				ImageHelper.DrawBasis(cr, CubeSize);
 			}
 		}
 	}
