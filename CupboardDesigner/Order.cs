@@ -24,7 +24,7 @@ namespace CupboardDesigner
 		private HBox hboxCubeList, hboxTypeList;
 		private int MaxCubeVSize;
 		private bool VerticalTypeList = false;
-		private bool VerticalCubeList = false;
+		private bool VerticalCubeList = true;
 		private List<CupboardListItem> TypeWidgetList;
 		private List<CubeListItem> CubeWidgetList;
 		private Cupboard OrderCupboard;
@@ -700,6 +700,12 @@ namespace CupboardDesigner
 		{
 			VerticalCubeList = !VerticalCubeList;
 			UpdateCubeList();
+		}
+
+		protected void OnNotebook1SwitchPage(object o, SwitchPageArgs args)
+		{
+			if (notebook1.CurrentPage == 1)
+				OrderCupboard.Clean();
 		}
 
 	}

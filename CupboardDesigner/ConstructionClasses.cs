@@ -179,6 +179,15 @@ namespace CupboardDesigner
 			}
 			return board;
 		}
+
+		public void Clean()
+		{
+			foreach(Cube item in Cubes.FindAll(c => c.BoardPositionX + c.CubesH > this.CubesH 
+				|| c.BoardPositionY + c.CubesV > this.CubesV))
+			{
+				this.Cubes.Remove(item);
+			}
+		}
 	}
 
 	public class DragInformation
