@@ -1,6 +1,7 @@
 ﻿using System;
 using NLog;
 using Cairo;
+using Gtk;
 
 namespace CupboardDesigner
 {
@@ -11,10 +12,13 @@ namespace CupboardDesigner
 		public int id;
 		public string _Name;
 		public SVGHelper Image;
+		public Gtk.RadioButton Button;
 
 		public CupboardListItem()
 		{
 			this.Build();
+			Button = radioType;
+			drawImage.AddEvents((int)Gdk.EventMask.ButtonPressMask);
 		}
 
 		int _CubePxSize;
@@ -36,7 +40,7 @@ namespace CupboardDesigner
 			set
 			{
 				_Name = value;
-				labelName.LabelProp = _Name;
+				radioType.Label = _Name;
 			}
 		}
 
@@ -54,6 +58,14 @@ namespace CupboardDesigner
 			{
 				cr.Translate(CubePxSize * 0.6, CubePxSize * 0.6);
 				Image.DrawBasis(cr, CubePxSize);
+			}
+		}
+
+		protected void OnDrawImageButtonPressEvent(object o, Gtk.ButtonPressEventArgs args)
+		{
+			if(args.Event.Button == 1)
+			{
+				radioType.Active = true;
 			}
 		}
 	}

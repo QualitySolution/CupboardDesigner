@@ -66,7 +66,10 @@ namespace CupboardDesigner
 					}
 				}
 				if(FrameSet)
+				{
 					OriginalFile = svg;
+					DrawingFile = null;
+				}
 			}
 			catch (Exception ex)
 			{
@@ -101,6 +104,8 @@ namespace CupboardDesigner
 
 		public void ModifyDrawingImage()
 		{
+			if (OriginalFile == null)
+				return;
 			MemoryStream stream = new MemoryStream(OriginalFile);
 			SvgDocument imagefile = SvgDocument.Open<SvgDocument>(stream);
 			SvgClipPath clip = imagefile.GetElementById<SvgClipPath>("presentation_clip_path");
@@ -137,6 +142,8 @@ namespace CupboardDesigner
 
 		public void DrawBasis(Context cr, int CubePxSize)
 		{
+			if (OriginalFile == null)
+				return;
 			if (DrawingFile == null)
 				ModifyDrawingImage();
 

@@ -22,6 +22,7 @@ namespace CupboardDesigner
 		private int CupboardZeroX, CupboardZeroY;
 		private VBox vboxCubeList, vboxTypeList;
 		private HBox hboxCubeList, hboxTypeList;
+		private List<CupboardListItem> TypeWidgetList;
 		private Cupboard OrderCupboard;
 		private DragInformation CurrentDrag;
 
@@ -43,7 +44,6 @@ namespace CupboardDesigner
 		{
 			this.Build();
 
-			ComboWorks.ComboFillReference(comboBasis, "basis", ComboWorks.ListMode.OnlyItems);
 			ComboWorks.ComboFillReference(comboExhibition, "exhibition", ComboWorks.ListMode.WithNo);
 
 			ComboBox TempCombo = new ComboBox();
@@ -139,12 +139,13 @@ namespace CupboardDesigner
 			}
 
 			//Загрузка Списка типов шкафов
-			//CubeList = new List<Cube>();
+			TypeWidgetList = new List<CupboardListItem>();
 			hboxTypeList = new HBox(false, 6);
 			sql = "SELECT * FROM basis";
 			cmd = new SqliteCommand(sql, (SqliteConnection)QSMain.ConnectionDB);
 			using (SqliteDataReader rdr = cmd.ExecuteReader())
 			{
+				GLib.SList Group = null;
 				while(rdr.Read())
 				{
 					if (rdr["image"] == DBNull.Value)
@@ -155,12 +156,18 @@ namespace CupboardDesigner
 					TempWidget.id = rdr.GetInt32(rdr.GetOrdinal("id"));
 					TempWidget.ItemName = DBWorks.GetString(rdr, "name", "");
 					TempWidget.CubePxSize = CubePxSize;
+					if (Group == null)
+						Group = TempWidget.Button.Group;
+					else
+						TempWidget.Button.Group = Group;
 					int size = DBWorks.GetInt(rdr, "image_size", 0);
 					byte[] ImageFile = new byte[size];
 					rdr.GetBytes(rdr.GetOrdinal("image"), 0, ImageFile, 0, size);
 					TempWidget.Image = new SVGHelper();
 					if (!TempWidget.Image.LoadImage(ImageFile))
 						continue;
+					TempWidget.Button.Clicked += OnBasisChanged;
+					TypeWidgetList.Add(TempWidget);
 					hboxTypeList.PackEnd(TempWidget);
 				}
 				hboxTypeList.ShowAll();
@@ -169,7 +176,6 @@ namespace CupboardDesigner
 
 			OrderCupboard = new Cupboard();
 			OrderCupboard.BorderImage = new SVGHelper();
-			OrderCupboard.BorderImage.LoadImage(((CupboardListItem)hboxTypeList.Children[0]).Image.OriginalFile);
 
 			//Настраиваем DND
 			Gtk.Drag.DestSet(drawCupboard, DestDefaults.Motion, TargetTable, Gdk.DragAction.Move);
@@ -198,7 +204,9 @@ namespace CupboardDesigner
 
 					dateArrval.Date = DBWorks.GetDateTime(rdr, "arrval", new DateTime());
 					dateDelivery.Date = DBWorks.GetDateTime(rdr, "delivery", new DateTime());
-					ComboWorks.SetActiveItem(comboBasis, rdr.GetInt32(rdr.GetOrdinal("basis_id")));
+					int basis_id = rdr.GetInt32(rdr.GetOrdinal("basis_id"));
+					CupboardListItem basis = TypeWidgetList.Find(w => w.id == basis_id);
+					basis.Button.Active = true;
 					ComboWorks.SetActiveItem(comboExhibition, DBWorks.GetInt(rdr, "exhibition_id", -1));
 					textviewComments.Buffer.Text = rdr["comment"].ToString();
 					OrderCupboard = Cupboard.Load(rdr["cupboard"].ToString(), CubeList);
@@ -311,7 +319,8 @@ namespace CupboardDesigner
 				cmd.Parameters.AddWithValue("@customer", DBWorks.ValueOrNull(entryCustomer.Text != "", entryCustomer.Text));
 				cmd.Parameters.AddWithValue("@arrval", DBWorks.ValueOrNull(!dateArrval.IsEmpty, dateArrval.Date));
 				cmd.Parameters.AddWithValue("@delivery", DBWorks.ValueOrNull(!dateDelivery.IsEmpty, dateDelivery.Date));
-				cmd.Parameters.AddWithValue("basis_id", ComboWorks.GetActiveIdOrNull(comboBasis));
+				CupboardListItem basis = TypeWidgetList.Find(w => w.Button.Active);
+				cmd.Parameters.AddWithValue("basis_id", DBWorks.ValueOrNull(basis != null, basis.id));
 				cmd.Parameters.AddWithValue("exhibition_id", ComboWorks.GetActiveIdOrNull(comboExhibition));
 				cmd.Parameters.AddWithValue("@comment", DBWorks.ValueOrNull(textviewComments.Buffer.Text != "", textviewComments.Buffer.Text));
 				cmd.Parameters.AddWithValue("@cupboard", OrderCupboard.SaveToString());
@@ -370,12 +379,17 @@ namespace CupboardDesigner
 
 		void SetInfo()
 		{
-			labelInfo.LabelProp = String.Format("{0} Ширина:{1}cм Высота:{2}cм", comboBasis.ActiveText, 
+			CupboardListItem basis = TypeWidgetList.Find(w => w.Button.Active);
+			string name = basis != null ? basis.ItemName : "Тип не выбран";
+
+			labelInfo.LabelProp = String.Format("{0} Ширина:{1}cм Высота:{2}cм", name, 
 				int.Parse(comboCubeH.ActiveText) * 40, int.Parse(comboCubeV.ActiveText) * 40);
 		}
 
-		protected void OnComboBasisChanged(object sender, EventArgs e)
+		protected void OnBasisChanged(object sender, EventArgs e)
 		{
+			CupboardListItem basis = TypeWidgetList.Find(w => w.Button.Active);
+			OrderCupboard.BorderImage.LoadImage(basis.Image.OriginalFile);
 			SetInfo();
 		}
 
