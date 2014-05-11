@@ -190,6 +190,10 @@ namespace CupboardDesigner
 			//Настраиваем DND
 			Gtk.Drag.DestSet(drawCupboard, DestDefaults.Motion, TargetTable, Gdk.DragAction.Move);
 			Gtk.Drag.SourceSet(drawCupboard, ModifierType.Button1Mask, TargetTable, Gdk.DragAction.Move);
+			Gtk.Drag.DestSet(vboxCubeList, DestDefaults.Motion, TargetTable, Gdk.DragAction.Move);
+			Gtk.Drag.DestSet(hboxCubeList, DestDefaults.Motion, TargetTable, Gdk.DragAction.Move);
+			vboxCubeList.DragDrop += OnCubeListDragDrop;
+			hboxCubeList.DragDrop += OnCubeListDragDrop;
 		}
 
 		public void Fill(int id)
@@ -605,6 +609,19 @@ namespace CupboardDesigner
 		protected void OnDrawCupboardDragDataDelete(object o, DragDataDeleteArgs args)
 		{
 			OrderCupboard.Cubes.Remove(CurrentDrag.cube);
+			args.RetVal = true;
+		}
+
+		protected void OnCubeListDragDrop(object o, DragDropArgs args)
+		{
+			logger.Debug ("Drop to CubeList");
+			if (CurrentDrag.FromList)
+				Gtk.Drag.Finish(args.Context, false, false, args.Time);
+			else
+			{
+				Gtk.Drag.Finish(args.Context, true, true, args.Time);
+				drawCupboard.QueueDraw();
+			}
 			args.RetVal = true;
 		}
 
