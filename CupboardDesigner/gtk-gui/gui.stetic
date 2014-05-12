@@ -90,7 +90,8 @@
       </action>
     </action-group>
     <property name="MemberName" />
-    <property name="Title" translatable="yes">MainWindow</property>
+    <property name="Title" translatable="yes">QS: Конфигуратор шкафа</property>
+    <property name="Icon">resource:CupboardDesigner.icons.logo.ico</property>
     <property name="WindowPosition">CenterOnParent</property>
     <signal name="DeleteEvent" handler="OnDeleteEvent" />
     <child>

@@ -10,6 +10,8 @@
     <RootNamespace>CupboardDesigner</RootNamespace>
     <AssemblyName>CupboardDesigner</AssemblyName>
     <UseMSBuildEngine>False</UseMSBuildEngine>
+    <StartupObject>CupboardDesigner.MainClass</StartupObject>
+    <ApplicationIcon>icons\logo.ico</ApplicationIcon>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x86' ">
     <DebugSymbols>true</DebugSymbols>
@@ -53,7 +55,9 @@
     <Reference Include="pango-sharp, Version=2.12.0.0, Culture=neutral, PublicKeyToken=35e10195dab3c99f" />
     <Reference Include="atk-sharp, Version=2.12.0.0, Culture=neutral, PublicKeyToken=35e10195dab3c99f" />
     <Reference Include="glade-sharp, Version=2.12.0.0, Culture=neutral, PublicKeyToken=35e10195dab3c99f" />
-    <Reference Include="rsvg2-sharp, Version=2.18.0.0, Culture=neutral, PublicKeyToken=35e10195dab3c99f" />
+    <Reference Include="rsvg2-sharp, Version=2.18.0.0, Culture=neutral, PublicKeyToken=35e10195dab3c99f">
+      <Private>True</Private>
+    </Reference>
     <Reference Include="Mono.Cairo" />
     <Reference Include="System.Xml" />
     <Reference Include="Svg">
@@ -67,6 +71,8 @@
       <LogicalName>gui.stetic</LogicalName>
     </EmbeddedResource>
     <EmbeddedResource Include="icons\emblem-synchronizing.png" />
+    <EmbeddedResource Include="icons\logo.png" />
+    <EmbeddedResource Include="icons\logo.ico" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="gtk-gui\generated.cs" />

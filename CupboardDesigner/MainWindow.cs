@@ -124,7 +124,7 @@ public partial class MainWindow: Gtk.Window
 		Version version = System.Reflection.Assembly.GetExecutingAssembly().GetName().Version;
 		dialog.Version = version.ToString (version.Revision == 0 ? 3 : 4);
 
-		//dialog.Logo = Gdk.Pixbuf.LoadFromResource ("bazar.icons.logo.png");
+		dialog.Logo = Gdk.Pixbuf.LoadFromResource ("CupboardDesigner.icons.logo.png");
 
 		dialog.Comments = "Программа позволяет создавать спецификации шкафов." +
 			"\nРазработана на MonoDevelop с использованием открытых технологий Mono, GTK#, MySQL." +
