@@ -85,6 +85,7 @@ namespace CupboardDesigner
 		public Cupboard()
 		{
 			Cubes = new List<Cube>();
+			BorderImage = new SVGHelper();
 		}
 
 		public int CubesV
@@ -146,6 +147,20 @@ namespace CupboardDesigner
 			return null;
 		}
 
+		public Dictionary<int, int> GetAmounts()
+		{
+			Dictionary<int, int> Counts = new Dictionary<int, int>();
+
+			foreach(Cube item in Cubes)
+			{
+				if (Counts.ContainsKey(item.NomenclatureId))
+					Counts[item.NomenclatureId]++;
+				else
+					Counts.Add(item.NomenclatureId, 1);
+			}
+			return Counts;
+		}
+
 		public string SaveToString()
 		{
 			XmlSerializer serializer = new XmlSerializer(typeof(Cupboard));
@@ -180,13 +195,16 @@ namespace CupboardDesigner
 			return board;
 		}
 
-		public void Clean()
+		public bool Clean()
 		{
+			bool Catch = false;
 			foreach(Cube item in Cubes.FindAll(c => c.BoardPositionX + c.CubesH > this.CubesH 
 				|| c.BoardPositionY + c.CubesV > this.CubesV))
 			{
 				this.Cubes.Remove(item);
+				Catch = true;
 			}
+			return Catch;
 		}
 	}
 

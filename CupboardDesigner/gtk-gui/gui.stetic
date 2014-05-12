@@ -11,7 +11,7 @@
     <widget-library name="glade-sharp, Version=2.12.0.0, Culture=neutral, PublicKeyToken=35e10195dab3c99f" />
     <widget-library name="../../../QSProjects/QSSupportLib/bin/Debug/QSSupportLib.dll" />
   </import>
-  <widget class="Gtk.Window" id="MainWindow" design-size="626 300">
+  <widget class="Gtk.Window" id="MainWindow" design-size="725 465">
     <action-group name="Default">
       <action id="Action">
         <property name="Type">Action</property>
@@ -1077,7 +1077,7 @@
           <widget class="Gtk.Notebook" id="notebook1">
             <property name="MemberName" />
             <property name="CanFocus">True</property>
-            <property name="CurrentPage">1</property>
+            <property name="CurrentPage">2</property>
             <signal name="SwitchPage" handler="OnNotebook1SwitchPage" />
             <child>
               <widget class="Gtk.HBox" id="hbox1">
@@ -1706,7 +1706,17 @@
                 <property name="MemberName" />
                 <property name="Spacing">6</property>
                 <child>
-                  <placeholder />
+                  <widget class="Gtk.Label" id="label1">
+                    <property name="MemberName" />
+                    <property name="LabelProp" translatable="yes">На этой странице для каждого элемента шкафа можно указать ма
+териал и отделку.</property>
+                  </widget>
+                  <packing>
+                    <property name="Position">0</property>
+                    <property name="AutoSize">True</property>
+                    <property name="Expand">False</property>
+                    <property name="Fill">False</property>
+                  </packing>
                 </child>
                 <child>
                   <widget class="Gtk.ScrolledWindow" id="GtkScrolledWindow1">
@@ -1726,7 +1736,17 @@
                   </packing>
                 </child>
                 <child>
-                  <placeholder />
+                  <widget class="Gtk.Label" id="labelTotalCount">
+                    <property name="MemberName" />
+                    <property name="Xalign">1</property>
+                    <property name="LabelProp" translatable="yes">label2</property>
+                  </widget>
+                  <packing>
+                    <property name="Position">2</property>
+                    <property name="AutoSize">True</property>
+                    <property name="Expand">False</property>
+                    <property name="Fill">False</property>
+                  </packing>
                 </child>
               </widget>
               <packing>

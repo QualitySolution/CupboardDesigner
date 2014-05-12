@@ -39,8 +39,10 @@ namespace CupboardDesigner
 		private global::Gtk.ScrolledWindow scrolledCubeListV;
 		private global::Gtk.Label label8;
 		private global::Gtk.VBox vbox3;
+		private global::Gtk.Label label1;
 		private global::Gtk.ScrolledWindow GtkScrolledWindow1;
 		private global::Gtk.TreeView treeviewComponents;
+		private global::Gtk.Label labelTotalCount;
 		private global::Gtk.Label label5;
 		private global::Gtk.Button buttonCancel;
 		private global::Gtk.Button buttonOk;
@@ -59,7 +61,7 @@ namespace CupboardDesigner
 			this.notebook1 = new global::Gtk.Notebook ();
 			this.notebook1.CanFocus = true;
 			this.notebook1.Name = "notebook1";
-			this.notebook1.CurrentPage = 1;
+			this.notebook1.CurrentPage = 2;
 			// Container child notebook1.Gtk.Notebook+NotebookChild
 			this.hbox1 = new global::Gtk.HBox ();
 			this.hbox1.Name = "hbox1";
@@ -423,6 +425,15 @@ namespace CupboardDesigner
 			this.vbox3.Name = "vbox3";
 			this.vbox3.Spacing = 6;
 			// Container child vbox3.Gtk.Box+BoxChild
+			this.label1 = new global::Gtk.Label ();
+			this.label1.Name = "label1";
+			this.label1.LabelProp = global::Mono.Unix.Catalog.GetString ("На этой странице для каждого элемента шкафа можно указать ма\nтериал и отделку.");
+			this.vbox3.Add (this.label1);
+			global::Gtk.Box.BoxChild w35 = ((global::Gtk.Box.BoxChild)(this.vbox3 [this.label1]));
+			w35.Position = 0;
+			w35.Expand = false;
+			w35.Fill = false;
+			// Container child vbox3.Gtk.Box+BoxChild
 			this.GtkScrolledWindow1 = new global::Gtk.ScrolledWindow ();
 			this.GtkScrolledWindow1.Name = "GtkScrolledWindow1";
 			this.GtkScrolledWindow1.ShadowType = ((global::Gtk.ShadowType)(1));
@@ -432,11 +443,21 @@ namespace CupboardDesigner
 			this.treeviewComponents.Name = "treeviewComponents";
 			this.GtkScrolledWindow1.Add (this.treeviewComponents);
 			this.vbox3.Add (this.GtkScrolledWindow1);
-			global::Gtk.Box.BoxChild w36 = ((global::Gtk.Box.BoxChild)(this.vbox3 [this.GtkScrolledWindow1]));
-			w36.Position = 1;
+			global::Gtk.Box.BoxChild w37 = ((global::Gtk.Box.BoxChild)(this.vbox3 [this.GtkScrolledWindow1]));
+			w37.Position = 1;
+			// Container child vbox3.Gtk.Box+BoxChild
+			this.labelTotalCount = new global::Gtk.Label ();
+			this.labelTotalCount.Name = "labelTotalCount";
+			this.labelTotalCount.Xalign = 1F;
+			this.labelTotalCount.LabelProp = global::Mono.Unix.Catalog.GetString ("label2");
+			this.vbox3.Add (this.labelTotalCount);
+			global::Gtk.Box.BoxChild w38 = ((global::Gtk.Box.BoxChild)(this.vbox3 [this.labelTotalCount]));
+			w38.Position = 2;
+			w38.Expand = false;
+			w38.Fill = false;
 			this.notebook1.Add (this.vbox3);
-			global::Gtk.Notebook.NotebookChild w37 = ((global::Gtk.Notebook.NotebookChild)(this.notebook1 [this.vbox3]));
-			w37.Position = 2;
+			global::Gtk.Notebook.NotebookChild w39 = ((global::Gtk.Notebook.NotebookChild)(this.notebook1 [this.vbox3]));
+			w39.Position = 2;
 			// Notebook tab
 			this.label5 = new global::Gtk.Label ();
 			this.label5.Name = "label5";
@@ -444,14 +465,14 @@ namespace CupboardDesigner
 			this.notebook1.SetTabLabel (this.vbox3, this.label5);
 			this.label5.ShowAll ();
 			w1.Add (this.notebook1);
-			global::Gtk.Box.BoxChild w38 = ((global::Gtk.Box.BoxChild)(w1 [this.notebook1]));
-			w38.Position = 0;
+			global::Gtk.Box.BoxChild w40 = ((global::Gtk.Box.BoxChild)(w1 [this.notebook1]));
+			w40.Position = 0;
 			// Internal child CupboardDesigner.Order.ActionArea
-			global::Gtk.HButtonBox w39 = this.ActionArea;
-			w39.Name = "dialog1_ActionArea";
-			w39.Spacing = 10;
-			w39.BorderWidth = ((uint)(5));
-			w39.LayoutStyle = ((global::Gtk.ButtonBoxStyle)(4));
+			global::Gtk.HButtonBox w41 = this.ActionArea;
+			w41.Name = "dialog1_ActionArea";
+			w41.Spacing = 10;
+			w41.BorderWidth = ((uint)(5));
+			w41.LayoutStyle = ((global::Gtk.ButtonBoxStyle)(4));
 			// Container child dialog1_ActionArea.Gtk.ButtonBox+ButtonBoxChild
 			this.buttonCancel = new global::Gtk.Button ();
 			this.buttonCancel.CanDefault = true;
@@ -461,9 +482,9 @@ namespace CupboardDesigner
 			this.buttonCancel.UseUnderline = true;
 			this.buttonCancel.Label = "gtk-cancel";
 			this.AddActionWidget (this.buttonCancel, -6);
-			global::Gtk.ButtonBox.ButtonBoxChild w40 = ((global::Gtk.ButtonBox.ButtonBoxChild)(w39 [this.buttonCancel]));
-			w40.Expand = false;
-			w40.Fill = false;
+			global::Gtk.ButtonBox.ButtonBoxChild w42 = ((global::Gtk.ButtonBox.ButtonBoxChild)(w41 [this.buttonCancel]));
+			w42.Expand = false;
+			w42.Fill = false;
 			// Container child dialog1_ActionArea.Gtk.ButtonBox+ButtonBoxChild
 			this.buttonOk = new global::Gtk.Button ();
 			this.buttonOk.CanDefault = true;
@@ -472,11 +493,11 @@ namespace CupboardDesigner
 			this.buttonOk.UseStock = true;
 			this.buttonOk.UseUnderline = true;
 			this.buttonOk.Label = "gtk-ok";
-			w39.Add (this.buttonOk);
-			global::Gtk.ButtonBox.ButtonBoxChild w41 = ((global::Gtk.ButtonBox.ButtonBoxChild)(w39 [this.buttonOk]));
-			w41.Position = 1;
-			w41.Expand = false;
-			w41.Fill = false;
+			w41.Add (this.buttonOk);
+			global::Gtk.ButtonBox.ButtonBoxChild w43 = ((global::Gtk.ButtonBox.ButtonBoxChild)(w41 [this.buttonOk]));
+			w43.Position = 1;
+			w43.Expand = false;
+			w43.Fill = false;
 			if ((this.Child != null)) {
 				this.Child.ShowAll ();
 			}

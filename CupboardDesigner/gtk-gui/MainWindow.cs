@@ -218,8 +218,8 @@ public partial class MainWindow
 		if ((this.Child != null)) {
 			this.Child.ShowAll ();
 		}
-		this.DefaultWidth = 626;
-		this.DefaultHeight = 300;
+		this.DefaultWidth = 725;
+		this.DefaultHeight = 465;
 		this.Show ();
 		this.DeleteEvent += new global::Gtk.DeleteEventHandler (this.OnDeleteEvent);
 		this.quitAction.Activated += new global::System.EventHandler (this.OnQuitActionActivated);

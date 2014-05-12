@@ -32,12 +32,15 @@ namespace CupboardDesigner
 
 		private enum ComponentCol{
 			row_id,
-			component_id,
-			component,
+			nomenclature_type,
+			nomenclature_id,
+			nomenclature,
+			count,
 			material_id,
 			material,
 			facing_id,
-			facing
+			facing,
+			comment
 		}
 
 		Gtk.TargetEntry[] TargetTable = new Gtk.TargetEntry[] {
@@ -50,6 +53,7 @@ namespace CupboardDesigner
 
 			ComboWorks.ComboFillReference(comboExhibition, "exhibition", ComboWorks.ListMode.WithNo);
 
+			//Создаем таблицу номенклатуры
 			ComboBox TempCombo = new ComboBox();
 			ComboWorks.ComboFillReference(TempCombo, "materials", ComboWorks.ListMode.WithNo);
 			MaterialNameList = TempCombo.Model;
@@ -60,7 +64,7 @@ namespace CupboardDesigner
 			FacingNameList = TempCombo.Model;
 			TempCombo.Destroy ();
 
-			ComponentsStore = new ListStore(typeof(long), typeof(int), typeof(string), typeof(int), typeof(string), typeof(int), typeof(string));
+			ComponentsStore = new ListStore(typeof(long), typeof(Nomenclature.NomType), typeof(int), typeof(string), typeof(int), typeof(int), typeof(string), typeof(int), typeof(string), typeof(string));
 
 			Gtk.TreeViewColumn ColumnMaterial = new Gtk.TreeViewColumn ();
 			ColumnMaterial.Title = "Материал";
@@ -86,26 +90,25 @@ namespace CupboardDesigner
 			ColumnFacing.PackStart (CellFacing, true);
 			ColumnFacing.AddAttribute(CellFacing, "text", (int)ComponentCol.facing);
 
-			treeviewComponents.AppendColumn("Наименование", new Gtk.CellRendererText (), "text", (int)ComponentCol.component);
+			Gtk.TreeViewColumn ColumnComment = new Gtk.TreeViewColumn ();
+			ColumnComment.Title = "Комментарий";
+			Gtk.CellRendererText CellComment = new Gtk.CellRendererText ();
+			CellComment.WrapMode = Pango.WrapMode.WordChar;
+			CellComment.WrapWidth = 500;
+			CellComment.Editable = true;
+			CellComment.Edited += OnCommentTextEdited;
+			ColumnComment.MaxWidth = 500;
+			ColumnComment.PackStart (CellComment, true);
+			ColumnComment.AddAttribute(CellComment, "text", (int)ComponentCol.comment);
+
+			treeviewComponents.AppendColumn("Наименование", new Gtk.CellRendererText (), "text", (int)ComponentCol.nomenclature);
+			treeviewComponents.AppendColumn("Кол-во", new Gtk.CellRendererText (), "text", (int)ComponentCol.count);
 			treeviewComponents.AppendColumn(ColumnMaterial);
 			treeviewComponents.AppendColumn(ColumnFacing);
+			treeviewComponents.AppendColumn(ColumnComment);
 
 			treeviewComponents.Model = ComponentsStore;
 			treeviewComponents.ShowAll();
-
-			//Загрузка списка компонентов
-			string sql = "SELECT id, name FROM components";
-			SqliteCommand cmd = new SqliteCommand(sql, (SqliteConnection)QSMain.ConnectionDB);
-			using (SqliteDataReader rdr = cmd.ExecuteReader())
-			{
-				while(rdr.Read())
-				{
-					ComponentsStore.AppendValues((long) -1,
-						rdr.GetInt32(rdr.GetOrdinal("id")),
-						rdr["name"].ToString()
-					);
-				}
-			}
 
 			CurrentDrag = new DragInformation();
 			//Загрузка списка кубов
@@ -113,8 +116,8 @@ namespace CupboardDesigner
 			CubeWidgetList = new List<CubeListItem>();
 			vboxCubeList = new VBox(false, 5);
 			hboxCubeList = new HBox(false, 5);
-			sql = "SELECT * FROM nomenclature WHERE type = @type";
-			cmd = new SqliteCommand(sql, (SqliteConnection)QSMain.ConnectionDB);
+			string sql = "SELECT * FROM nomenclature WHERE type = @type";
+			SqliteCommand cmd = new SqliteCommand(sql, (SqliteConnection)QSMain.ConnectionDB);
 			cmd.Parameters.AddWithValue("@type", Nomenclature.NomType.cube.ToString());
 			using (SqliteDataReader rdr = cmd.ExecuteReader())
 			{
@@ -155,7 +158,7 @@ namespace CupboardDesigner
 			cmd = new SqliteCommand(sql, (SqliteConnection)QSMain.ConnectionDB);
 			using (SqliteDataReader rdr = cmd.ExecuteReader())
 			{
-				GLib.SList Group = null;
+				Gtk.RadioButton FirstButton = null;
 				while(rdr.Read())
 				{
 					if (rdr["image"] == DBNull.Value)
@@ -166,10 +169,10 @@ namespace CupboardDesigner
 					TempWidget.id = rdr.GetInt32(rdr.GetOrdinal("id"));
 					TempWidget.ItemName = DBWorks.GetString(rdr, "name", "");
 					TempWidget.CubePxSize = CubePxSize;
-					if (Group == null)
-						Group = TempWidget.Button.Group;
+					if (FirstButton == null)
+						FirstButton = TempWidget.Button;
 					else
-						TempWidget.Button.Group = Group;
+						TempWidget.Button.Group = FirstButton.Group;
 					int size = DBWorks.GetInt(rdr, "image_size", 0);
 					byte[] ImageFile = new byte[size];
 					rdr.GetBytes(rdr.GetOrdinal("image"), 0, ImageFile, 0, size);
@@ -185,7 +188,6 @@ namespace CupboardDesigner
 			}
 
 			OrderCupboard = new Cupboard();
-			OrderCupboard.BorderImage = new SVGHelper();
 
 			//Настраиваем DND
 			Gtk.Drag.DestSet(drawCupboard, DestDefaults.Motion, TargetTable, Gdk.DragAction.Move);
@@ -209,6 +211,7 @@ namespace CupboardDesigner
 
 				cmd.Parameters.AddWithValue("@id", id);
 
+				CupboardListItem basis;
 				using(SqliteDataReader rdr = cmd.ExecuteReader())
 				{
 					rdr.Read();
@@ -219,8 +222,7 @@ namespace CupboardDesigner
 					dateArrval.Date = DBWorks.GetDateTime(rdr, "arrval", new DateTime());
 					dateDelivery.Date = DBWorks.GetDateTime(rdr, "delivery", new DateTime());
 					int basis_id = rdr.GetInt32(rdr.GetOrdinal("basis_id"));
-					CupboardListItem basis = TypeWidgetList.Find(w => w.id == basis_id);
-					basis.Button.Active = true;
+					basis = TypeWidgetList.Find(w => w.id == basis_id);
 					ComboWorks.SetActiveItem(comboExhibition, DBWorks.GetInt(rdr, "exhibition_id", -1));
 					textviewComments.Buffer.Text = rdr["comment"].ToString();
 					OrderCupboard = Cupboard.Load(rdr["cupboard"].ToString(), CubeList);
@@ -229,8 +231,12 @@ namespace CupboardDesigner
 					SetInfo();
 					CalculateCubePxSize(drawCupboard.Allocation);
 				}
+				basis.Button.Active = true;
 
-				sql = "SELECT order_components.*, materials.name as material, facing.name as facing FROM order_components " +
+				sql = "SELECT order_components.*, materials.name as material, facing.name as facing, " +
+					"nomenclature.name as nomenclature, nomenclature.type " +
+					"FROM order_components " +
+					"LEFT JOIN nomenclature ON nomenclature.id = order_components.nomenclature_id " +
 					"LEFT JOIN materials ON materials.id = order_components.material_id " +
 					"LEFT JOIN facing ON facing.id = order_components.facing_id " +
 					"WHERE order_components.order_id = @id";
@@ -238,34 +244,30 @@ namespace CupboardDesigner
 				cmd.Parameters.AddWithValue("@id", id);
 				using(SqliteDataReader rdr = cmd.ExecuteReader())
 				{
-					TreeIter iter;
 					while(rdr.Read())
 					{
-						if(!ComponentsStore.GetIterFirst(out iter))
-							break;
-						do
-						{
-
-							if((int)ComponentsStore.GetValue(iter, (int)ComponentCol.component_id) == rdr.GetInt32(rdr.GetOrdinal("component_id")))
-							{
-								ComponentsStore.SetValue(iter, (int)ComponentCol.row_id, (object)DBWorks.GetLong(rdr, "id", -1));
-								ComponentsStore.SetValue(iter, (int)ComponentCol.material_id, DBWorks.GetInt(rdr, "material_id", -1));
-								ComponentsStore.SetValue(iter, (int)ComponentCol.material, DBWorks.GetString(rdr, "material", "нет"));
-								ComponentsStore.SetValue(iter, (int)ComponentCol.facing_id, DBWorks.GetInt(rdr, "facing_id", -1));
-								ComponentsStore.SetValue(iter, (int)ComponentCol.facing, DBWorks.GetString(rdr, "facing", "нет"));
-								break;
-							}
-						} while(ComponentsStore.IterNext(ref iter));
+						ComponentsStore.AppendValues(
+							DBWorks.GetLong(rdr, "id", -1),
+							Enum.Parse(typeof(Nomenclature.NomType), rdr["type"].ToString()),
+							DBWorks.GetInt(rdr, "nomenclature_id", -1),
+							DBWorks.GetString(rdr, "nomenclature", "нет"),
+							DBWorks.GetInt(rdr, "count", 0),
+							DBWorks.GetInt(rdr, "material_id", -1),
+							DBWorks.GetString(rdr, "material", "нет"),
+							DBWorks.GetInt(rdr, "facing_id", -1),
+							DBWorks.GetString(rdr, "facing", "нет"),
+							DBWorks.GetString(rdr, "comment", "")
+						);
 					}
 				}
+				CalculateTotalCount();
 
 				MainClass.StatusMessage("Ok");
 			}
 			catch (Exception ex)
 			{
-				MainClass.StatusMessage("Ошибка получения информации о заказе!");
-				logger.Error(ex.ToString());
-				QSMain.ErrorMessage(this,ex);
+				logger.ErrorException("Ошибка получения информации о заказе!", ex);
+				QSMain.ErrorMessage(this, ex);
 			}
 			TestCanSave();
 		}
@@ -304,6 +306,20 @@ namespace CupboardDesigner
 				ComponentsStore.SetValue(iter, (int)ComponentCol.facing, args.NewText);
 				ComponentsStore.SetValue(iter, (int)ComponentCol.facing_id, FacingNameList.GetValue(RefIter, 1));
 			}
+		}
+
+		void OnCommentTextEdited (object o, EditedArgs args)
+		{
+			TreeIter iter;
+			if (!ComponentsStore.GetIterFromString (out iter, args.Path))
+				return;
+			if(args.NewText == null)
+			{
+				logger.Warn("newtext is empty");
+				return;
+			}
+
+			ComponentsStore.SetValue(iter, (int)ComponentCol.comment, args.NewText);
 		}
 
 		protected void TestCanSave ()
@@ -351,21 +367,25 @@ namespace CupboardDesigner
 				// Запись компонент
 				foreach(object[] row in ComponentsStore)
 				{
-					bool HasValue = (int) row[(int)ComponentCol.facing_id] > 0 || (int) row[(int)ComponentCol.material_id] > 0;
-					if(HasValue)
-					{
+					bool HasValue = (int) row[(int)ComponentCol.count] > 0;
+                    if(HasValue)
+				    {
 						if((long)row[(int)ComponentCol.row_id] < 0)
-							sql = "INSERT INTO order_components (order_id, component_id, material_id, facing_id) " +
-								"VALUES (@order_id, @component_id, @material_id, @facing_id)";
+							sql = "INSERT INTO order_components (order_id, nomenclature_id, count, material_id, facing_id, comment) " +
+								"VALUES (@order_id, @nomenclature_id, @count, @material_id, @facing_id, @comment)";
 						else
-							sql = "UPDATE order_components SET material_id = @material_id, facing_id = @facing_id " +
+							sql = "UPDATE order_components SET material_id = @material_id, facing_id = @facing_id, count = @count, " +
+								"comment = @comment " +
 								"WHERE id = @id";
 
 						cmd = new SqliteCommand(sql, (SqliteConnection)QSMain.ConnectionDB, trans);
+						cmd.Parameters.AddWithValue("@id", (long)row[(int)ComponentCol.row_id]);
 						cmd.Parameters.AddWithValue("@order_id", ItemId);
-						cmd.Parameters.AddWithValue("@component_id", row[(int)ComponentCol.component_id]);
+						cmd.Parameters.AddWithValue("@nomenclature_id", row[(int)ComponentCol.nomenclature_id]);
+						cmd.Parameters.AddWithValue("@count", row[(int)ComponentCol.count]);
 						cmd.Parameters.AddWithValue("@material_id", DBWorks.ValueOrNull((int) row[(int)ComponentCol.material_id] > 0, row[(int)ComponentCol.material_id]));
 						cmd.Parameters.AddWithValue("@facing_id", DBWorks.ValueOrNull((int)row[(int)ComponentCol.facing_id] > 0, row[(int)ComponentCol.facing_id]));
+						cmd.Parameters.AddWithValue("@comment", DBWorks.ValueOrNull((string)row[(int)ComponentCol.comment] != "", row[(int)ComponentCol.comment]));
 						cmd.ExecuteNonQuery();
 					}
 					else if((long)row[(int)ComponentCol.row_id] > 0)
@@ -385,8 +405,7 @@ namespace CupboardDesigner
 			catch (Exception ex)
 			{
 				trans.Rollback();
-				MainClass.StatusMessage("Ошибка записи заказа!");
-				logger.Error(ex.ToString());
+				logger.ErrorException("Ошибка записи заказа!", ex);
 				QSMain.ErrorMessage(this, ex);
 			}
 		}
@@ -403,8 +422,14 @@ namespace CupboardDesigner
 		protected void OnBasisChanged(object sender, EventArgs e)
 		{
 			CupboardListItem basis = TypeWidgetList.Find(w => w.Button.Active);
+			if(basis == null)
+			{
+				logger.Warn("Не найдена активная основа");
+				return;
+			}
 			OrderCupboard.BorderImage.LoadImage(basis.Image.OriginalFile);
 			SetInfo();
+			UpdateBasisComponents(basis.id);
 		}
 
 		protected void OnComboCubeHChanged(object sender, EventArgs e)
@@ -562,6 +587,7 @@ namespace CupboardDesigner
 					NewCube.BoardPositionX = CubePosX;
 					NewCube.BoardPositionY = CubePosY;
 					OrderCupboard.Cubes.Add(NewCube);
+					UpdateCubeComponents();
 				} 
 				else
 				{
@@ -609,6 +635,7 @@ namespace CupboardDesigner
 		protected void OnDrawCupboardDragDataDelete(object o, DragDataDeleteArgs args)
 		{
 			OrderCupboard.Cubes.Remove(CurrentDrag.cube);
+			UpdateCubeComponents();
 			args.RetVal = true;
 		}
 
@@ -705,9 +732,126 @@ namespace CupboardDesigner
 		protected void OnNotebook1SwitchPage(object o, SwitchPageArgs args)
 		{
 			if (notebook1.CurrentPage == 1)
-				OrderCupboard.Clean();
+			{
+				if (OrderCupboard.Clean())
+					UpdateCubeComponents();
+			}
 		}
 
+		private void UpdateBasisComponents(int id)
+		{
+			TreeIter iter;
+			if (ComponentsStore.GetIterFirst(out iter))
+			{
+				do
+				{
+					if ((Nomenclature.NomType)ComponentsStore.GetValue(iter, (int)ComponentCol.nomenclature_type) == Nomenclature.NomType.construct)
+					{
+						if((long)ComponentsStore.GetValue(iter, (int)ComponentCol.row_id) > 0)
+							ComponentsStore.SetValue(iter, (int)ComponentCol.count, 0);
+						else
+							ComponentsStore.Remove(ref iter);
+					}
+				}
+				while(ComponentsStore.IterNext(ref iter));
+			}
+				
+			string sql = "SELECT nomenclature.name as nomenclature, nomenclature.type, basis_items.* FROM basis_items " +
+				"LEFT JOIN nomenclature ON nomenclature.id = basis_items.item_id " +
+				"WHERE basis_id = @basis_id";
+			SqliteCommand cmd = new SqliteCommand(sql, (SqliteConnection)QSMain.ConnectionDB);
+			cmd.Parameters.AddWithValue("@basis_id", id);
+			using (SqliteDataReader rdr = cmd.ExecuteReader())
+			{
+				while (rdr.Read())
+				{
+					bool Found = false;
+					if (ComponentsStore.GetIterFirst(out iter))
+					{
+						do
+						{
+							if ((int)ComponentsStore.GetValue(iter, (int)ComponentCol.nomenclature_id) == rdr.GetInt32(rdr.GetOrdinal("item_id")))
+							{
+								Found = true;
+								ComponentsStore.SetValue(iter, (int)ComponentCol.count, 1);
+							}
+						}
+						while(ComponentsStore.IterNext(ref iter));
+					}
+					if(!Found)
+					{
+						ComponentsStore.AppendValues(
+							(long)-1,
+							Enum.Parse(typeof(Nomenclature.NomType), rdr["type"].ToString()),
+							DBWorks.GetInt(rdr, "item_id", -1),
+							DBWorks.GetString(rdr, "nomenclature", "нет"),
+							1,
+							-1,
+							"",
+							-1,
+							"",
+							""
+						);
+					}
+				}
+			}
+			CalculateTotalCount();
+		}
+
+		private void UpdateCubeComponents()
+		{
+			TreeIter iter;
+			Dictionary<int, int> Counts = OrderCupboard.GetAmounts();
+			if (ComponentsStore.GetIterFirst(out iter))
+			{
+				do
+				{
+					if ((Nomenclature.NomType)ComponentsStore.GetValue(iter, (int)ComponentCol.nomenclature_type) == Nomenclature.NomType.cube)
+					{
+						int NomId = (int)ComponentsStore.GetValue(iter, (int)ComponentCol.nomenclature_id);
+						if(Counts.ContainsKey(NomId))
+						{
+							ComponentsStore.SetValue(iter, (int)ComponentCol.count, Counts[NomId]);
+							Counts.Remove(NomId);
+						}
+						else if((long)ComponentsStore.GetValue(iter, (int)ComponentCol.row_id) > 0)
+							ComponentsStore.SetValue(iter, (int)ComponentCol.count, 0);
+						else
+							ComponentsStore.Remove(ref iter);
+					}
+				}
+				while(ComponentsStore.IterNext(ref iter));
+			}
+
+			foreach (KeyValuePair<int, int> pair in Counts)
+			{
+				Cube cube = OrderCupboard.Cubes.Find(c => c.NomenclatureId == pair.Key);
+				ComponentsStore.AppendValues(
+					(long)-1,
+					Nomenclature.NomType.cube,
+					pair.Key,
+					cube.Name,
+					1,
+					-1,
+					"",
+					-1,
+					"",
+					""
+				);
+			}
+			CalculateTotalCount();
+		}
+
+		void CalculateTotalCount()
+		{
+			int TotalCount = 0;
+			foreach(object[] row in ComponentsStore)
+			{
+				TotalCount += (int)row[(int)ComponentCol.count];
+			}
+
+			labelTotalCount.LabelProp = String.Format("Итого {0} единиц", TotalCount);
+		}
 	}
 }
 
