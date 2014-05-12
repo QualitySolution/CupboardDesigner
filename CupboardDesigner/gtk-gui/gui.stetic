@@ -48,9 +48,9 @@
         <property name="ShortLabel" translatable="yes">Номенклатура</property>
         <signal name="Activated" handler="OnAction9Activated" />
       </action>
-      <action id="Action4">
+      <action id="Action11">
         <property name="Type">Action</property>
-        <property name="Label" translatable="yes">Виды оснований</property>
+        <property name="Label" translatable="yes">Каркасы</property>
         <property name="ShortLabel" translatable="yes">Виды оснований</property>
         <signal name="Activated" handler="OnAction4Activated" />
       </action>
@@ -110,7 +110,7 @@
               </node>
               <node type="Menu" action="Action1">
                 <node type="Menuitem" action="Action9" />
-                <node type="Menuitem" action="Action4" />
+                <node type="Menuitem" action="Action11" />
                 <node type="Separator" />
                 <node type="Menuitem" action="Action10" />
                 <node type="Separator" />

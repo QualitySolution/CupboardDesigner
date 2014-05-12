@@ -122,7 +122,13 @@ public partial class MainWindow: Gtk.Window
 
 	protected void OnButtonDelClicked(object sender, EventArgs e)
 	{
-		throw new NotImplementedException();
+		TreeIter iter;
+		Delete winDelete = new Delete();
+
+		treeviewOrders.Selection.GetSelected(out iter);
+		int itemid = (int) OrdersFilter.GetValue(iter, (int)OrdersCol.id);
+		winDelete.RunDeletion("orders", itemid);
+		UpdateOrders();
 	}
 
 }

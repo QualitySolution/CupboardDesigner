@@ -74,7 +74,7 @@ public partial class MainWindow: Gtk.Window
 
 	protected void SetAdminMode(bool admin)
 	{
-		ActionPassword.Sensitive = Action9.Sensitive = Action4.Sensitive = Action10.Sensitive 
+		ActionPassword.Sensitive = Action9.Sensitive = Action11.Sensitive = Action10.Sensitive 
 			= Action8.Sensitive = Action7.Sensitive = admin;
 	}
 
@@ -154,7 +154,7 @@ public partial class MainWindow: Gtk.Window
 	{
 		Reference winref = new Reference();
 		winref.SetMode(false,false,true,true,true);
-		winref.FillList("basis", "вид основания", "Виды оснований");
+		winref.FillList("basis", "каркас", "Виды каркасов");
 		winref.Show();
 		winref.Run();
 		winref.Destroy();
