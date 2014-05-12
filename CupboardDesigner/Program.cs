@@ -96,6 +96,13 @@ namespace CupboardDesigner
 			try
 			{
 				QSMain.DBMS = QSMain.DataProviders.Factory;
+				string Providers = "";
+				foreach(System.Data.DataRow row in DbProviderFactories.GetFactoryClasses().Rows)
+				{
+					Providers += String.Format("{0}#{1}#{2}#{3}", row[0], row[1], row[2], row[3]);
+					Providers += Environment.NewLine;
+				}
+				logger.Debug("Exist DataProviders:\n{0}", Providers);
 				QSMain.ProviderDB = DbProviderFactories.GetFactory("Mono.Data.Sqlite");
 				QSMain.ConnectionDB = QSMain.ProviderDB.CreateConnection();
 				QSMain.ConnectionDB.ConnectionString = String.Format("Data Source={0};Version=3;", DataBase);
