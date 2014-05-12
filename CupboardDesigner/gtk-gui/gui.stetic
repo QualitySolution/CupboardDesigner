@@ -328,7 +328,7 @@
                     <property name="MemberName" />
                     <property name="IsTextCombo">True</property>
                     <property name="Items" translatable="yes">Куб
-Конструкци</property>
+Конструкция</property>
                     <property name="Active">0</property>
                     <signal name="Changed" handler="OnComboTypeChanged" />
                   </widget>
@@ -916,7 +916,7 @@
                     <child>
                       <widget class="Gtk.Label" id="labelId">
                         <property name="MemberName" />
-                        <property name="LabelProp" translatable="yes">не определн</property>
+                        <property name="LabelProp" translatable="yes">не определён</property>
                       </widget>
                       <packing>
                         <property name="LeftAttach">1</property>

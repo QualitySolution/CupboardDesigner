@@ -80,7 +80,7 @@ namespace CupboardDesigner
 			// Container child table1.Gtk.Table+TableChild
 			this.labelId = new global::Gtk.Label ();
 			this.labelId.Name = "labelId";
-			this.labelId.LabelProp = global::Mono.Unix.Catalog.GetString ("не определн");
+			this.labelId.LabelProp = global::Mono.Unix.Catalog.GetString ("не определён");
 			this.table1.Add (this.labelId);
 			global::Gtk.Table.TableChild w5 = ((global::Gtk.Table.TableChild)(this.table1 [this.labelId]));
 			w5.LeftAttach = ((uint)(1));
