@@ -231,7 +231,6 @@ namespace CupboardDesigner
 					SetInfo();
 					CalculateCubePxSize(drawCupboard.Allocation);
 				}
-				basis.Button.Active = true;
 
 				sql = "SELECT order_components.*, materials.name as material, facing.name as facing, " +
 					"nomenclature.name as nomenclature, nomenclature.type " +
@@ -260,7 +259,7 @@ namespace CupboardDesigner
 						);
 					}
 				}
-				CalculateTotalCount();
+				basis.Button.Active = true;
 
 				MainClass.StatusMessage("Ok");
 			}
@@ -774,6 +773,7 @@ namespace CupboardDesigner
 							{
 								Found = true;
 								ComponentsStore.SetValue(iter, (int)ComponentCol.count, 1);
+								break;
 							}
 						}
 						while(ComponentsStore.IterNext(ref iter));
