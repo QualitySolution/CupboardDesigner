@@ -14,7 +14,7 @@ namespace CupboardDesigner
 		public bool NewItem;
 		private int ItemId;
 		private byte[] ImageFile;
-		bool ImageChanged = false;
+		private bool ImageChanged = false;
 
 		internal enum NomType {cube, construct};
 
@@ -60,7 +60,7 @@ namespace CupboardDesigner
 					spinH.Value = DBWorks.GetInt(rdr, "height", 0);
 					spinL.Value = DBWorks.GetInt(rdr, "lenght", 0);
 					spinW.Value = DBWorks.GetInt(rdr, "widht", 0);
-					if(comboType.Active == 1)
+					if(comboType.Active == (int) NomType.construct)
 					{
 						checkPlusH.Active = DBWorks.GetBoolean(rdr, "plush", false);
 						checkPlusL.Active = DBWorks.GetBoolean(rdr, "plusl", false);
@@ -98,13 +98,13 @@ namespace CupboardDesigner
 			string sql;
 			if(NewItem)
 			{
-				sql = "INSERT INTO nomenclature (type, article, name, description, widht, lenght, height) " +
-					"VALUES (@type, @article, @name, @description, @widht, @lenght, @height)";
+				sql = "INSERT INTO nomenclature (type, article, name, description, widht, lenght, height, plusl, plush) " +
+					"VALUES (@type, @article, @name, @description, @widht, @lenght, @height, @plusl, @plush)";
 			}
 			else
 			{
 				sql = "UPDATE nomenclature SET type = @type, article = @article, name = @name, description = @description, " +
-					"widht = @widht, lenght = @lenght, height = @height WHERE id = @id";
+					"widht = @widht, lenght = @lenght, height = @height, plusl = @plusl, plush = @plush WHERE id = @id";
 			}
 			MainClass.StatusMessage("Запись номенклатуры...");
 			SqliteTransaction trans = (SqliteTransaction)QSMain.ConnectionDB.BeginTransaction();
@@ -120,8 +120,8 @@ namespace CupboardDesigner
 				cmd.Parameters.AddWithValue("@widht", DBWorks.ValueOrNull(spinW.ValueAsInt > 0, spinW.ValueAsInt));
 				cmd.Parameters.AddWithValue("@lenght", DBWorks.ValueOrNull(spinL.ValueAsInt > 0, spinL.ValueAsInt));
 				cmd.Parameters.AddWithValue("@height", DBWorks.ValueOrNull(spinH.ValueAsInt > 0, spinH.ValueAsInt));
-				cmd.Parameters.AddWithValue("@plush", DBWorks.ValueOrNull(comboType.Active == 1, checkPlusH.Active));
-				cmd.Parameters.AddWithValue("@plusl", DBWorks.ValueOrNull(comboType.Active == 1, checkPlusL.Active));
+				cmd.Parameters.AddWithValue("@plush", DBWorks.ValueOrNull(comboType.Active == (int)NomType.construct , checkPlusH.Active));
+				cmd.Parameters.AddWithValue("@plusl", DBWorks.ValueOrNull(comboType.Active == (int)NomType.construct, checkPlusL.Active));
 
 				cmd.ExecuteNonQuery();
 
