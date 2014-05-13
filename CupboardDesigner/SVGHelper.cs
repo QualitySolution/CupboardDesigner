@@ -34,6 +34,7 @@ namespace CupboardDesigner
 
 		public bool LoadImage(byte[] svg)
 		{
+			logger.Debug("Загружаем svg в помошник.");
 			try
 			{
 				XmlSvg = new XmlDocument();
@@ -76,7 +77,7 @@ namespace CupboardDesigner
 				logger.ErrorException("Ошибка в чтении svg!", ex);
 				return false;
 			}
-
+			logger.Debug("Закончили загрузку.");
 			return FrameSet;
 		}
 
@@ -106,6 +107,12 @@ namespace CupboardDesigner
 		{
 			if (OriginalFile == null)
 				return;
+			if(CubesV == 1 && CubesH == 1)
+			{
+				DrawingFile = OriginalFile;
+				return;
+			}
+			logger.Debug("Начала изменение svg");
 			MemoryStream stream = new MemoryStream(OriginalFile);
 			SvgDocument imagefile = SvgDocument.Open<SvgDocument>(stream);
 			SvgClipPath clip = imagefile.GetElementById<SvgClipPath>("presentation_clip_path");
@@ -126,6 +133,7 @@ namespace CupboardDesigner
 			imagefile.Write(stream);
 			DrawingFile = stream.ToArray();
 			//logger.Debug(System.Text.Encoding.Default.GetString(DrawingFile));
+			logger.Debug("Закончили изменение svg.");
 		}
 			
 		private SvgUnit FixX(SvgUnit OldX)

@@ -10,6 +10,8 @@ namespace CupboardDesigner
 	public class Cube
 	{
 		[XmlIgnore]
+		private static Logger logger = LogManager.GetCurrentClassLogger();
+		[XmlIgnore]
 		public string Name;
 		[XmlIgnore]
 		public int Widht;
@@ -51,6 +53,7 @@ namespace CupboardDesigner
 
 		public void DrawCube(Context cr, int CubePxSize, bool Coloring)
 		{
+			logger.Debug("Начали рисовать куб {0}", Name);
 			int PxWidth = CubesH * CubePxSize;
 			int PxHeight = CubesV * CubePxSize;
 
@@ -70,6 +73,7 @@ namespace CupboardDesigner
 			double ratio = Math.Min(vratio, hratio);
 			cr.Scale(ratio, ratio);
 			svg.RenderCairo(cr);
+			logger.Debug("Закончили рисовать куб.");
 		}
 	}
 
