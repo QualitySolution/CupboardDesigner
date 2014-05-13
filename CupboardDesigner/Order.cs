@@ -19,7 +19,6 @@ namespace CupboardDesigner
 		private List<Cube> CubeList;
 		private int CubePxSize = 100;
 		private int BorderPxSize = 30;
-		private int CupboardZeroX, CupboardZeroY;
 		private VBox vboxCubeList, vboxTypeList;
 		private HBox hboxCubeList, hboxTypeList;
 		private int MaxCubeVSize;
@@ -454,56 +453,10 @@ namespace CupboardDesigner
 			using (Context cr = Gdk.CairoHelper.Create (args.Event.Window)) {
 				int w, h;
 				args.Event.Window.GetSize (out w, out h);
-				Draw (cr, w, h);
+				OrderCupboard.Draw(cr, w, h, CubePxSize, false);
 			}
 		}
-
-		void Draw (Context cr, int width, int height)
-		{
-			int CupboardPxSizeH = BorderPxSize * 2 + CubePxSize * int.Parse(comboCubeH.ActiveText);
-			int CupboardPxSizeV = BorderPxSize * 2 + CubePxSize * int.Parse(comboCubeV.ActiveText);
-
-			int ShiftX = (width - CupboardPxSizeH) / 2;
-			int ShiftY = (height - CupboardPxSizeV) / 2;
-
-			CupboardZeroX = ShiftX + BorderPxSize;
-			CupboardZeroY = ShiftY + BorderPxSize;
-
-			cr.Translate(CupboardZeroX, CupboardZeroY);
-			DrawGrid(cr);
-			cr.Save();
-			if (OrderCupboard.BorderImage != null)
-				OrderCupboard.BorderImage.DrawBasis(cr, CubePxSize);
-			cr.Restore();
-
-			foreach(Cube cube in OrderCupboard.Cubes)
-			{
-				cr.Save();
-				cr.Translate(cube.BoardPositionX * CubePxSize, cube.BoardPositionY * CubePxSize);
-				cube.DrawCube(cr, CubePxSize);
-				cr.Restore();
-			}
-		}
-
-		void DrawGrid(Context cr)
-		{
-			int CubesH = int.Parse(comboCubeH.ActiveText);
-			int CubesV = int.Parse(comboCubeV.ActiveText);
-			cr.SetSourceRGB(1, 1, 1);
-			cr.SetDash(new double[]{2.0, 3.0}, 0.0);
-			for (int x = 0; x <= CubesH; x++)
-			{
-				cr.MoveTo(x * CubePxSize, 0);
-				cr.LineTo(x * CubePxSize, CubePxSize * CubesV);
-			}
-			for (int y = 0; y <= CubesV; y++)
-			{
-				cr.MoveTo(0, y * CubePxSize);
-				cr.LineTo(CubesH * CubePxSize, CubePxSize * y);
-			}
-			cr.Stroke();
-		}
-						
+									
 		protected void OnDrawCupboardSizeAllocated(object o, SizeAllocatedArgs args)
 		{
 			CalculateCubePxSize(args.Allocation);
@@ -556,8 +509,8 @@ namespace CupboardDesigner
 		protected void OnDrawCupboardDragMotion(object o, DragMotionArgs args)
 		{
 			logger.Debug ("Drag motion x={0} y={1}", args.X, args.Y);
-			int CubePosX = (args.X + (int)(CubePxSize * 1.5) - CurrentDrag.IconPosX - CupboardZeroX) / CubePxSize;
-			int CubePosY = (args.Y + (int)(CubePxSize * 1.5) - CurrentDrag.IconPosY - CupboardZeroY) / CubePxSize;
+			int CubePosX = (args.X + (int)(CubePxSize * 1.5) - CurrentDrag.IconPosX - OrderCupboard.CupboardZeroX) / CubePxSize;
+			int CubePosY = (args.Y + (int)(CubePxSize * 1.5) - CurrentDrag.IconPosY - OrderCupboard.CupboardZeroY) / CubePxSize;
 			//Для того что бы корректно посчитать 0 ячейку добавли 1, сейчас онимаем.
 			CubePosX--; CubePosY--;
 			logger.Debug ("CupBoard pos x={0} y={1}", CubePosX, CubePosY);
@@ -572,8 +525,8 @@ namespace CupboardDesigner
 		protected void OnDrawCupboardDragDrop(object o, DragDropArgs args)
 		{
 			logger.Debug ("Drop");
-			int CubePosX = (args.X + (int)(CubePxSize * 1.5) - CurrentDrag.IconPosX - CupboardZeroX) / CubePxSize;
-			int CubePosY = (args.Y + (int)(CubePxSize * 1.5) - CurrentDrag.IconPosY - CupboardZeroY) / CubePxSize;
+			int CubePosX = (args.X + (int)(CubePxSize * 1.5) - CurrentDrag.IconPosX - OrderCupboard.CupboardZeroX) / CubePxSize;
+			int CubePosY = (args.Y + (int)(CubePxSize * 1.5) - CurrentDrag.IconPosY - OrderCupboard.CupboardZeroY) / CubePxSize;
 			//Для того что бы корректно посчитать 0 ячейку добавли 1, сейчас онимаем.
 			CubePosX--; CubePosY--;
 			logger.Debug ("CupBoard pos x={0} y={1}", CubePosX, CubePosY);
@@ -605,8 +558,8 @@ namespace CupboardDesigner
 			int MousePosX, MousePosY;
 			drawCupboard.GetPointer(out MousePosX, out MousePosY);
 
-			int CubePosX = (MousePosX - CupboardZeroX) / CubePxSize;
-			int CubePosY = (MousePosY - CupboardZeroY) / CubePxSize;
+			int CubePosX = (MousePosX - OrderCupboard.CupboardZeroX) / CubePxSize;
+			int CubePosY = (MousePosY - OrderCupboard.CupboardZeroY) / CubePxSize;
 			Cube cube = OrderCupboard.GetCube(CubePosX, CubePosY);
 
 			if(cube == null)
@@ -620,11 +573,11 @@ namespace CupboardDesigner
 
 			using (Context cr = Gdk.CairoHelper.Create(pix))
 			{
-				cube.DrawCube(cr, CubePxSize);
+				cube.DrawCube(cr, CubePxSize, true);
 			}
 			Gdk.Pixbuf pixbuf = Gdk.Pixbuf.FromDrawable(pix, Gdk.Colormap.System, 0, 0, 0, 0, cube.CubesH * CubePxSize, cube.CubesV * CubePxSize);
-			CurrentDrag.IconPosX = MousePosX - CupboardZeroX - (cube.BoardPositionX * CubePxSize);
-			CurrentDrag.IconPosY = MousePosY - CupboardZeroY - (cube.BoardPositionY * CubePxSize);
+			CurrentDrag.IconPosX = MousePosX - OrderCupboard.CupboardZeroX - (cube.BoardPositionX * CubePxSize);
+			CurrentDrag.IconPosY = MousePosY - OrderCupboard.CupboardZeroY - (cube.BoardPositionY * CubePxSize);
 
 			Gtk.Drag.SetIconPixbuf(args.Context, pixbuf, CurrentDrag.IconPosX, CurrentDrag.IconPosY);
 			CurrentDrag.FromList = false;
@@ -852,6 +805,30 @@ namespace CupboardDesigner
 
 			labelTotalCount.LabelProp = String.Format("Итого {0} единиц", TotalCount);
 		}
+
+		protected void OnButtonPrintClicked(object sender, EventArgs e)
+		{
+			string TempImagePath = System.IO.Path.Combine (System.IO.Path.GetTempPath (), String.Format("Cupboard{0}.png", ItemId));
+			int widght = 2244;
+			int height = 1181;
+			ImageSurface surf = new ImageSurface(Format.ARGB32, widght, height);
+			Cairo.Context cr = new Context(surf);
+
+			int MinCubeSizeForH = Convert.ToInt32(widght / (OrderCupboard.CubesH + 1.2));
+			int MinCubeSizeForV = Convert.ToInt32(height / (OrderCupboard.CubesV + 1.2));
+			int NeedCubePxSize = Math.Min(MinCubeSizeForH, MinCubeSizeForV);
+
+			OrderCupboard.Draw(cr, widght, height, NeedCubePxSize, true);
+			surf.Flush();
+			surf.WriteToPng(TempImagePath);
+			logger.Debug("Writed {0}", TempImagePath);
+			string param = "id=" + ItemId.ToString() +
+				"&image=" + TempImagePath +
+				"&basel=" + OrderCupboard.CubesH.ToString() + 
+				"&baseh=" + OrderCupboard.CubesV.ToString();
+			ViewReportExt.Run ("order", param);
+		}
+
 	}
 }
 

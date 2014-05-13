@@ -49,7 +49,7 @@ namespace CupboardDesigner
 				return;
 			using (Context cr = Gdk.CairoHelper.Create (args.Event.Window)) 
 			{
-				CubeItem.DrawCube(cr, CubePxSize);
+				CubeItem.DrawCube(cr, CubePxSize, true);
 			}
 		}
 
@@ -59,7 +59,7 @@ namespace CupboardDesigner
 
 			using (Context cr = Gdk.CairoHelper.Create(pix))
 			{
-				CubeItem.DrawCube(cr, CubePxSize);
+				CubeItem.DrawCube(cr, CubePxSize, true);
 			}
 			Gdk.Pixbuf pixbuf = Gdk.Pixbuf.FromDrawable(pix, Gdk.Colormap.System, 0, 0, 0, 0, CubeItem.CubesH * CubePxSize, CubeItem.CubesV * CubePxSize);
 

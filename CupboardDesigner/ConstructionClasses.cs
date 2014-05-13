@@ -49,15 +49,19 @@ namespace CupboardDesigner
 			return NewCube;
 		}
 
-		public void DrawCube(Context cr, int CubePxSize)
+		public void DrawCube(Context cr, int CubePxSize, bool Coloring)
 		{
 			int PxWidth = CubesH * CubePxSize;
 			int PxHeight = CubesV * CubePxSize;
 
 			//Фон
-			cr.Rectangle(0, 0, PxWidth, PxHeight);
-			cr.SetSourceRGB(1, 0.9, 0.6);
-			cr.Fill();
+			if(Coloring)
+			{
+				cr.Rectangle(0, 0, PxWidth, PxHeight);
+				//cr.SetSourceRGB(1, 0.9, 0.6);
+				cr.SetSourceRGB(0.77254902, 0.631372549, 0.435294118);
+				cr.Fill();
+			}
 
 			//Куб
 			Rsvg.Handle svg = new Rsvg.Handle(ImageFile);
@@ -79,6 +83,11 @@ namespace CupboardDesigner
 		private int cubesH = 1;
 		[XmlIgnore]
 		public SVGHelper BorderImage;
+
+		[XmlIgnore]
+		public int CupboardZeroX { get; private set;}
+		[XmlIgnore]
+		public int CupboardZeroY { get; private set;}
 
 		public List<Cube> Cubes;
 
@@ -206,6 +215,52 @@ namespace CupboardDesigner
 			}
 			return Catch;
 		}
+
+		public void Draw (Context cr, int width, int height, int CubePxSize, bool ForPrint)
+		{
+			int CupboardPxSizeH = (int)(CubePxSize * (CubesH + 1.2)) ;
+			int CupboardPxSizeV = (int)(CubePxSize * (CubesV + 1.2));
+
+			int ShiftX = (width - CupboardPxSizeH) / 2;
+			int ShiftY = (height - CupboardPxSizeV) / 2;
+
+			CupboardZeroX = ShiftX + (int)(CubePxSize * 0.6);
+			CupboardZeroY = ShiftY + (int)(CubePxSize * 0.6);
+
+			cr.Translate(CupboardZeroX, CupboardZeroY);
+			if(!ForPrint)
+				DrawGrid(cr, CubePxSize);
+			cr.Save();
+			if (BorderImage != null)
+				BorderImage.DrawBasis(cr, CubePxSize);
+			cr.Restore();
+
+			foreach(Cube cube in Cubes)
+			{
+				cr.Save();
+				cr.Translate(cube.BoardPositionX * CubePxSize, cube.BoardPositionY * CubePxSize);
+				cube.DrawCube(cr, CubePxSize, !ForPrint);
+				cr.Restore();
+			}
+		}
+
+		void DrawGrid(Context cr, int CubePxSize)
+		{
+			cr.SetSourceRGB(1, 1, 1);
+			cr.SetDash(new double[]{2.0, 3.0}, 0.0);
+			for (int x = 0; x <= CubesH; x++)
+			{
+				cr.MoveTo(x * CubePxSize, 0);
+				cr.LineTo(x * CubePxSize, CubePxSize * CubesV);
+			}
+			for (int y = 0; y <= CubesV; y++)
+			{
+				cr.MoveTo(0, y * CubePxSize);
+				cr.LineTo(CubesH * CubePxSize, CubePxSize * y);
+			}
+			cr.Stroke();
+		}
+
 	}
 
 	public class DragInformation

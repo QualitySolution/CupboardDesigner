@@ -143,8 +143,7 @@ namespace CupboardDesigner
 			} 
 			catch (Exception ex)
 			{
-				logger.Warn(ex.Message);
-				logger.Warn("Конфигурационный фаил не найден. Создаем новый.");
+				logger.WarnException("Конфигурационный фаил не найден. Создаем новый.", ex);
 				Configsource = new IniConfigSource();
 
 				IConfig config = Configsource.AddConfig("Login");
@@ -165,7 +164,8 @@ namespace CupboardDesigner
 				logger.Debug("Exist DataProviders:\n{0}", Providers);
 				QSMain.ProviderDB = DbProviderFactories.GetFactory("Mono.Data.Sqlite");
 				QSMain.ConnectionDB = QSMain.ProviderDB.CreateConnection();
-				QSMain.ConnectionDB.ConnectionString = String.Format("Data Source={0};Version=3;", DataBase);
+				QSMain.ConnectionString = String.Format("Data Source={0};Version=3;", DataBase);
+				QSMain.ConnectionDB.ConnectionString = QSMain.ConnectionString;
 				QSMain.ConnectionDB.Open();
 				logger.Info("Открытие базы данных прошло успешно.");
 				logger.Info("Читаем параметры");
