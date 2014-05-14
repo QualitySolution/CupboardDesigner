@@ -38,7 +38,7 @@ namespace CupboardDesigner
 			try
 			{
 				XmlSvg = new XmlDocument();
-				XmlSvg.LoadXml(System.Text.Encoding.Default.GetString(svg));
+				XmlSvg.LoadXml(System.Text.Encoding.UTF8.GetString(svg));
 
 				foreach (XmlNode node in XmlSvg.GetElementsByTagName("svg"))
 				{
@@ -79,6 +79,28 @@ namespace CupboardDesigner
 			}
 			logger.Debug("Закончили загрузку.");
 			return FrameSet;
+		}
+
+		public void PrepairForDBSave()
+		{
+
+			foreach (XmlNode node in XmlSvg.GetElementsByTagName("svg"))
+			{
+				XmlAttribute attr = (XmlAttribute)node.Attributes["stroke-width"];
+				if(attr != null)
+					attr.Value = XmlConvert.ToString(BaseWidht / 100);
+				break;
+			}
+
+			using (MemoryStream stream = new MemoryStream())
+			{
+				using (TextWriter writer = new StreamWriter(stream, new System.Text.UTF8Encoding(false)))
+				{
+					XmlSvg.Save(writer);
+				}
+				OriginalFile = stream.ToArray();
+			}
+			//logger.Debug(System.Text.Encoding.Default.GetString(OriginalFile));
 		}
 
 		private double ParseSize(string value)

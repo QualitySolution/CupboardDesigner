@@ -15,7 +15,6 @@ namespace CupboardDesigner
 		public bool NewItem;
 		private int ItemId;
 		private Dictionary<string, bool> NomenclatureInDB;
-		private byte[] ImageFile;
 		private SVGHelper ImageHelper;
 		private bool ImageChanged = false;
 
@@ -61,7 +60,7 @@ namespace CupboardDesigner
 					if(rdr["image"] != DBNull.Value)
 					{
 						int size = DBWorks.GetInt(rdr, "image_size", 0);
-						ImageFile = new byte[size];
+						byte[] ImageFile = new byte[size];
 						rdr.GetBytes(rdr.GetOrdinal("image"), 0, ImageFile, 0, size);
 						ImageHelper = new SVGHelper();
 						ImageHelper.LoadImage(ImageFile);
@@ -86,8 +85,7 @@ namespace CupboardDesigner
 			}
 			catch (Exception ex)
 			{
-				MainClass.StatusMessage("Ошибка получения информации о типе шкафа!");
-				logger.Error(ex.ToString());
+				logger.ErrorException("Ошибка получения информации о типе шкафа!", ex);
 				QSMain.ErrorMessage(this,ex);
 			}
 			TestCanSave();
@@ -164,8 +162,8 @@ namespace CupboardDesigner
 					sql = "UPDATE basis SET image_size = @image_size, image = @image WHERE id = @id";
 					cmd = new SqliteCommand(sql, (SqliteConnection)QSMain.ConnectionDB, trans);
 					cmd.Parameters.AddWithValue("@id", ItemId);
-					cmd.Parameters.AddWithValue("@image_size", ImageFile.Length);
-					cmd.Parameters.AddWithValue("@image", ImageFile);
+					cmd.Parameters.AddWithValue("@image_size", ImageHelper.OriginalFile.Length);
+					cmd.Parameters.AddWithValue("@image", ImageHelper.OriginalFile);
 					cmd.ExecuteNonQuery();
 				}
 
@@ -211,8 +209,8 @@ namespace CupboardDesigner
 						byte[] NewFile = ms.ToArray();
 						if(FrameTest.LoadImage(NewFile))
 						{
-							ImageFile =  NewFile;
 							ImageHelper = FrameTest;
+							ImageHelper.PrepairForDBSave();
 							ImageChanged = true;
 						}
 						else
@@ -241,8 +239,8 @@ namespace CupboardDesigner
 			logger.Debug("Render Cairo");
 			using (Context cr = Gdk.CairoHelper.Create (args.Event.Window)) 
 			{
-				int MaxWidth = args.Event.Area.Width;
-				int MaxHeight = args.Event.Area.Height;
+				int MaxWidth, MaxHeight;
+				args.Event.Window.GetSize(out MaxWidth, out MaxHeight);
 				logger.Debug("Image widget size W: {0} H: {1}", MaxWidth, MaxHeight);
 
 				int CubeSize = (int)(args.Event.Area.Height / 2.2);
