@@ -2,9 +2,12 @@
 using Gtk;
 using CupboardDesigner;
 using QSProjectsLib;
+using NLog;
 
 public partial class MainWindow: Gtk.Window
 {
+	private static Logger logger = LogManager.GetCurrentClassLogger();
+
 	public MainWindow() : base(Gtk.WindowType.Toplevel)
 	{
 		Build();
@@ -55,17 +58,16 @@ public partial class MainWindow: Gtk.Window
 				Result = (ResponseType)BasisEdit.Run();
 				BasisEdit.Destroy();
 				break;
-				/*case "services":
-				Service ServiceEdit = new Service();
-				if(e.NewItem)
-					ServiceEdit.NewItem = true;
-				else 
-					ServiceEdit.Fill(e.ItemId);
-				ServiceEdit.Show();
-				Result = (ResponseType)ServiceEdit.Run();
-				ServiceEdit.Destroy();
-				break; */
+			case "exhibition":
+				Exhibition ExhibitionEdit = new Exhibition();
+				if(!e.NewItem)
+					ExhibitionEdit.Fill(e.ItemId);
+				ExhibitionEdit.Show();
+				Result = (ResponseType)ExhibitionEdit.Run();
+				ExhibitionEdit.Destroy();
+				break;
 			default:
+				logger.Warn("Диалог для справочника {0} не найден.", e.TableName);
 				Result = ResponseType.None;
 				break;
 		}
@@ -87,7 +89,7 @@ public partial class MainWindow: Gtk.Window
 	protected void OnAction5Activated(object sender, EventArgs e)
 	{
 		Reference winref = new Reference();
-		winref.SetMode(true,false,true,true,true);
+		winref.SetMode(false,false,true,true,true);
 		winref.FillList("exhibition","выставка", "Выставки");
 		winref.Show();
 		winref.Run();

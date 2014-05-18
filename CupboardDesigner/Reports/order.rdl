@@ -6,14 +6,6 @@
   </Author>
   <PageHeight>11in</PageHeight>
   <PageWidth>8.5in</PageWidth>
-  <DataSources>
-    <DataSource Name="DS1">
-      <ConnectionProperties>
-        <DataProvider>SQLite</DataProvider>
-        <ConnectString>Data Source=C:\Program Files\Конструктор шкафа\Cupboard.db3;Version=3;Pooling=True;Max Pool Size=100;</ConnectString>
-      </ConnectionProperties>
-    </DataSource>
-  </DataSources>
   <Width>7.5in</Width>
   <TopMargin>.25in</TopMargin>
   <LeftMargin>.25in</LeftMargin>
@@ -84,7 +76,7 @@ LEFT JOIN facing ON facing.id = facing_id
     <DataSet Name="Order">
       <Query>
         <DataSourceName>DS1</DataSourceName>
-        <CommandText>SELECT customer, arrval, delivery, exhibition.name as exhibition, comment FROM orders
+        <CommandText>SELECT customer, arrval, delivery, exhibition.name as exhibition, exhibition.phone, exhibition.address, comment FROM orders
 LEFT JOIN exhibition ON exhibition_id = exhibition.id
  WHERE orders.id = @id</CommandText>
         <QueryParameters>
@@ -110,6 +102,14 @@ LEFT JOIN exhibition ON exhibition_id = exhibition.id
           <DataField>exhibition</DataField>
           <TypeName>System.String</TypeName>
         </Field>
+        <Field Name="phone">
+          <DataField>phone</DataField>
+          <TypeName>System.String</TypeName>
+        </Field>
+        <Field Name="address">
+          <DataField>address</DataField>
+          <TypeName>System.String</TypeName>
+        </Field>
         <Field Name="comment">
           <DataField>comment</DataField>
           <TypeName>System.String</TypeName>
@@ -131,8 +131,8 @@ LEFT JOIN exhibition ON exhibition_id = exhibition.id
           <BorderStyle>
             <Default>Solid</Default>
           </BorderStyle>
-          <BorderColor  />
-          <BorderWidth  />
+          <BorderColor />
+          <BorderWidth />
         </Style>
         <TableColumns>
           <TableColumn>
@@ -456,13 +456,13 @@ LEFT JOIN exhibition ON exhibition_id = exhibition.id
           </TableRows>
         </Details>
         <Left>1.7pt</Left>
-        <Top>374.2pt</Top>
+        <Top>381.4pt</Top>
       </Table>
       <List Name="List1">
         <Height>74.71pt</Height>
         <Width>561.55pt</Width>
-        <Left>10.70pt</Left>
-        <Top>7.10pt</Top>
+        <Left>7.5pt</Left>
+        <Top>3.9pt</Top>
         <ReportItems>
           <Textbox Name="Textbox2">
             <Height>17.24pt</Height>
@@ -523,11 +523,11 @@ LEFT JOIN exhibition ON exhibition_id = exhibition.id
           </Textbox>
           <Textbox Name="Textbox6">
             <Height>14.26pt</Height>
-            <Width>477.92pt</Width>
+            <Width>303.92pt</Width>
             <Value>={customer}</Value>
             <ZIndex>1</ZIndex>
-            <Left>84.2pt</Left>
-            <Top>29.0pt</Top>
+            <Left>84.20pt</Left>
+            <Top>27.40pt</Top>
             <Style>
               <BorderStyle />
               <BorderColor />
@@ -535,12 +535,12 @@ LEFT JOIN exhibition ON exhibition_id = exhibition.id
             </Style>
           </Textbox>
           <Textbox Name="Textbox7">
-            <Height>12pt</Height>
-            <Width>3in</Width>
+            <Height>12.00pt</Height>
+            <Width>216.81pt</Width>
             <Value>={arrval}</Value>
             <ZIndex>1</ZIndex>
-            <Left>83.4pt</Left>
-            <Top>43.9pt</Top>
+            <Left>83.40pt</Left>
+            <Top>43.10pt</Top>
             <Style>
               <BorderStyle />
               <BorderColor />
@@ -567,14 +567,45 @@ LEFT JOIN exhibition ON exhibition_id = exhibition.id
             <Width>188.87pt</Width>
             <Value>={exhibition}</Value>
             <ZIndex>1</ZIndex>
-            <Left>375.3pt</Left>
-            <Top>16.5pt</Top>
+            <Left>374.50pt</Left>
+            <Top>12.50pt</Top>
             <Style>
               <BorderStyle />
               <BorderColor />
               <BorderWidth />
-              <TextAlign>Center</TextAlign>
+              <TextAlign>Right</TextAlign>
+              <FontWeight>Bold</FontWeight>
+              <TextDecoration>None</TextDecoration>
             </Style>
+          </Textbox>
+          <Textbox Name="Textbox30">
+            <Height>13.51pt</Height>
+            <Width>181.31pt</Width>
+            <Value>={phone}</Value>
+            <ZIndex>1</ZIndex>
+            <Left>382.4pt</Left>
+            <Top>28.2pt</Top>
+            <Style>
+              <BorderStyle />
+              <BorderColor />
+              <BorderWidth />
+              <TextAlign>Right</TextAlign>
+            </Style>
+          </Textbox>
+          <Textbox Name="Textbox31">
+            <Height>26.27pt</Height>
+            <Width>176.92pt</Width>
+            <Value>={address}</Value>
+            <ZIndex>1</ZIndex>
+            <Left>387.1pt</Left>
+            <Top>41.4pt</Top>
+            <Style>
+              <BorderStyle />
+              <BorderColor />
+              <BorderWidth />
+              <TextAlign>Right</TextAlign>
+            </Style>
+            <CanGrow>true</CanGrow>
           </Textbox>
         </ReportItems>
         <DataSetName>Order</DataSetName>
@@ -629,12 +660,14 @@ LEFT JOIN exhibition ON exhibition_id = exhibition.id
         </ReportItems>
       </List>
       <Image Name="Image1">
-        <Height>289.40pt</Height>
-        <Width>547.95pt</Width>
-        <Left>15.40pt</Left>
-        <Top>77.00pt</Top>
+        <Height>293.90pt</Height>
+        <Width>562.20pt</Width>
+        <Left>13.00pt</Left>
+        <Top>81.00pt</Top>
         <Style>
-          <BorderStyle />
+          <BorderStyle>
+            <Top>Dashed</Top>
+          </BorderStyle>
           <BorderColor />
           <BorderWidth />
           <BackgroundColor>
@@ -722,4 +755,13 @@ LEFT JOIN exhibition ON exhibition_id = exhibition.id
       </Prompt>
     </ReportParameter>
   </ReportParameters>
+  <DataSources>
+    <DataSource Name="DS1">
+      <ConnectionProperties>
+        <DataProvider>SQLite</DataProvider>
+        <ConnectString>Data Source=C:\Users\виртуал\AppData\Roaming\CupboardDesigner\Cupboard.db3;Version=3;Pooling=True;Max Pool Size=100;</ConnectString>
+        <IntegratedSecurity>false</IntegratedSecurity>
+      </ConnectionProperties>
+    </DataSource>
+  </DataSources>
 </Report>

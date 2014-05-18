@@ -93,6 +93,8 @@
     <Compile Include="SVGHelper.cs" />
     <Compile Include="Widgets\CupboardListItem.cs" />
     <Compile Include="gtk-gui\CupboardDesigner.CupboardListItem.cs" />
+    <Compile Include="Exhibition.cs" />
+    <Compile Include="gtk-gui\CupboardDesigner.Exhibition.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>

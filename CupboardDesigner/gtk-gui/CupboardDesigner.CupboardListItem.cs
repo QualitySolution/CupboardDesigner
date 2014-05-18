@@ -30,6 +30,7 @@ namespace CupboardDesigner
 			this.radioType = new global::Gtk.RadioButton (global::Mono.Unix.Catalog.GetString ("radiobutton1"));
 			this.radioType.CanFocus = true;
 			this.radioType.Name = "radioType";
+			this.radioType.Active = true;
 			this.radioType.DrawIndicator = true;
 			this.radioType.UseUnderline = true;
 			this.radioType.Group = new global::GLib.SList (global::System.IntPtr.Zero);

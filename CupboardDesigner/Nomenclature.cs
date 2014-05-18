@@ -55,7 +55,6 @@ namespace CupboardDesigner
 					entryName.Text = rdr["name"].ToString();
 					comboType.Active = (int) Enum.Parse(typeof(NomType), rdr["type"].ToString());
 					entryArticle.Text = DBWorks.GetString(rdr, "article", "");
-					entryName.Text = DBWorks.GetString(rdr, "name", "");
 					entryDescription.Text = DBWorks.GetString(rdr, "description", "");
 					spinH.Value = DBWorks.GetInt(rdr, "height", 0);
 					spinL.Value = DBWorks.GetInt(rdr, "lenght", 0);
