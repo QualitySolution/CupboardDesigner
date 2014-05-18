@@ -1078,7 +1078,7 @@
           <widget class="Gtk.Notebook" id="notebook1">
             <property name="MemberName" />
             <property name="CanFocus">True</property>
-            <property name="CurrentPage">1</property>
+            <property name="CurrentPage">0</property>
             <signal name="SwitchPage" handler="OnNotebook1SwitchPage" />
             <child>
               <widget class="Gtk.HBox" id="hbox1">
@@ -1188,6 +1188,7 @@
                             <property name="Date">0</property>
                             <property name="IsEditable">True</property>
                             <property name="AutoSeparation">True</property>
+                            <signal name="DateChanged" handler="OnOrderDatesChanged" />
                           </widget>
                           <packing>
                             <property name="TopAttach">1</property>
@@ -1211,6 +1212,7 @@
                             <property name="Date">0</property>
                             <property name="IsEditable">True</property>
                             <property name="AutoSeparation">True</property>
+                            <signal name="DateChanged" handler="OnOrderDatesChanged" />
                           </widget>
                           <packing>
                             <property name="TopAttach">2</property>

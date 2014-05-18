@@ -50,6 +50,7 @@ namespace CupboardDesigner
 			this.Build();
 
 			ComboWorks.ComboFillReference(comboExhibition, "exhibition", ComboWorks.ListMode.WithNo);
+			dateArrval.Date = DateTime.Today;
 
 			//Создаем таблицу номенклатуры
 			ComboBox TempCombo = new ComboBox();
@@ -321,6 +322,9 @@ namespace CupboardDesigner
 
 		protected void TestCanSave ()
 		{
+			bool Dateok = dateArrval.IsEmpty || dateDelivery.IsEmpty || dateArrval.Date <= dateDelivery.Date;
+
+			buttonOk.Sensitive = buttonPrint.Sensitive = Dateok;
 		}
 
 		protected void OnButtonOkClicked(object sender, EventArgs e)
@@ -825,6 +829,21 @@ namespace CupboardDesigner
 				"&basel=" + OrderCupboard.CubesH.ToString() + 
 				"&baseh=" + OrderCupboard.CubesV.ToString();
 			ViewReportExt.Run ("order", param);
+		}
+
+		protected void OnOrderDatesChanged(object sender, EventArgs e)
+		{
+			TestCanSave();
+			bool Dateok = dateArrval.IsEmpty || dateDelivery.IsEmpty || dateArrval.Date <= dateDelivery.Date;
+			if(!Dateok)
+			{
+				MessageDialog md = new MessageDialog ( this, DialogFlags.DestroyWithParent,
+					MessageType.Warning, 
+					ButtonsType.Ok, 
+					"Дата сдачи должна быть позже даты прихода.");
+				md.Run ();
+				md.Destroy();
+			}
 		}
 
 	}
