@@ -18,7 +18,6 @@ namespace CupboardDesigner
 		private TreeModel MaterialNameList, FacingNameList;
 		private List<Cube> CubeList;
 		private int CubePxSize = 100;
-		private int BorderPxSize = 30;
 		private VBox vboxCubeList, vboxTypeList;
 		private HBox hboxCubeList, hboxTypeList;
 		private int MaxCubeVSize;
@@ -489,7 +488,6 @@ namespace CupboardDesigner
 			if(CubePxSize != NeedCubePxSize)
 			{
 				CubePxSize = NeedCubePxSize;
-				BorderPxSize = Convert.ToInt32(CubePxSize * 0.3);
 
 				int MaxHeight = 0;
 				foreach(Cube cube in CubeList)
