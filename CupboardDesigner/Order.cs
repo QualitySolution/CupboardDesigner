@@ -327,7 +327,7 @@ namespace CupboardDesigner
 			buttonOk.Sensitive = buttonPrint.Sensitive = Dateok;
 		}
 
-		protected void OnButtonOkClicked(object sender, EventArgs e)
+		private bool Save()
 		{
 			string sql;
 			if (NewItem)
@@ -363,51 +363,67 @@ namespace CupboardDesigner
 					sql = @"select last_insert_rowid()";
 					cmd = new SqliteCommand(sql, (SqliteConnection)QSMain.ConnectionDB, trans);
 					ItemId = Convert.ToInt32(cmd.ExecuteScalar());
+					NewItem = false;
 				}
 
 				// Запись компонент
-				foreach(object[] row in ComponentsStore)
+				TreeIter iter;
+				if(ComponentsStore.GetIterFirst(out iter))
+				
 				{
-					bool HasValue = (int) row[(int)ComponentCol.count] > 0;
-                    if(HasValue)
-				    {
-						if((long)row[(int)ComponentCol.row_id] < 0)
-							sql = "INSERT INTO order_components (order_id, nomenclature_id, count, material_id, facing_id, comment) " +
-								"VALUES (@order_id, @nomenclature_id, @count, @material_id, @facing_id, @comment)";
-						else
-							sql = "UPDATE order_components SET material_id = @material_id, facing_id = @facing_id, count = @count, " +
-								"comment = @comment " +
-								"WHERE id = @id";
-
-						cmd = new SqliteCommand(sql, (SqliteConnection)QSMain.ConnectionDB, trans);
-						cmd.Parameters.AddWithValue("@id", (long)row[(int)ComponentCol.row_id]);
-						cmd.Parameters.AddWithValue("@order_id", ItemId);
-						cmd.Parameters.AddWithValue("@nomenclature_id", row[(int)ComponentCol.nomenclature_id]);
-						cmd.Parameters.AddWithValue("@count", row[(int)ComponentCol.count]);
-						cmd.Parameters.AddWithValue("@material_id", DBWorks.ValueOrNull((int) row[(int)ComponentCol.material_id] > 0, row[(int)ComponentCol.material_id]));
-						cmd.Parameters.AddWithValue("@facing_id", DBWorks.ValueOrNull((int)row[(int)ComponentCol.facing_id] > 0, row[(int)ComponentCol.facing_id]));
-						cmd.Parameters.AddWithValue("@comment", DBWorks.ValueOrNull((string)row[(int)ComponentCol.comment] != "", row[(int)ComponentCol.comment]));
-						cmd.ExecuteNonQuery();
-					}
-					else if((long)row[(int)ComponentCol.row_id] > 0)
+					do
 					{
-						sql = "DELETE FROM order_components WHERE id = @id";
+						bool HasValue = (int) ComponentsStore.GetValue(iter, (int)ComponentCol.count) > 0;
+						bool InDB = (long)ComponentsStore.GetValue(iter, (int)ComponentCol.row_id) > 0;
+	                    if(HasValue)
+					    {
+							if(!InDB)
+								sql = "INSERT INTO order_components (order_id, nomenclature_id, count, material_id, facing_id, comment) " +
+									"VALUES (@order_id, @nomenclature_id, @count, @material_id, @facing_id, @comment)";
+							else
+								sql = "UPDATE order_components SET material_id = @material_id, facing_id = @facing_id, count = @count, " +
+									"comment = @comment " +
+									"WHERE id = @id";
 
-						cmd = new SqliteCommand(sql, (SqliteConnection)QSMain.ConnectionDB, trans);
-						cmd.Parameters.AddWithValue("@id", row[(int)ComponentCol.row_id]);
-						cmd.ExecuteNonQuery();
+							cmd = new SqliteCommand(sql, (SqliteConnection)QSMain.ConnectionDB, trans);
+							cmd.Parameters.AddWithValue("@id", (long)ComponentsStore.GetValue(iter, (int)ComponentCol.row_id));
+							cmd.Parameters.AddWithValue("@order_id", ItemId);
+							cmd.Parameters.AddWithValue("@nomenclature_id", ComponentsStore.GetValue(iter,(int)ComponentCol.nomenclature_id));
+							cmd.Parameters.AddWithValue("@count", ComponentsStore.GetValue(iter,(int)ComponentCol.count));
+							cmd.Parameters.AddWithValue("@material_id", DBWorks.ValueOrNull((int) ComponentsStore.GetValue(iter,(int)ComponentCol.material_id) > 0, ComponentsStore.GetValue(iter, (int)ComponentCol.material_id)));
+							cmd.Parameters.AddWithValue("@facing_id", DBWorks.ValueOrNull((int)ComponentsStore.GetValue(iter, (int)ComponentCol.facing_id) > 0, ComponentsStore.GetValue(iter, (int)ComponentCol.facing_id)));
+							cmd.Parameters.AddWithValue("@comment", DBWorks.ValueOrNull((string)ComponentsStore.GetValue(iter, (int)ComponentCol.comment) != "", ComponentsStore.GetValue(iter, (int)ComponentCol.comment)));
+							cmd.ExecuteNonQuery();
+							if(!InDB)
+							{
+								sql = @"select last_insert_rowid()";
+								cmd = new SqliteCommand(sql, (SqliteConnection)QSMain.ConnectionDB, trans);
+								long RowId = (long) cmd.ExecuteScalar();
+								ComponentsStore.SetValue(iter, (int)ComponentCol.row_id, (object)RowId);
+							}
+						}
+						else if(InDB)
+						{
+							sql = "DELETE FROM order_components WHERE id = @id";
+
+							cmd = new SqliteCommand(sql, (SqliteConnection)QSMain.ConnectionDB, trans);
+							cmd.Parameters.AddWithValue("@id", ComponentsStore.GetValue(iter, (int)ComponentCol.row_id));
+							cmd.ExecuteNonQuery();
+						}
 					}
+					while(ComponentsStore.IterNext(ref iter));
 				}
 
 				trans.Commit();
 				MainClass.StatusMessage("Ok");
-				Respond(Gtk.ResponseType.Ok);
+				return true;
 			}
 			catch (Exception ex)
 			{
 				trans.Rollback();
 				logger.ErrorException("Ошибка записи заказа!", ex);
 				QSMain.ErrorMessage(this, ex);
+				return false;
 			}
 		}
 
@@ -810,6 +826,8 @@ namespace CupboardDesigner
 
 		protected void OnButtonPrintClicked(object sender, EventArgs e)
 		{
+			if (!Save())
+				return;
 			string TempImagePath = System.IO.Path.Combine (System.IO.Path.GetTempPath (), String.Format("Cupboard{0}.png", ItemId));
 			int widght = 2244;
 			int height = 1181;
@@ -844,6 +862,12 @@ namespace CupboardDesigner
 				md.Run ();
 				md.Destroy();
 			}
+		}
+
+		protected void OnButtonOkClicked(object sender, EventArgs e)
+		{
+			if(Save())
+				Respond(Gtk.ResponseType.Ok);
 		}
 
 	}
