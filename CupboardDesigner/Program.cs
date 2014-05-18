@@ -130,10 +130,12 @@ namespace CupboardDesigner
 
 		private static void CreateConnection()
 		{
-			string ConfigFileName = System.Reflection.Assembly.GetExecutingAssembly().GetName().Name.ToString() + ".ini";
-			string DataBase = "Cupboard.db3";
+			string AppName = System.Reflection.Assembly.GetExecutingAssembly().GetName().Name.ToString();
+			string ConfigFileName = AppName + ".ini";
+			string AppFolder = System.IO.Path.Combine (Environment.GetFolderPath (Environment.SpecialFolder.ApplicationData), AppName);
+			string DataBase = System.IO.Path.Combine (AppFolder, "Cupboard.db3");
 
-			string configfile = System.IO.Path.Combine (Environment.GetFolderPath (Environment.SpecialFolder.ApplicationData), ConfigFileName);
+			string configfile = System.IO.Path.Combine (AppFolder, ConfigFileName);
 			IniConfigSource Configsource;
 			try
 			{
@@ -148,6 +150,8 @@ namespace CupboardDesigner
 
 				IConfig config = Configsource.AddConfig("Login");
 				config.Set("DataBase", DataBase);
+				if (!System.IO.Directory.Exists(AppFolder))
+					System.IO.Directory.CreateDirectory(AppFolder);
 				Configsource.Save(configfile);
 			}
 
@@ -164,6 +168,7 @@ namespace CupboardDesigner
 				logger.Debug("Exist DataProviders:\n{0}", Providers);
 				QSMain.ProviderDB = DbProviderFactories.GetFactory("Mono.Data.Sqlite");
 				QSMain.ConnectionDB = QSMain.ProviderDB.CreateConnection();
+				logger.Debug("Открываем базу:{0}", DataBase);
 				QSMain.ConnectionString = String.Format("Data Source={0};Version=3;", DataBase);
 				QSMain.ConnectionDB.ConnectionString = QSMain.ConnectionString;
 				QSMain.ConnectionDB.Open();
