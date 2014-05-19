@@ -1990,7 +1990,7 @@
       </widget>
     </child>
   </widget>
-  <widget class="Gtk.Bin" id="CupboardDesigner.CupboardListItem" design-size="122 38">
+  <widget class="Gtk.Bin" id="CupboardDesigner.CupboardListItem" design-size="116 29">
     <property name="MemberName" />
     <property name="Visible">False</property>
     <child>
@@ -2018,23 +2018,16 @@
           </packing>
         </child>
         <child>
-          <widget class="Gtk.RadioButton" id="radioType">
+          <widget class="Gtk.Label" id="labelName">
             <property name="MemberName" />
-            <property name="CanFocus">True</property>
-            <property name="Label" translatable="yes">radiobutton1</property>
-            <property name="Active">True</property>
-            <property name="DrawIndicator">True</property>
-            <property name="HasLabel">True</property>
-            <property name="UseUnderline">True</property>
-            <property name="Group">group1</property>
+            <property name="LabelProp" translatable="yes">label1</property>
           </widget>
           <packing>
             <property name="TopAttach">1</property>
             <property name="BottomAttach">2</property>
-            <property name="AutoSize">True</property>
-            <property name="XOptions">Fill</property>
+            <property name="AutoSize">False</property>
             <property name="YOptions">Fill</property>
-            <property name="XExpand">False</property>
+            <property name="XExpand">True</property>
             <property name="XFill">True</property>
             <property name="XShrink">False</property>
             <property name="YExpand">False</property>

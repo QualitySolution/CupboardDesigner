@@ -13,12 +13,20 @@ namespace CupboardDesigner
 		public string _Name;
 		public SVGHelper Image;
 		public Gtk.RadioButton Button;
+		private Rsvg.Handle CheckImage;
 
-		public CupboardListItem()
+		public CupboardListItem(Rsvg.Handle checkimage)
 		{
 			this.Build();
-			Button = radioType;
+			Button = new RadioButton("");
+			Button.Toggled += HandleButtonToggled;
+			CheckImage = checkimage;
 			drawImage.AddEvents((int)Gdk.EventMask.ButtonPressMask);
+		}
+
+		void HandleButtonToggled (object sender, EventArgs e)
+		{
+			this.State = Button.State;
 		}
 
 		int _CubePxSize;
@@ -40,7 +48,7 @@ namespace CupboardDesigner
 			set
 			{
 				_Name = value;
-				radioType.Label = _Name;
+				labelName.LabelProp = _Name;
 			}
 		}
 
@@ -56,8 +64,17 @@ namespace CupboardDesigner
 				return;
 			using (Context cr = Gdk.CairoHelper.Create (args.Event.Window)) 
 			{
+				cr.Save();
 				cr.Translate(CubePxSize * 0.6, CubePxSize * 0.6);
 				Image.DrawBasis(cr, CubePxSize);
+				cr.Restore();
+
+				if (this.State == StateType.Active)
+				{
+					cr.Translate(10, 0);
+					cr.Scale(0.1, 0.1);
+					CheckImage.RenderCairo(cr);
+				}
 			}
 		}
 
@@ -65,7 +82,7 @@ namespace CupboardDesigner
 		{
 			if(args.Event.Button == 1)
 			{
-				radioType.Active = true;
+				Button.Active = true;
 			}
 		}
 	}

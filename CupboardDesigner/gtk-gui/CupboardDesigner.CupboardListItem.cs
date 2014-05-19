@@ -6,7 +6,7 @@ namespace CupboardDesigner
 	{
 		private global::Gtk.Table table1;
 		private global::Gtk.DrawingArea drawImage;
-		private global::Gtk.RadioButton radioType;
+		private global::Gtk.Label labelName;
 
 		protected virtual void Build ()
 		{
@@ -27,18 +27,13 @@ namespace CupboardDesigner
 			w1.XOptions = ((global::Gtk.AttachOptions)(0));
 			w1.YOptions = ((global::Gtk.AttachOptions)(1));
 			// Container child table1.Gtk.Table+TableChild
-			this.radioType = new global::Gtk.RadioButton (global::Mono.Unix.Catalog.GetString ("radiobutton1"));
-			this.radioType.CanFocus = true;
-			this.radioType.Name = "radioType";
-			this.radioType.Active = true;
-			this.radioType.DrawIndicator = true;
-			this.radioType.UseUnderline = true;
-			this.radioType.Group = new global::GLib.SList (global::System.IntPtr.Zero);
-			this.table1.Add (this.radioType);
-			global::Gtk.Table.TableChild w2 = ((global::Gtk.Table.TableChild)(this.table1 [this.radioType]));
+			this.labelName = new global::Gtk.Label ();
+			this.labelName.Name = "labelName";
+			this.labelName.LabelProp = global::Mono.Unix.Catalog.GetString ("label1");
+			this.table1.Add (this.labelName);
+			global::Gtk.Table.TableChild w2 = ((global::Gtk.Table.TableChild)(this.table1 [this.labelName]));
 			w2.TopAttach = ((uint)(1));
 			w2.BottomAttach = ((uint)(2));
-			w2.XOptions = ((global::Gtk.AttachOptions)(4));
 			w2.YOptions = ((global::Gtk.AttachOptions)(4));
 			this.Add (this.table1);
 			if ((this.Child != null)) {

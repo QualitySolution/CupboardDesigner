@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   version="1.0"
+   width="60"
+   height="60"
+   id="tick"
+   inkscape:version="0.48.4 r9939"
+   sodipodi:docname="Yes_check.svg">
+  <metadata
+     id="metadata10">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <sodipodi:namedview
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1"
+     objecttolerance="10"
+     gridtolerance="10"
+     guidetolerance="10"
+     inkscape:pageopacity="0"
+     inkscape:pageshadow="2"
+     inkscape:window-width="640"
+     inkscape:window-height="480"
+     id="namedview8"
+     showgrid="false"
+     inkscape:zoom="0.39333333"
+     inkscape:cx="300"
+     inkscape:cy="300"
+     inkscape:window-x="228"
+     inkscape:window-y="153"
+     inkscape:window-maximized="0"
+     inkscape:current-layer="tick" />
+  <defs
+     id="defs">
+    <linearGradient
+       x1="548"
+       y1="77"
+       x2="139"
+       y2="439"
+       id="g"
+       gradientUnits="userSpaceOnUse">
+      <stop
+         style="stop-color:#8dc549;stop-opacity:1;"
+         offset="0"
+         id="s1" />
+      <stop
+         style="stop-color:#a0cf67;stop-opacity:1;"
+         offset="1"
+         id="s2" />
+    </linearGradient>
+  </defs>
+  <path
+     d="M 13,416 C 328,703 127,576 591,64 C 620,27 548,12 490,36 C 402,73 244,381 207,421 C 169,460 123,343 87,341 C 52,340 -25,380 13,416 z"
+     style="fill:url(#g);fill-opacity:1;fill-rule:evenodd;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+     id="t" />
+</svg>

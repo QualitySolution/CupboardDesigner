@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 using NLog;
 using Gtk;
 using Mono.Data.Sqlite;
@@ -153,6 +154,14 @@ namespace CupboardDesigner
 			TypeWidgetList = new List<CupboardListItem>();
 			hboxTypeList = new HBox(false, 3);
 			vboxTypeList = new VBox(false, 3);
+			Stream stream = System.Reflection.Assembly.GetExecutingAssembly().GetManifestResourceStream( "CupboardDesigner.icons.Yes_check.svg" );
+			byte[] temparray;
+			using(MemoryStream mstream = new MemoryStream())
+			{
+				stream.CopyTo(mstream);
+				temparray = mstream.ToArray();
+			}
+			Rsvg.Handle CheckImage = new Rsvg.Handle(temparray);
 			sql = "SELECT * FROM basis";
 			cmd = new SqliteCommand(sql, (SqliteConnection)QSMain.ConnectionDB);
 			using (SqliteDataReader rdr = cmd.ExecuteReader())
@@ -164,7 +173,7 @@ namespace CupboardDesigner
 						continue;
 
 					//Добавляем виджеты в лист
-					CupboardListItem TempWidget = new CupboardListItem();
+					CupboardListItem TempWidget = new CupboardListItem(CheckImage);
 					TempWidget.id = rdr.GetInt32(rdr.GetOrdinal("id"));
 					TempWidget.ItemName = DBWorks.GetString(rdr, "name", "");
 					TempWidget.CubePxSize = CubePxSize;

@@ -71,6 +71,7 @@
     <EmbeddedResource Include="icons\emblem-synchronizing.png" />
     <EmbeddedResource Include="icons\logo.png" />
     <EmbeddedResource Include="icons\logo.ico" />
+    <EmbeddedResource Include="icons\Yes_check.svg" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="gtk-gui\generated.cs" />
