@@ -84,8 +84,6 @@
     <Compile Include="Basis.cs" />
     <Compile Include="gtk-gui\CupboardDesigner.Basis.cs" />
     <Compile Include="MainWinOrders.cs" />
-    <Compile Include="Order.cs" />
-    <Compile Include="gtk-gui\CupboardDesigner.Order.cs" />
     <Compile Include="ConstructionClasses.cs" />
     <Compile Include="Widgets\CubeListItem.cs" />
     <Compile Include="gtk-gui\CupboardDesigner.CubeListItem.cs" />
@@ -96,6 +94,8 @@
     <Compile Include="gtk-gui\CupboardDesigner.CupboardListItem.cs" />
     <Compile Include="Exhibition.cs" />
     <Compile Include="gtk-gui\CupboardDesigner.Exhibition.cs" />
+    <Compile Include="Order.cs" />
+    <Compile Include="gtk-gui\CupboardDesigner.Order.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>

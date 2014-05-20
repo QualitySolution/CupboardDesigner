@@ -10,7 +10,7 @@ using Gdk;
 
 namespace CupboardDesigner
 {
-	public partial class Order : Gtk.Dialog
+	public partial class Order : Gtk.Window
 	{
 		private static Logger logger = LogManager.GetCurrentClassLogger();
 		private bool NewItem = true;
@@ -46,7 +46,8 @@ namespace CupboardDesigner
 			new Gtk.TargetEntry ("application/cube", Gtk.TargetFlags.App, 0)
 		};
 
-		public Order()
+		public Order() : 
+			base(Gtk.WindowType.Toplevel)
 		{
 			this.Build();
 
@@ -333,7 +334,7 @@ namespace CupboardDesigner
 		{
 			bool Dateok = dateArrval.IsEmpty || dateDelivery.IsEmpty || dateArrval.Date <= dateDelivery.Date;
 
-			buttonOk.Sensitive = buttonPrint.Sensitive = Dateok;
+			saveAction.Sensitive = printAction.Sensitive = Dateok;
 		}
 
 		private bool Save()
@@ -378,14 +379,14 @@ namespace CupboardDesigner
 				// Запись компонент
 				TreeIter iter;
 				if(ComponentsStore.GetIterFirst(out iter))
-				
+
 				{
 					do
 					{
 						bool HasValue = (int) ComponentsStore.GetValue(iter, (int)ComponentCol.count) > 0;
 						bool InDB = (long)ComponentsStore.GetValue(iter, (int)ComponentCol.row_id) > 0;
-	                    if(HasValue)
-					    {
+						if(HasValue)
+						{
 							if(!InDB)
 								sql = "INSERT INTO order_components (order_id, nomenclature_id, count, material_id, facing_id, comment) " +
 									"VALUES (@order_id, @nomenclature_id, @count, @material_id, @facing_id, @comment)";
@@ -425,6 +426,7 @@ namespace CupboardDesigner
 
 				trans.Commit();
 				MainClass.StatusMessage("Ok");
+				MainClass.MainWin.UpdateOrders();
 				return true;
 			}
 			catch (Exception ex)
@@ -484,7 +486,7 @@ namespace CupboardDesigner
 				OrderCupboard.Draw(cr, w, h, CubePxSize, false);
 			}
 		}
-									
+
 		protected void OnDrawCupboardSizeAllocated(object o, SizeAllocatedArgs args)
 		{
 			CalculateCubePxSize(args.Allocation);
@@ -715,6 +717,8 @@ namespace CupboardDesigner
 				if (OrderCupboard.Clean())
 					UpdateCubeComponents();
 			}
+			goBackAction.Sensitive = notebook1.CurrentPage != 0;
+			goForwardAction.Sensitive = notebook1.CurrentPage != 2;
 		}
 
 		private void UpdateBasisComponents(int id)
@@ -734,7 +738,7 @@ namespace CupboardDesigner
 				}
 				while(ComponentsStore.IterNext(ref iter));
 			}
-				
+
 			string sql = "SELECT nomenclature.name as nomenclature, nomenclature.type, basis_items.* FROM basis_items " +
 				"LEFT JOIN nomenclature ON nomenclature.id = basis_items.item_id " +
 				"WHERE basis_id = @basis_id";
@@ -873,10 +877,20 @@ namespace CupboardDesigner
 			}
 		}
 
-		protected void OnButtonOkClicked(object sender, EventArgs e)
+		protected void OnSaveActionActivated(object sender, EventArgs e)
 		{
-			if(Save())
-				Respond(Gtk.ResponseType.Ok);
+			if (Save())
+				this.Destroy();
+		}
+
+		protected void OnGoBackActionActivated(object sender, EventArgs e)
+		{
+			notebook1.PrevPage();
+		}
+
+		protected void OnGoForwardActionActivated(object sender, EventArgs e)
+		{
+			notebook1.NextPage();
 		}
 
 	}

@@ -31,7 +31,7 @@ public partial class MainWindow: Gtk.Window
 		UpdateOrders();
 	}
 
-	void UpdateOrders()
+	public void UpdateOrders()
 	{
 		MainClass.StatusMessage("Получаем таблицу заказов...");
 
@@ -100,12 +100,17 @@ public partial class MainWindow: Gtk.Window
 	protected void OnButtonAddClicked(object sender, EventArgs e)
 	{
 		Order ItemOrder = new Order();
+		ItemOrder.DeleteEvent += OnDeleteOrderEvent;
 		ItemOrder.Show();
-		if ((ResponseType)ItemOrder.Run() == ResponseType.Ok)
-			UpdateOrders();
-		ItemOrder.Destroy();
 	}
 
+	protected void OnDeleteOrderEvent( object s, DeleteEventArgs arg)
+	{
+		Order OrderWin = (Order)s;
+		OrderWin.Destroy ();
+		UpdateOrders();
+	}
+		
 	protected void OnButtonEditClicked(object sender, EventArgs e)
 	{
 		TreeIter iter;
@@ -113,11 +118,8 @@ public partial class MainWindow: Gtk.Window
 		int itemid = Convert.ToInt32(OrdersFilter.GetValue(iter,0));
 		Order winOrder = new Order();
 		winOrder.Fill(itemid);
+		winOrder.DeleteEvent += OnDeleteOrderEvent;
 		winOrder.Show();
-		ResponseType result = (ResponseType)winOrder.Run();
-		winOrder.Destroy();
-		if(result == ResponseType.Ok)
-			UpdateOrders();
 	}
 
 	protected void OnButtonDelClicked(object sender, EventArgs e)
