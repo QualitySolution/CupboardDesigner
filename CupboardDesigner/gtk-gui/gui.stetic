@@ -1520,6 +1520,7 @@
         <property name="ShortLabel" translatable="yes">Отменить</property>
         <property name="StockId">gtk-revert-to-saved</property>
         <property name="Tooltip" translatable="yes">Отменить изменения</property>
+        <signal name="Activated" handler="OnRevertToSavedActionActivated" />
       </action>
       <action id="goBackAction">
         <property name="Type">Action</property>
@@ -1552,6 +1553,7 @@
         <property name="ShortLabel" translatable="yes">Печать</property>
         <property name="StockId">gtk-print</property>
         <property name="Tooltip" translatable="yes">Напечатать заказ</property>
+        <signal name="Activated" handler="OnPrintActionActivated" />
       </action>
     </action-group>
     <property name="MemberName" />

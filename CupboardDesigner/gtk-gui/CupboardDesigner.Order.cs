@@ -513,9 +513,11 @@ namespace CupboardDesigner
 			this.DefaultWidth = 803;
 			this.DefaultHeight = 594;
 			this.Show ();
+			this.revertToSavedAction.Activated += new global::System.EventHandler (this.OnRevertToSavedActionActivated);
 			this.goBackAction.Activated += new global::System.EventHandler (this.OnGoBackActionActivated);
 			this.goForwardAction.Activated += new global::System.EventHandler (this.OnGoForwardActionActivated);
 			this.saveAction.Activated += new global::System.EventHandler (this.OnSaveActionActivated);
+			this.printAction.Activated += new global::System.EventHandler (this.OnPrintActionActivated);
 			this.notebook1.SwitchPage += new global::Gtk.SwitchPageHandler (this.OnNotebook1SwitchPage);
 			this.buttonTypeListOrient.Clicked += new global::System.EventHandler (this.OnButtonTypeListOrientClicked);
 			this.dateDelivery.DateChanged += new global::System.EventHandler (this.OnOrderDatesChanged);

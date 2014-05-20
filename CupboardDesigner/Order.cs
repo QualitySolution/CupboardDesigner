@@ -837,7 +837,7 @@ namespace CupboardDesigner
 			labelTotalCount.LabelProp = String.Format("Итого {0} единиц", TotalCount);
 		}
 
-		protected void OnButtonPrintClicked(object sender, EventArgs e)
+		protected void OnPrintActionActivated(object sender, EventArgs e)
 		{
 			if (!Save())
 				return;
@@ -893,6 +893,10 @@ namespace CupboardDesigner
 			notebook1.NextPage();
 		}
 
+		protected void OnRevertToSavedActionActivated(object sender, EventArgs e)
+		{
+			this.Destroy();
+		}
 	}
 }
 
