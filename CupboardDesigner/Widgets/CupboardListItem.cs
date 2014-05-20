@@ -20,6 +20,7 @@ namespace CupboardDesigner
 			this.Build();
 			Button = new RadioButton("");
 			Button.Toggled += HandleButtonToggled;
+			this.State = Button.State;
 			CheckImage = checkimage;
 			drawImage.AddEvents((int)Gdk.EventMask.ButtonPressMask);
 		}
