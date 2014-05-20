@@ -18,7 +18,10 @@ namespace CupboardDesigner
 		[XmlIgnore]
 		public int Height;
 		[XmlIgnore]
-		public byte[] ImageFile;
+		public Rsvg.Handle SvgImage;
+		[XmlIgnore]
+		private byte[] ImageFile;
+
 		public int NomenclatureId;
 		[XmlIgnore]
 		public Gtk.Widget Widget;
@@ -47,8 +50,14 @@ namespace CupboardDesigner
 			NewCube.Widht = Widht;
 			NewCube.Height = Height;
 			NewCube.NomenclatureId = NomenclatureId;
-			NewCube.ImageFile = (byte[])ImageFile.Clone();
+			NewCube.LoadSvg(ImageFile);
 			return NewCube;
+		}
+
+		public void LoadSvg(byte[] file)
+		{
+			ImageFile = file;
+			SvgImage = new Rsvg.Handle(ImageFile);
 		}
 
 		public void DrawCube(Context cr, int CubePxSize, bool Coloring)
@@ -67,12 +76,11 @@ namespace CupboardDesigner
 			}
 
 			//Куб
-			Rsvg.Handle svg = new Rsvg.Handle(ImageFile);
-			double vratio = (double) PxHeight / svg.Dimensions.Height;
-			double hratio = (double) PxWidth / svg.Dimensions.Width;
+			double vratio = (double) PxHeight / SvgImage.Dimensions.Height;
+			double hratio = (double) PxWidth / SvgImage.Dimensions.Width;
 			double ratio = Math.Min(vratio, hratio);
 			cr.Scale(ratio, ratio);
-			svg.RenderCairo(cr);
+			SvgImage.RenderCairo(cr);
 			logger.Debug("Закончили рисовать куб.");
 		}
 	}
@@ -195,7 +203,7 @@ namespace CupboardDesigner
 				if(found != null)
 				{
 					cube.Height = found.Height;
-					cube.ImageFile = found.ImageFile;
+					cube.SvgImage = found.SvgImage;
 					cube.Name = found.Name;
 					cube.Widht = found.Widht;
 				}

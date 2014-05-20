@@ -12,7 +12,7 @@ namespace CupboardDesigner
 	{
 		private static Logger logger = LogManager.GetCurrentClassLogger();
 		public byte[] OriginalFile;
-		private byte[] DrawingFile;
+		private Rsvg.Handle DrawingSvg;
 		private XmlDocument XmlSvg;
 
 		private double BaseX, BaseY, BaseHeight, BaseWidht;
@@ -69,7 +69,7 @@ namespace CupboardDesigner
 				if(FrameSet)
 				{
 					OriginalFile = svg;
-					DrawingFile = null;
+					DrawingSvg = null;
 				}
 			}
 			catch (Exception ex)
@@ -131,7 +131,7 @@ namespace CupboardDesigner
 				return;
 			if(CubesV == 1 && CubesH == 1)
 			{
-				DrawingFile = OriginalFile;
+				DrawingSvg = new Handle(OriginalFile);
 				return;
 			}
 			logger.Debug("Начала изменение svg");
@@ -153,7 +153,7 @@ namespace CupboardDesigner
 
 			stream = new MemoryStream();
 			imagefile.Write(stream);
-			DrawingFile = stream.ToArray();
+			DrawingSvg = new Handle(stream.ToArray());
 			//logger.Debug(System.Text.Encoding.Default.GetString(DrawingFile));
 			logger.Debug("Закончили изменение svg.");
 		}
@@ -174,17 +174,15 @@ namespace CupboardDesigner
 		{
 			if (OriginalFile == null)
 				return;
-			if (DrawingFile == null)
+			if (DrawingSvg == null)
 				ModifyDrawingImage();
 
-			Rsvg.Handle svg = new Rsvg.Handle(DrawingFile);
-
-			FrameScale = svg.Dimensions.Width / SvgWidht;
+			FrameScale = DrawingSvg.Dimensions.Width / SvgWidht;
 
 			double ratio = CubePxSize / (BaseWidht * FrameScale);
 			cr.Scale(ratio, ratio);
 			cr.Translate(0.0 - ((BaseX - AddX) * FrameScale), 0.0 - ((BaseY - AddY) * FrameScale));
-			svg.RenderCairo(cr);
+			DrawingSvg.RenderCairo(cr);
 		}
 	}
 }

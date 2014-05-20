@@ -131,8 +131,9 @@ namespace CupboardDesigner
 					TempCube.Height = DBWorks.GetInt(rdr, "height", 0);
 					TempCube.Widht = DBWorks.GetInt(rdr, "lenght", 0);
 					int size = DBWorks.GetInt(rdr, "image_size", 0);
-					TempCube.ImageFile = new byte[size];
-					rdr.GetBytes(rdr.GetOrdinal("image"), 0, TempCube.ImageFile, 0, size);
+					byte[] ImageFile = new byte[size];
+					rdr.GetBytes(rdr.GetOrdinal("image"), 0, ImageFile, 0, size);
+					TempCube.LoadSvg(ImageFile);
 					CubeList.Add(TempCube);
 					MaxCubeVSize = Math.Max(MaxCubeVSize, TempCube.CubesV);
 
@@ -144,7 +145,6 @@ namespace CupboardDesigner
 					TempWidget.DragInfo = CurrentDrag;
 					CubeWidgetList.Add(TempWidget);
 				}
-				//hboxCubeList.Add(new Label("Ntcn dscjns"));
 				UpdateCubeList();
 				scrolledCubeListV.AddWithViewport(vboxCubeList);
 				scrolledCubeListH.AddWithViewport(hboxCubeList);
