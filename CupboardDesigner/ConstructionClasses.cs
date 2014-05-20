@@ -258,7 +258,7 @@ namespace CupboardDesigner
 
 		void DrawGrid(Context cr, int CubePxSize)
 		{
-			cr.SetSourceRGB(1, 1, 1);
+			cr.SetSourceRGB(0.321568627, 0.235294118, 0.235294118);
 			cr.SetDash(new double[]{2.0, 3.0}, 0.0);
 			for (int x = 0; x <= CubesH; x++)
 			{
