@@ -176,6 +176,8 @@ namespace CupboardDesigner
 					//Добавляем виджеты в лист
 					CupboardListItem TempWidget = new CupboardListItem(CheckImage);
 					TempWidget.id = rdr.GetInt32(rdr.GetOrdinal("id"));
+					TempWidget.DeltaH = rdr.GetInt32(rdr.GetOrdinal("delta_h"));
+					TempWidget.DeltaL = rdr.GetInt32(rdr.GetOrdinal("delta_l"));
 					TempWidget.ItemName = DBWorks.GetString(rdr, "name", "");
 					TempWidget.CubePxSize = CubePxSize;
 					if (FirstButton == null)
@@ -443,8 +445,9 @@ namespace CupboardDesigner
 			CupboardListItem basis = TypeWidgetList.Find(w => w.Button.Active);
 			string name = basis != null ? basis.ItemName : "Тип не выбран";
 
-			labelInfo.LabelProp = String.Format("{0} Ширина:{1}cм Высота:{2}cм", name, 
-				int.Parse(comboCubeH.ActiveText) * 40, int.Parse(comboCubeV.ActiveText) * 40);
+			labelInfo.LabelProp = String.Format("{0} Ширина:{1}мм Высота:{2}мм", name, 
+				int.Parse(comboCubeH.ActiveText) * 400 + basis.DeltaL, 
+				int.Parse(comboCubeV.ActiveText) * 400 + basis.DeltaH);
 		}
 
 		protected void OnBasisChanged(object sender, EventArgs e)

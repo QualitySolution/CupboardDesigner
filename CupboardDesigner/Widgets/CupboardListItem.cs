@@ -11,6 +11,8 @@ namespace CupboardDesigner
 		private static Logger logger = LogManager.GetCurrentClassLogger();
 		public int id;
 		public string _Name;
+		public int DeltaH = 0;
+		public int DeltaL = 0;
 		public SVGHelper Image;
 		public Gtk.RadioButton Button;
 		private Rsvg.Handle CheckImage;
