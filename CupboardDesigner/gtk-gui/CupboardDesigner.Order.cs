@@ -268,7 +268,7 @@ namespace CupboardDesigner
 			this.label2 = new global::Gtk.Label ();
 			this.label2.Name = "label2";
 			this.label2.Xalign = 1F;
-			this.label2.LabelProp = global::Mono.Unix.Catalog.GetString ("Кубов по вертикали<span foreground=\"red\">*</span>:");
+			this.label2.LabelProp = global::Mono.Unix.Catalog.GetString ("Кубов по вертикали:");
 			this.label2.UseMarkup = true;
 			this.table3.Add (this.label2);
 			global::Gtk.Table.TableChild w15 = ((global::Gtk.Table.TableChild)(this.table3 [this.label2]));
@@ -282,7 +282,7 @@ namespace CupboardDesigner
 			this.label3 = new global::Gtk.Label ();
 			this.label3.Name = "label3";
 			this.label3.Xalign = 1F;
-			this.label3.LabelProp = global::Mono.Unix.Catalog.GetString ("Кубов по горизонтали<span foreground=\"red\">*</span>:");
+			this.label3.LabelProp = global::Mono.Unix.Catalog.GetString ("Кубов по горизонтали:");
 			this.label3.UseMarkup = true;
 			this.table3.Add (this.label3);
 			global::Gtk.Table.TableChild w16 = ((global::Gtk.Table.TableChild)(this.table3 [this.label3]));

@@ -55,7 +55,7 @@ namespace CupboardDesigner
 			// Container child table1.Gtk.Table+TableChild
 			this.comboType = global::Gtk.ComboBox.NewText ();
 			this.comboType.AppendText (global::Mono.Unix.Catalog.GetString ("Куб"));
-			this.comboType.AppendText (global::Mono.Unix.Catalog.GetString ("Конструкция"));
+			this.comboType.AppendText (global::Mono.Unix.Catalog.GetString ("Каркас"));
 			this.comboType.Name = "comboType";
 			this.comboType.Active = 0;
 			this.table1.Add (this.comboType);
@@ -190,7 +190,7 @@ namespace CupboardDesigner
 			this.label2 = new global::Gtk.Label ();
 			this.label2.Name = "label2";
 			this.label2.Xalign = 1F;
-			this.label2.LabelProp = global::Mono.Unix.Catalog.GetString ("Тип<span foreground=\"red\">*</span>:");
+			this.label2.LabelProp = global::Mono.Unix.Catalog.GetString ("Тип:");
 			this.label2.UseMarkup = true;
 			this.table1.Add (this.label2);
 			global::Gtk.Table.TableChild w13 = ((global::Gtk.Table.TableChild)(this.table1 [this.label2]));

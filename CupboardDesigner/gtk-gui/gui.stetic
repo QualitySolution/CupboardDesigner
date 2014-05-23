@@ -538,7 +538,7 @@
                   <widget class="Gtk.Label" id="label2">
                     <property name="MemberName" />
                     <property name="Xalign">1</property>
-                    <property name="LabelProp" translatable="yes">Тип&lt;span foreground="red"&gt;*&lt;/span&gt;:</property>
+                    <property name="LabelProp" translatable="yes">Тип:</property>
                     <property name="UseMarkup">True</property>
                   </widget>
                   <packing>
@@ -2026,7 +2026,7 @@
                           <widget class="Gtk.Label" id="label2">
                             <property name="MemberName" />
                             <property name="Xalign">1</property>
-                            <property name="LabelProp" translatable="yes">Кубов по вертикали&lt;span foreground="red"&gt;*&lt;/span&gt;:</property>
+                            <property name="LabelProp" translatable="yes">Кубов по вертикали:</property>
                             <property name="UseMarkup">True</property>
                           </widget>
                           <packing>
@@ -2049,7 +2049,7 @@
                           <widget class="Gtk.Label" id="label3">
                             <property name="MemberName" />
                             <property name="Xalign">1</property>
-                            <property name="LabelProp" translatable="yes">Кубов по горизонтали&lt;span foreground="red"&gt;*&lt;/span&gt;:</property>
+                            <property name="LabelProp" translatable="yes">Кубов по горизонтали:</property>
                             <property name="UseMarkup">True</property>
                           </widget>
                           <packing>
