@@ -117,7 +117,7 @@ namespace CupboardDesigner
 			CubeWidgetList = new List<CubeListItem>();
 			vboxCubeList = new VBox(false, 6);
 			hboxCubeList = new HBox(false, 20);
-			string sql = "SELECT * FROM nomenclature WHERE type = @type";
+			string sql = "SELECT * FROM nomenclature WHERE type = @type ORDER BY ordinal";
 			SqliteCommand cmd = new SqliteCommand(sql, (SqliteConnection)QSMain.ConnectionDB);
 			cmd.Parameters.AddWithValue("@type", Nomenclature.NomType.cube.ToString());
 			using (SqliteDataReader rdr = cmd.ExecuteReader())
@@ -163,7 +163,7 @@ namespace CupboardDesigner
 				temparray = mstream.ToArray();
 			}
 			Rsvg.Handle CheckImage = new Rsvg.Handle(temparray);
-			sql = "SELECT * FROM basis";
+			sql = "SELECT * FROM basis ORDER BY ordinal ";
 			cmd = new SqliteCommand(sql, (SqliteConnection)QSMain.ConnectionDB);
 			using (SqliteDataReader rdr = cmd.ExecuteReader())
 			{
@@ -686,7 +686,7 @@ namespace CupboardDesigner
 			{
 				if(item.Parent != null)
 					ForRemove.Remove(item);
-				boxTypeList.PackEnd(item);
+				boxTypeList.Add(item);
 			}
 			boxTypeList.ShowAll();
 		}

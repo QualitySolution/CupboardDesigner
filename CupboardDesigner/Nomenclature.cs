@@ -124,15 +124,20 @@ namespace CupboardDesigner
 
 				cmd.ExecuteNonQuery();
 
+				if(NewItem)
+				{
+					sql = @"select last_insert_rowid()";
+					cmd = new SqliteCommand(sql, (SqliteConnection)QSMain.ConnectionDB, trans);
+					ItemId = Convert.ToInt32(cmd.ExecuteScalar());
+
+					sql = "UPDATE nomenclature SET ordinal = @id WHERE id = @id";
+					cmd = new SqliteCommand(sql, (SqliteConnection)QSMain.ConnectionDB, trans);
+					cmd.Parameters.AddWithValue("@id", ItemId);
+					cmd.ExecuteNonQuery();
+				}
+
 				if(ImageChanged)
 				{
-					if(NewItem)
-					{
-						sql = @"select last_insert_rowid()";
-						cmd = new SqliteCommand(sql, (SqliteConnection)QSMain.ConnectionDB, trans);
-						ItemId = Convert.ToInt32(cmd.ExecuteScalar());
-					}
-
 					sql = "UPDATE nomenclature SET image_size = @image_size, image = @image WHERE id = @id";
 					cmd = new SqliteCommand(sql, (SqliteConnection)QSMain.ConnectionDB, trans);
 					cmd.Parameters.AddWithValue("@id", ItemId);

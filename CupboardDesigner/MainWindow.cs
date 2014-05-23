@@ -145,6 +145,8 @@ public partial class MainWindow: Gtk.Window
 	protected void OnAction9Activated(object sender, EventArgs e)
 	{
 		Reference winref = new Reference();
+		winref.SqlSelect = "SELECT id, name FROM @tablename ORDER BY ordinal";
+		winref.OrdinalField = "ordinal";
 		winref.SetMode(false,false,true,true,true);
 		winref.FillList("nomenclature", "номенклатура", "Номенклатура");
 		winref.Show();
@@ -155,6 +157,8 @@ public partial class MainWindow: Gtk.Window
 	protected void OnAction4Activated(object sender, EventArgs e)
 	{
 		Reference winref = new Reference();
+		winref.SqlSelect = "SELECT id, name FROM @tablename ORDER BY ordinal";
+		winref.OrdinalField = "ordinal";
 		winref.SetMode(false,false,true,true,true);
 		winref.FillList("basis", "каркас", "Виды каркасов");
 		winref.Show();

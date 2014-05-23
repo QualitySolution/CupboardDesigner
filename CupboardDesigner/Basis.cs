@@ -129,6 +129,11 @@ namespace CupboardDesigner
 					sql = @"select last_insert_rowid()";
 					cmd = new SqliteCommand(sql, (SqliteConnection)QSMain.ConnectionDB, trans);
 					ItemId = Convert.ToInt32(cmd.ExecuteScalar());
+
+					sql = "UPDATE basis SET ordinal = @id WHERE id = @id";
+					cmd = new SqliteCommand(sql, (SqliteConnection)QSMain.ConnectionDB, trans);
+					cmd.Parameters.AddWithValue("@id", ItemId);
+					cmd.ExecuteNonQuery();
 				}
 
 				// Запись Номенклатур
