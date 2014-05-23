@@ -164,8 +164,14 @@ namespace CupboardDesigner
 				"Загрузить", ResponseType.Accept );
 
 			FileFilter Filter = new FileFilter();
-			Filter.AddMimeType("image/svg+xml");
 			Filter.Name = "SVG изображение";
+			Filter.AddMimeType("image/svg+xml");
+			Filter.AddPattern("*.svg");
+			Chooser.AddFilter(Filter);
+
+			Filter = new FileFilter();
+			Filter.Name = "Все файлы";
+			Filter.AddPattern("*.*");
 			Chooser.AddFilter(Filter);
 
 			if((ResponseType) Chooser.Run () == ResponseType.Accept)
