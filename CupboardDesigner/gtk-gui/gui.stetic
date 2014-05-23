@@ -1226,13 +1226,13 @@
       </widget>
     </child>
   </widget>
-  <widget class="Gtk.Bin" id="CupboardDesigner.CubeListItem" design-size="72 57">
+  <widget class="Gtk.Bin" id="CupboardDesigner.CubeListItem" design-size="40 27">
     <property name="MemberName" />
     <child>
       <widget class="Gtk.Table" id="table1">
         <property name="MemberName" />
         <property name="NRows">2</property>
-        <property name="RowSpacing">6</property>
+        <property name="RowSpacing">4</property>
         <property name="ColumnSpacing">6</property>
         <child>
           <widget class="Gtk.DrawingArea" id="drawCube">
@@ -1261,12 +1261,12 @@
             <property name="TopAttach">1</property>
             <property name="BottomAttach">2</property>
             <property name="AutoSize">False</property>
-            <property name="YOptions">Fill</property>
+            <property name="YOptions">0</property>
             <property name="XExpand">True</property>
             <property name="XFill">True</property>
             <property name="XShrink">False</property>
             <property name="YExpand">False</property>
-            <property name="YFill">True</property>
+            <property name="YFill">False</property>
             <property name="YShrink">False</property>
           </packing>
         </child>

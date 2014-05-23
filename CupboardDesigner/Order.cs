@@ -115,8 +115,8 @@ namespace CupboardDesigner
 			//Загрузка списка кубов
 			CubeList = new List<Cube>();
 			CubeWidgetList = new List<CubeListItem>();
-			vboxCubeList = new VBox(false, 5);
-			hboxCubeList = new HBox(false, 5);
+			vboxCubeList = new VBox(false, 6);
+			hboxCubeList = new HBox(false, 20);
 			string sql = "SELECT * FROM nomenclature WHERE type = @type";
 			SqliteCommand cmd = new SqliteCommand(sql, (SqliteConnection)QSMain.ConnectionDB);
 			cmd.Parameters.AddWithValue("@type", Nomenclature.NomType.cube.ToString());
@@ -153,8 +153,8 @@ namespace CupboardDesigner
 
 			//Загрузка Списка типов шкафов
 			TypeWidgetList = new List<CupboardListItem>();
-			hboxTypeList = new HBox(false, 3);
-			vboxTypeList = new VBox(false, 3);
+			hboxTypeList = new HBox(false, 2);
+			vboxTypeList = new VBox(false, 2);
 			Stream stream = System.Reflection.Assembly.GetExecutingAssembly().GetManifestResourceStream( "CupboardDesigner.icons.Yes_check.svg" );
 			byte[] temparray;
 			using(MemoryStream mstream = new MemoryStream())
