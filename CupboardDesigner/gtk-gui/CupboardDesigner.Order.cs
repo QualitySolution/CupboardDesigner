@@ -100,7 +100,7 @@ namespace CupboardDesigner
 			this.notebook1 = new global::Gtk.Notebook ();
 			this.notebook1.CanFocus = true;
 			this.notebook1.Name = "notebook1";
-			this.notebook1.CurrentPage = 1;
+			this.notebook1.CurrentPage = 0;
 			// Container child notebook1.Gtk.Notebook+NotebookChild
 			this.hbox1 = new global::Gtk.HBox ();
 			this.hbox1.Name = "hbox1";
@@ -130,8 +130,8 @@ namespace CupboardDesigner
 			this.comboCubeH.Active = 0;
 			this.table3.Add (this.comboCubeH);
 			global::Gtk.Table.TableChild w3 = ((global::Gtk.Table.TableChild)(this.table3 [this.comboCubeH]));
-			w3.TopAttach = ((uint)(2));
-			w3.BottomAttach = ((uint)(3));
+			w3.TopAttach = ((uint)(1));
+			w3.BottomAttach = ((uint)(2));
 			w3.LeftAttach = ((uint)(3));
 			w3.RightAttach = ((uint)(4));
 			w3.XOptions = ((global::Gtk.AttachOptions)(4));
@@ -152,8 +152,8 @@ namespace CupboardDesigner
 			this.comboCubeV.Active = 0;
 			this.table3.Add (this.comboCubeV);
 			global::Gtk.Table.TableChild w4 = ((global::Gtk.Table.TableChild)(this.table3 [this.comboCubeV]));
-			w4.TopAttach = ((uint)(1));
-			w4.BottomAttach = ((uint)(2));
+			w4.TopAttach = ((uint)(2));
+			w4.BottomAttach = ((uint)(3));
 			w4.LeftAttach = ((uint)(3));
 			w4.RightAttach = ((uint)(4));
 			w4.XOptions = ((global::Gtk.AttachOptions)(4));
@@ -272,8 +272,8 @@ namespace CupboardDesigner
 			this.label2.UseMarkup = true;
 			this.table3.Add (this.label2);
 			global::Gtk.Table.TableChild w15 = ((global::Gtk.Table.TableChild)(this.table3 [this.label2]));
-			w15.TopAttach = ((uint)(1));
-			w15.BottomAttach = ((uint)(2));
+			w15.TopAttach = ((uint)(2));
+			w15.BottomAttach = ((uint)(3));
 			w15.LeftAttach = ((uint)(2));
 			w15.RightAttach = ((uint)(3));
 			w15.XOptions = ((global::Gtk.AttachOptions)(4));
@@ -286,8 +286,8 @@ namespace CupboardDesigner
 			this.label3.UseMarkup = true;
 			this.table3.Add (this.label3);
 			global::Gtk.Table.TableChild w16 = ((global::Gtk.Table.TableChild)(this.table3 [this.label3]));
-			w16.TopAttach = ((uint)(2));
-			w16.BottomAttach = ((uint)(3));
+			w16.TopAttach = ((uint)(1));
+			w16.BottomAttach = ((uint)(2));
 			w16.LeftAttach = ((uint)(2));
 			w16.RightAttach = ((uint)(3));
 			w16.XOptions = ((global::Gtk.AttachOptions)(4));
