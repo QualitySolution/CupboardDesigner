@@ -322,7 +322,7 @@
                     <property name="MemberName" />
                     <property name="IsTextCombo">True</property>
                     <property name="Items" translatable="yes">Куб
-Конструкция</property>
+Каркас</property>
                     <property name="Active">0</property>
                     <signal name="Changed" handler="OnComboTypeChanged" />
                   </widget>
