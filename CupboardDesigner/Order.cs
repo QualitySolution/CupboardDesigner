@@ -445,7 +445,7 @@ namespace CupboardDesigner
 			CupboardListItem basis = TypeWidgetList.Find(w => w.Button.Active);
 			string name = basis != null ? basis.ItemName : "Тип не выбран";
 
-			labelInfo.LabelProp = String.Format("{0} Ширина:{1}мм Высота:{2}мм", name, 
+			labelInfo.LabelProp = String.Format("{0} Длина (L):{1}мм Высота (H):{2}мм", name, 
 				int.Parse(comboCubeH.ActiveText) * 400 + basis.DeltaL, 
 				int.Parse(comboCubeV.ActiveText) * 400 + basis.DeltaH);
 		}

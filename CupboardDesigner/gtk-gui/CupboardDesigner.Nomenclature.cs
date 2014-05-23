@@ -48,7 +48,7 @@ namespace CupboardDesigner
 			this.hbox1.Name = "hbox1";
 			this.hbox1.Spacing = 6;
 			// Container child hbox1.Gtk.Box+BoxChild
-			this.table1 = new global::Gtk.Table (((uint)(9)), ((uint)(2)), false);
+			this.table1 = new global::Gtk.Table (((uint)(8)), ((uint)(2)), false);
 			this.table1.Name = "table1";
 			this.table1.RowSpacing = ((uint)(6));
 			this.table1.ColumnSpacing = ((uint)(6));
@@ -171,8 +171,8 @@ namespace CupboardDesigner
 			w10.Expand = false;
 			this.table1.Add (this.hbox3);
 			global::Gtk.Table.TableChild w11 = ((global::Gtk.Table.TableChild)(this.table1 [this.hbox3]));
-			w11.TopAttach = ((uint)(6));
-			w11.BottomAttach = ((uint)(7));
+			w11.TopAttach = ((uint)(7));
+			w11.BottomAttach = ((uint)(8));
 			w11.LeftAttach = ((uint)(1));
 			w11.RightAttach = ((uint)(2));
 			w11.XOptions = ((global::Gtk.AttachOptions)(4));
@@ -250,8 +250,8 @@ namespace CupboardDesigner
 			this.label7.LabelProp = global::Mono.Unix.Catalog.GetString ("Ширина(W):");
 			this.table1.Add (this.label7);
 			global::Gtk.Table.TableChild w18 = ((global::Gtk.Table.TableChild)(this.table1 [this.label7]));
-			w18.TopAttach = ((uint)(7));
-			w18.BottomAttach = ((uint)(8));
+			w18.TopAttach = ((uint)(6));
+			w18.BottomAttach = ((uint)(7));
 			w18.XOptions = ((global::Gtk.AttachOptions)(4));
 			w18.YOptions = ((global::Gtk.AttachOptions)(4));
 			// Container child table1.Gtk.Table+TableChild
@@ -261,8 +261,8 @@ namespace CupboardDesigner
 			this.label8.LabelProp = global::Mono.Unix.Catalog.GetString ("Высота(H):");
 			this.table1.Add (this.label8);
 			global::Gtk.Table.TableChild w19 = ((global::Gtk.Table.TableChild)(this.table1 [this.label8]));
-			w19.TopAttach = ((uint)(6));
-			w19.BottomAttach = ((uint)(7));
+			w19.TopAttach = ((uint)(7));
+			w19.BottomAttach = ((uint)(8));
 			w19.XOptions = ((global::Gtk.AttachOptions)(4));
 			w19.YOptions = ((global::Gtk.AttachOptions)(4));
 			// Container child table1.Gtk.Table+TableChild
@@ -284,8 +284,8 @@ namespace CupboardDesigner
 			this.spinW.Numeric = true;
 			this.table1.Add (this.spinW);
 			global::Gtk.Table.TableChild w21 = ((global::Gtk.Table.TableChild)(this.table1 [this.spinW]));
-			w21.TopAttach = ((uint)(7));
-			w21.BottomAttach = ((uint)(8));
+			w21.TopAttach = ((uint)(6));
+			w21.BottomAttach = ((uint)(7));
 			w21.LeftAttach = ((uint)(1));
 			w21.RightAttach = ((uint)(2));
 			w21.XOptions = ((global::Gtk.AttachOptions)(4));
@@ -325,6 +325,8 @@ namespace CupboardDesigner
 			w1.Add (this.hbox1);
 			global::Gtk.Box.BoxChild w27 = ((global::Gtk.Box.BoxChild)(w1 [this.hbox1]));
 			w27.Position = 0;
+			w27.Expand = false;
+			w27.Fill = false;
 			// Internal child CupboardDesigner.Nomenclature.ActionArea
 			global::Gtk.HButtonBox w28 = this.ActionArea;
 			w28.Name = "dialog1_ActionArea";

@@ -74,7 +74,7 @@ LEFT JOIN facing ON facing.id = facing_id
       </Fields>
     </DataSet>
     <DataSet Name="Order">
-      <Query >
+      <Query>
         <DataSourceName>DS1</DataSourceName>
         <CommandText>SELECT customer, arrval, delivery, exhibition.name as exhibition, exhibition.phone, exhibition.address, comment, basis.delta_h, basis.delta_l FROM orders
 LEFT JOIN exhibition ON exhibition_id = exhibition.id
@@ -86,7 +86,7 @@ LEFT JOIN basis ON basis.id = orders.basis_id
           </QueryParameter>
         </QueryParameters>
       </Query>
-      <Fields >
+      <Fields>
         <Field Name="customer">
           <DataField>customer</DataField>
           <TypeName>System.String</TypeName>
@@ -716,11 +716,11 @@ LEFT JOIN basis ON basis.id = orders.basis_id
       </Image>
       <Textbox Name="Textbox32">
         <Height>12.75pt</Height>
-        <Width>118.18pt</Width>
-        <Value>="Ширина " + Convert.ToString(Max(Fields!widht.Value, "Data")) + "мм"</Value>
+        <Width>123.43pt</Width>
+        <Value>="Ширина (W) " + Convert.ToString(Max(Fields!widht.Value, "Data")) + "мм"</Value>
         <ZIndex>1</ZIndex>
-        <Left>8.6pt</Left>
-        <Top>158.6pt</Top>
+        <Left>8.60pt</Left>
+        <Top>173.80pt</Top>
         <Style>
           <BorderStyle />
           <BorderColor />
@@ -729,11 +729,11 @@ LEFT JOIN basis ON basis.id = orders.basis_id
       </Textbox>
       <Textbox Name="Textbox33">
         <Height>13.50pt</Height>
-        <Width>115.14pt</Width>
-        <Value>="Высота " + Convert.ToString(First(Fields!delta_h.Value, "Order") + {?baseh} * 400) + "мм"</Value>
+        <Width>124.89pt</Width>
+        <Value>="Высота (H) " + Convert.ToString(First(Fields!delta_h.Value, "Order") + {?baseh} * 400) + "мм"</Value>
         <ZIndex>1</ZIndex>
         <Left>8.8pt</Left>
-        <Top>173.5pt</Top>
+        <Top>187.9pt</Top>
         <Style>
           <BorderStyle />
           <BorderColor />
@@ -742,11 +742,11 @@ LEFT JOIN basis ON basis.id = orders.basis_id
       </Textbox>
       <Textbox Name="Textbox34">
         <Height>12.00pt</Height>
-        <Width>112.89pt</Width>
-        <Value>="Длина " + Convert.ToString(First(Fields!delta_l.Value, "Order") + {?basel} * 400) + "мм"</Value>
+        <Width>118.90pt</Width>
+        <Value>="Длина (L) " + Convert.ToString(First(Fields!delta_l.Value, "Order") + {?basel} * 400) + "мм"</Value>
         <ZIndex>1</ZIndex>
-        <Left>8.9pt</Left>
-        <Top>186.8pt</Top>
+        <Left>8.90pt</Left>
+        <Top>158.80pt</Top>
         <Style>
           <BorderStyle />
           <BorderColor />
