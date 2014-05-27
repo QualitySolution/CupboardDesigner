@@ -89,6 +89,9 @@ public partial class MainWindow: Gtk.Window
 	protected void OnAction5Activated(object sender, EventArgs e)
 	{
 		Reference winref = new Reference();
+		winref.SqlSelect = "SELECT id, name, phone FROM @tablename ORDER BY ordinal";
+		winref.OrdinalField = "ordinal";
+		winref.Columns.Add(new Reference.ColumnInfo("Телефон", "{2}"));
 		winref.SetMode(false,false,true,true,true);
 		winref.FillList("exhibition","выставка", "Выставки");
 		winref.Show();

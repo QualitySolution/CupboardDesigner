@@ -50,8 +50,8 @@ namespace CupboardDesigner
 			base(Gtk.WindowType.Toplevel)
 		{
 			this.Build();
-
-			ComboWorks.ComboFillReference(comboExhibition, "exhibition", ComboWorks.ListMode.WithNo);
+			string sqlSelect = "SELECT name, id FROM exhibition ORDER BY ordinal";
+			ComboWorks.ComboFillUniversal(comboExhibition, sqlSelect, "{0}", null, 1, ComboWorks.ListMode.WithNo);
 			dateArrval.Date = DateTime.Today;
 
 			//Создаем таблицу номенклатуры

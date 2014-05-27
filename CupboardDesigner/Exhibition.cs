@@ -81,6 +81,18 @@ namespace CupboardDesigner
 				cmd.Parameters.AddWithValue("@address", DBWorks.ValueOrNull(textAddress.Buffer.Text != "", textAddress.Buffer.Text));
 				cmd.ExecuteNonQuery();
 
+				if(NewItem)
+				{
+					sql = @"select last_insert_rowid()";
+					cmd = new SqliteCommand(sql, (SqliteConnection)QSMain.ConnectionDB, trans);
+					ItemId = Convert.ToInt32(cmd.ExecuteScalar());
+
+					sql = "UPDATE exhibition SET ordinal = @id WHERE id = @id";
+					cmd = new SqliteCommand(sql, (SqliteConnection)QSMain.ConnectionDB, trans);
+					cmd.Parameters.AddWithValue("@id", ItemId);
+					cmd.ExecuteNonQuery();
+				}
+
 				trans.Commit();
 				MainClass.StatusMessage("Ok");
 				Respond (Gtk.ResponseType.Ok);
