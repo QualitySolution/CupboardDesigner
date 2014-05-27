@@ -27,6 +27,8 @@ namespace CupboardDesigner
 		private global::Gtk.Label labelId;
 		private global::Gtk.SpinButton spinW;
 		private global::Gtk.VBox vbox2;
+		private global::Gtk.Frame frame1;
+		private global::Gtk.Alignment GtkAlignment3;
 		private global::Gtk.DrawingArea drawCube;
 		private global::Gtk.Button buttonLoadImage;
 		private global::Gtk.Button buttonCancel;
@@ -300,39 +302,52 @@ namespace CupboardDesigner
 			this.vbox2.Name = "vbox2";
 			this.vbox2.Spacing = 6;
 			// Container child vbox2.Gtk.Box+BoxChild
+			this.frame1 = new global::Gtk.Frame ();
+			this.frame1.Name = "frame1";
+			this.frame1.BorderWidth = ((uint)(3));
+			// Container child frame1.Gtk.Container+ContainerChild
+			this.GtkAlignment3 = new global::Gtk.Alignment (0.5F, 0.5F, 1F, 1F);
+			this.GtkAlignment3.Name = "GtkAlignment3";
+			this.GtkAlignment3.LeftPadding = ((uint)(10));
+			this.GtkAlignment3.TopPadding = ((uint)(10));
+			this.GtkAlignment3.RightPadding = ((uint)(10));
+			this.GtkAlignment3.BottomPadding = ((uint)(10));
+			// Container child GtkAlignment3.Gtk.Container+ContainerChild
 			this.drawCube = new global::Gtk.DrawingArea ();
 			this.drawCube.Name = "drawCube";
-			this.vbox2.Add (this.drawCube);
-			global::Gtk.Box.BoxChild w23 = ((global::Gtk.Box.BoxChild)(this.vbox2 [this.drawCube]));
-			w23.Position = 0;
+			this.GtkAlignment3.Add (this.drawCube);
+			this.frame1.Add (this.GtkAlignment3);
+			this.vbox2.Add (this.frame1);
+			global::Gtk.Box.BoxChild w25 = ((global::Gtk.Box.BoxChild)(this.vbox2 [this.frame1]));
+			w25.Position = 0;
 			// Container child vbox2.Gtk.Box+BoxChild
 			this.buttonLoadImage = new global::Gtk.Button ();
 			this.buttonLoadImage.CanFocus = true;
 			this.buttonLoadImage.Name = "buttonLoadImage";
 			this.buttonLoadImage.UseUnderline = true;
 			this.buttonLoadImage.Label = global::Mono.Unix.Catalog.GetString ("Загрузить изображение");
-			global::Gtk.Image w24 = new global::Gtk.Image ();
-			w24.Pixbuf = global::Stetic.IconLoader.LoadIcon (this, "gtk-harddisk", global::Gtk.IconSize.Menu);
-			this.buttonLoadImage.Image = w24;
+			global::Gtk.Image w26 = new global::Gtk.Image ();
+			w26.Pixbuf = global::Stetic.IconLoader.LoadIcon (this, "gtk-harddisk", global::Gtk.IconSize.Menu);
+			this.buttonLoadImage.Image = w26;
 			this.vbox2.Add (this.buttonLoadImage);
-			global::Gtk.Box.BoxChild w25 = ((global::Gtk.Box.BoxChild)(this.vbox2 [this.buttonLoadImage]));
-			w25.Position = 1;
-			w25.Expand = false;
-			w25.Fill = false;
-			this.hbox1.Add (this.vbox2);
-			global::Gtk.Box.BoxChild w26 = ((global::Gtk.Box.BoxChild)(this.hbox1 [this.vbox2]));
-			w26.Position = 1;
-			w1.Add (this.hbox1);
-			global::Gtk.Box.BoxChild w27 = ((global::Gtk.Box.BoxChild)(w1 [this.hbox1]));
-			w27.Position = 0;
+			global::Gtk.Box.BoxChild w27 = ((global::Gtk.Box.BoxChild)(this.vbox2 [this.buttonLoadImage]));
+			w27.Position = 1;
 			w27.Expand = false;
 			w27.Fill = false;
+			this.hbox1.Add (this.vbox2);
+			global::Gtk.Box.BoxChild w28 = ((global::Gtk.Box.BoxChild)(this.hbox1 [this.vbox2]));
+			w28.Position = 1;
+			w1.Add (this.hbox1);
+			global::Gtk.Box.BoxChild w29 = ((global::Gtk.Box.BoxChild)(w1 [this.hbox1]));
+			w29.Position = 0;
+			w29.Expand = false;
+			w29.Fill = false;
 			// Internal child CupboardDesigner.Nomenclature.ActionArea
-			global::Gtk.HButtonBox w28 = this.ActionArea;
-			w28.Name = "dialog1_ActionArea";
-			w28.Spacing = 10;
-			w28.BorderWidth = ((uint)(5));
-			w28.LayoutStyle = ((global::Gtk.ButtonBoxStyle)(4));
+			global::Gtk.HButtonBox w30 = this.ActionArea;
+			w30.Name = "dialog1_ActionArea";
+			w30.Spacing = 10;
+			w30.BorderWidth = ((uint)(5));
+			w30.LayoutStyle = ((global::Gtk.ButtonBoxStyle)(4));
 			// Container child dialog1_ActionArea.Gtk.ButtonBox+ButtonBoxChild
 			this.buttonCancel = new global::Gtk.Button ();
 			this.buttonCancel.CanDefault = true;
@@ -342,9 +357,9 @@ namespace CupboardDesigner
 			this.buttonCancel.UseUnderline = true;
 			this.buttonCancel.Label = "gtk-cancel";
 			this.AddActionWidget (this.buttonCancel, -6);
-			global::Gtk.ButtonBox.ButtonBoxChild w29 = ((global::Gtk.ButtonBox.ButtonBoxChild)(w28 [this.buttonCancel]));
-			w29.Expand = false;
-			w29.Fill = false;
+			global::Gtk.ButtonBox.ButtonBoxChild w31 = ((global::Gtk.ButtonBox.ButtonBoxChild)(w30 [this.buttonCancel]));
+			w31.Expand = false;
+			w31.Fill = false;
 			// Container child dialog1_ActionArea.Gtk.ButtonBox+ButtonBoxChild
 			this.buttonOk = new global::Gtk.Button ();
 			this.buttonOk.CanDefault = true;
@@ -353,11 +368,11 @@ namespace CupboardDesigner
 			this.buttonOk.UseStock = true;
 			this.buttonOk.UseUnderline = true;
 			this.buttonOk.Label = "gtk-ok";
-			w28.Add (this.buttonOk);
-			global::Gtk.ButtonBox.ButtonBoxChild w30 = ((global::Gtk.ButtonBox.ButtonBoxChild)(w28 [this.buttonOk]));
-			w30.Position = 1;
-			w30.Expand = false;
-			w30.Fill = false;
+			w30.Add (this.buttonOk);
+			global::Gtk.ButtonBox.ButtonBoxChild w32 = ((global::Gtk.ButtonBox.ButtonBoxChild)(w30 [this.buttonOk]));
+			w32.Position = 1;
+			w32.Expand = false;
+			w32.Fill = false;
 			if ((this.Child != null)) {
 				this.Child.ShowAll ();
 			}

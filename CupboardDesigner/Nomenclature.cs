@@ -23,7 +23,7 @@ namespace CupboardDesigner
 			this.Build();
 
 			OnComboTypeChanged(comboType, EventArgs.Empty);
-			drawCube.SetSizeRequest(250, 250);
+			drawCube.SetSizeRequest(200, 200);
 		}
 
 		protected void OnComboTypeChanged(object sender, EventArgs e)

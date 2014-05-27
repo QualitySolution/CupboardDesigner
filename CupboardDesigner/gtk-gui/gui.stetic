@@ -296,7 +296,7 @@
       </widget>
     </child>
   </widget>
-  <widget class="Gtk.Dialog" id="CupboardDesigner.Nomenclature" design-size="499 369">
+  <widget class="Gtk.Dialog" id="CupboardDesigner.Nomenclature" design-size="456 342">
     <property name="MemberName" />
     <property name="Title" translatable="yes">Номенклатура</property>
     <property name="WindowPosition">CenterOnParent</property>
@@ -579,7 +579,7 @@
                   <widget class="Gtk.Label" id="label4">
                     <property name="MemberName" />
                     <property name="Xalign">1</property>
-                    <property name="LabelProp" translatable="yes">Наименование&lt;span foreground="red"&gt;*&lt;/span&gt;:</property>
+                    <property name="LabelProp" translatable="yes">Название:</property>
                     <property name="UseMarkup">True</property>
                   </widget>
                   <packing>
@@ -620,7 +620,7 @@
                   <widget class="Gtk.Label" id="label6">
                     <property name="MemberName" />
                     <property name="Xalign">1</property>
-                    <property name="LabelProp" translatable="yes">Длинна(L):</property>
+                    <property name="LabelProp" translatable="yes">Длинна (L):</property>
                   </widget>
                   <packing>
                     <property name="TopAttach">5</property>
@@ -640,7 +640,7 @@
                   <widget class="Gtk.Label" id="label7">
                     <property name="MemberName" />
                     <property name="Xalign">1</property>
-                    <property name="LabelProp" translatable="yes">Ширина(W):</property>
+                    <property name="LabelProp" translatable="yes">Ширина (W):</property>
                   </widget>
                   <packing>
                     <property name="TopAttach">6</property>
@@ -660,7 +660,7 @@
                   <widget class="Gtk.Label" id="label8">
                     <property name="MemberName" />
                     <property name="Xalign">1</property>
-                    <property name="LabelProp" translatable="yes">Высота(H):</property>
+                    <property name="LabelProp" translatable="yes">Высота (H):</property>
                   </widget>
                   <packing>
                     <property name="TopAttach">7</property>
@@ -734,9 +734,24 @@
                 <property name="MemberName" />
                 <property name="Spacing">6</property>
                 <child>
-                  <widget class="Gtk.DrawingArea" id="drawCube">
+                  <widget class="Gtk.Frame" id="frame1">
                     <property name="MemberName" />
-                    <signal name="ExposeEvent" handler="OnDrawCubeExposeEvent" />
+                    <property name="BorderWidth">3</property>
+                    <child>
+                      <widget class="Gtk.Alignment" id="GtkAlignment3">
+                        <property name="MemberName" />
+                        <property name="LeftPadding">10</property>
+                        <property name="TopPadding">10</property>
+                        <property name="RightPadding">10</property>
+                        <property name="BottomPadding">10</property>
+                        <child>
+                          <widget class="Gtk.DrawingArea" id="drawCube">
+                            <property name="MemberName" />
+                            <signal name="ExposeEvent" handler="OnDrawCubeExposeEvent" />
+                          </widget>
+                        </child>
+                      </widget>
+                    </child>
                   </widget>
                   <packing>
                     <property name="Position">0</property>
