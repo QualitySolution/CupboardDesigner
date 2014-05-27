@@ -215,7 +215,7 @@ namespace CupboardDesigner
 			this.label4 = new global::Gtk.Label ();
 			this.label4.Name = "label4";
 			this.label4.Xalign = 1F;
-			this.label4.LabelProp = global::Mono.Unix.Catalog.GetString ("Наименование<span foreground=\"red\">*</span>:");
+			this.label4.LabelProp = global::Mono.Unix.Catalog.GetString ("Название:");
 			this.label4.UseMarkup = true;
 			this.table1.Add (this.label4);
 			global::Gtk.Table.TableChild w15 = ((global::Gtk.Table.TableChild)(this.table1 [this.label4]));
@@ -238,7 +238,7 @@ namespace CupboardDesigner
 			this.label6 = new global::Gtk.Label ();
 			this.label6.Name = "label6";
 			this.label6.Xalign = 1F;
-			this.label6.LabelProp = global::Mono.Unix.Catalog.GetString ("Длинна(L):");
+			this.label6.LabelProp = global::Mono.Unix.Catalog.GetString ("Длинна (L):");
 			this.table1.Add (this.label6);
 			global::Gtk.Table.TableChild w17 = ((global::Gtk.Table.TableChild)(this.table1 [this.label6]));
 			w17.TopAttach = ((uint)(5));
@@ -249,7 +249,7 @@ namespace CupboardDesigner
 			this.label7 = new global::Gtk.Label ();
 			this.label7.Name = "label7";
 			this.label7.Xalign = 1F;
-			this.label7.LabelProp = global::Mono.Unix.Catalog.GetString ("Ширина(W):");
+			this.label7.LabelProp = global::Mono.Unix.Catalog.GetString ("Ширина (W):");
 			this.table1.Add (this.label7);
 			global::Gtk.Table.TableChild w18 = ((global::Gtk.Table.TableChild)(this.table1 [this.label7]));
 			w18.TopAttach = ((uint)(6));
@@ -260,7 +260,7 @@ namespace CupboardDesigner
 			this.label8 = new global::Gtk.Label ();
 			this.label8.Name = "label8";
 			this.label8.Xalign = 1F;
-			this.label8.LabelProp = global::Mono.Unix.Catalog.GetString ("Высота(H):");
+			this.label8.LabelProp = global::Mono.Unix.Catalog.GetString ("Высота (H):");
 			this.table1.Add (this.label8);
 			global::Gtk.Table.TableChild w19 = ((global::Gtk.Table.TableChild)(this.table1 [this.label8]));
 			w19.TopAttach = ((uint)(7));
@@ -376,8 +376,8 @@ namespace CupboardDesigner
 			if ((this.Child != null)) {
 				this.Child.ShowAll ();
 			}
-			this.DefaultWidth = 499;
-			this.DefaultHeight = 369;
+			this.DefaultWidth = 456;
+			this.DefaultHeight = 342;
 			this.Show ();
 			this.comboType.Changed += new global::System.EventHandler (this.OnComboTypeChanged);
 			this.drawCube.ExposeEvent += new global::Gtk.ExposeEventHandler (this.OnDrawCubeExposeEvent);

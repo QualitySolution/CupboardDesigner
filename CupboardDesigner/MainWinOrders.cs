@@ -12,16 +12,18 @@ public partial class MainWindow: Gtk.Window
 	private enum OrdersCol{
 		id,
 		custom,
-		basis_type
+		arrval,
+		delivery
 	}
 
 	void PrerareOrders()
 	{
-		OrdersListStore = new ListStore (typeof (int), typeof (string), typeof (string));
+		OrdersListStore = new ListStore (typeof (int), typeof (string), typeof (string), typeof (string));
 
 		treeviewOrders.AppendColumn("Номер", new Gtk.CellRendererText (), "text", (int)OrdersCol.id);
-		treeviewOrders.AppendColumn("Клиент", new Gtk.CellRendererText (), "text", (int)OrdersCol.custom);
-		treeviewOrders.AppendColumn("Тип шкафа", new Gtk.CellRendererText (), "text", (int)OrdersCol.basis_type);
+		treeviewOrders.AppendColumn("Ф.И.О. заказчика", new Gtk.CellRendererText (), "text", (int)OrdersCol.custom);
+		treeviewOrders.AppendColumn("Дата прихода", new Gtk.CellRendererText (), "text", (int)OrdersCol.arrval);
+		treeviewOrders.AppendColumn("Дата сдачи", new Gtk.CellRendererText (), "text", (int)OrdersCol.delivery);
 
 		OrdersFilter = new TreeModelFilter (OrdersListStore, null);
 		OrdersFilter.VisibleFunc = new TreeModelFilterVisibleFunc (FilterTreeOrders);
@@ -35,8 +37,7 @@ public partial class MainWindow: Gtk.Window
 	{
 		MainClass.StatusMessage("Получаем таблицу заказов...");
 
-		string sql = "SELECT orders.id, orders.customer, basis.name as basis FROM orders" +
-			" LEFT JOIN basis ON basis.id = orders.basis_id ";
+		string sql = "SELECT orders.id, orders.customer, orders.arrval, orders.delivery FROM orders ";
 		SqliteCommand cmd = new SqliteCommand(sql, (SqliteConnection) QSMain.ConnectionDB);
 
 		using(SqliteDataReader rdr = cmd.ExecuteReader())
@@ -46,7 +47,8 @@ public partial class MainWindow: Gtk.Window
 			{
 				OrdersListStore.AppendValues(rdr.GetInt32(rdr.GetOrdinal("id")),
 					rdr["customer"].ToString(),
-					rdr["basis"].ToString()
+					String.Format("{0:d}", rdr["arrval"]),
+					String.Format("{0:d}", rdr["delivery"])
 				);
 			}
 
