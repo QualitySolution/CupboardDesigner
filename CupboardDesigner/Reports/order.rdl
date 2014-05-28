@@ -74,9 +74,9 @@ LEFT JOIN facing ON facing.id = facing_id
       </Fields>
     </DataSet>
     <DataSet Name="Order">
-      <Query>
+      <Query >
         <DataSourceName>DS1</DataSourceName>
-        <CommandText>SELECT customer, arrval, delivery, exhibition.name as exhibition, exhibition.phone, exhibition.address, comment, basis.delta_h, basis.delta_l FROM orders
+        <CommandText>SELECT customer, orders.address as customaddress, phone1, orders.phone2, arrval, delivery, exhibition.name as exhibition, exhibition.phone as exphone1, exhibition.phone2 as exphone2, exhibition.address, comment, basis.delta_h, basis.delta_l FROM orders
 LEFT JOIN exhibition ON exhibition_id = exhibition.id
 LEFT JOIN basis ON basis.id = orders.basis_id
  WHERE orders.id = @id</CommandText>
@@ -86,9 +86,21 @@ LEFT JOIN basis ON basis.id = orders.basis_id
           </QueryParameter>
         </QueryParameters>
       </Query>
-      <Fields>
+      <Fields >
         <Field Name="customer">
           <DataField>customer</DataField>
+          <TypeName>System.String</TypeName>
+        </Field>
+        <Field Name="customaddress">
+          <DataField>customaddress</DataField>
+          <TypeName>System.String</TypeName>
+        </Field>
+        <Field Name="phone1">
+          <DataField>phone1</DataField>
+          <TypeName>System.String</TypeName>
+        </Field>
+        <Field Name="phone2">
+          <DataField>phone2</DataField>
           <TypeName>System.String</TypeName>
         </Field>
         <Field Name="arrval">
@@ -103,8 +115,8 @@ LEFT JOIN basis ON basis.id = orders.basis_id
           <DataField>exhibition</DataField>
           <TypeName>System.String</TypeName>
         </Field>
-        <Field Name="phone">
-          <DataField>phone</DataField>
+        <Field Name="exphone1">
+          <DataField>exphone1</DataField>
           <TypeName>System.String</TypeName>
         </Field>
         <Field Name="address">
@@ -115,13 +127,17 @@ LEFT JOIN basis ON basis.id = orders.basis_id
           <DataField>comment</DataField>
           <TypeName>System.String</TypeName>
         </Field>
-        <Field Name="delta_l">
-          <DataField>delta_l</DataField>
-          <TypeName>System.Int32</TypeName>
-        </Field>
         <Field Name="delta_h">
           <DataField>delta_h</DataField>
-          <TypeName>System.Int32</TypeName>
+          <TypeName>System.Int64</TypeName>
+        </Field>
+        <Field Name="delta_l">
+          <DataField>delta_l</DataField>
+          <TypeName>System.Int64</TypeName>
+        </Field>
+        <Field Name="exphone2">
+          <DataField>exphone2</DataField>
+          <TypeName>System.String</TypeName>
         </Field>
       </Fields>
     </DataSet>
@@ -493,78 +509,21 @@ LEFT JOIN basis ON basis.id = orders.basis_id
           </TableRows>
         </Details>
         <Left>1.7pt</Left>
-        <Top>446.2pt</Top>
+        <Top>459.8pt</Top>
       </Table>
       <List Name="List1">
-        <Height>119.71pt</Height>
-        <Width>561.55pt</Width>
-        <Left>7.5pt</Left>
-        <Top>11.1pt</Top>
+        <Height>127.21pt</Height>
+        <Width>565.30pt</Width>
+        <Left>7.50pt</Left>
+        <Top>10.30pt</Top>
         <ReportItems>
-          <Textbox Name="Textbox2">
-            <Height>17.24pt</Height>
-            <Width>218.31pt</Width>
-            <Value>= "Заказ №" + {?id}</Value>
-            <ZIndex>1</ZIndex>
-            <Left>171.1pt</Left>
-            <Top>49.6pt</Top>
-            <Style>
-              <BorderStyle />
-              <BorderColor />
-              <BorderWidth />
-              <FontSize>14pt</FontSize>
-              <TextAlign>Center</TextAlign>
-            </Style>
-          </Textbox>
-          <Textbox Name="Textbox3">
-            <Height>12pt</Height>
-            <Width>1in</Width>
-            <Value>Заказчик:</Value>
-            <ZIndex>1</ZIndex>
-            <Left>10.9pt</Left>
-            <Top>74.5pt</Top>
-            <Style>
-              <BorderStyle />
-              <BorderColor />
-              <BorderWidth />
-              <TextAlign>Right</TextAlign>
-            </Style>
-          </Textbox>
-          <Textbox Name="Textbox4">
-            <Height>14.25pt</Height>
-            <Width>84.27pt</Width>
-            <Value>Дата прихода:</Value>
-            <ZIndex>1</ZIndex>
-            <Left>0.3pt</Left>
-            <Top>88.9pt</Top>
-            <Style>
-              <BorderStyle />
-              <BorderColor />
-              <BorderWidth />
-              <TextAlign>Right</TextAlign>
-            </Style>
-          </Textbox>
-          <Textbox Name="Textbox5">
-            <Height>12.00pt</Height>
-            <Width>83.53pt</Width>
-            <Value>Дата сдачи:</Value>
-            <ZIndex>1</ZIndex>
-            <Left>0.3pt</Left>
-            <Top>104.3pt</Top>
-            <Style>
-              <BorderStyle />
-              <BorderColor />
-              <BorderWidth />
-              <TextAlign>Right</TextAlign>
-            </Style>
-          </Textbox>
           <Textbox Name="Textbox6">
             <Height>14.26pt</Height>
             <Width>303.92pt</Width>
-            <Value>={customer}</Value>
+            <Value>="Ф.И.О. Заказчика: " + {customer}</Value>
             <ZIndex>1</ZIndex>
-            <Left>84.2pt</Left>
-            <Top>73.8pt</Top>
+            <Left>6pt</Left>
+            <Top>45.0pt</Top>
             <Style>
               <BorderStyle />
               <BorderColor />
@@ -573,30 +532,16 @@ LEFT JOIN basis ON basis.id = orders.basis_id
           </Textbox>
           <Textbox Name="Textbox7">
             <Height>12.00pt</Height>
-            <Width>216.81pt</Width>
-            <Value>={arrval}</Value>
+            <Width>338.31pt</Width>
+            <Value>="Дата прихода Заказа: " + Iif(Fields.arrval.IsMissing, "------//-----", Format(Fields!arrval.Value, "dddd, dd MMMM yyyy"))</Value>
             <ZIndex>1</ZIndex>
-            <Left>83.4pt</Left>
-            <Top>89.5pt</Top>
+            <Left>6.0pt</Left>
+            <Top>90.3pt</Top>
             <Style>
               <BorderStyle />
               <BorderColor />
               <BorderWidth />
-              <Format>dddd, dd MMMM yyyy</Format>
-            </Style>
-          </Textbox>
-          <Textbox Name="Textbox8">
-            <Height>12pt</Height>
-            <Width>3in</Width>
-            <Value>={delivery}</Value>
-            <ZIndex>1</ZIndex>
-            <Left>83.2pt</Left>
-            <Top>104.5pt</Top>
-            <Style>
-              <BorderStyle />
-              <BorderColor />
-              <BorderWidth />
-              <Format>dddd, dd MMMM yyyy</Format>
+              <Format >None</Format>
             </Style>
           </Textbox>
           <Textbox Name="Textbox27">
@@ -618,7 +563,7 @@ LEFT JOIN basis ON basis.id = orders.basis_id
           <Textbox Name="Textbox30">
             <Height>13.51pt</Height>
             <Width>181.31pt</Width>
-            <Value>={phone}</Value>
+            <Value>={exphone1}</Value>
             <ZIndex>1</ZIndex>
             <Left>382.4pt</Left>
             <Top>19.4pt</Top>
@@ -634,8 +579,8 @@ LEFT JOIN basis ON basis.id = orders.basis_id
             <Width>176.92pt</Width>
             <Value>={address}</Value>
             <ZIndex>1</ZIndex>
-            <Left>387.1pt</Left>
-            <Top>32.6pt</Top>
+            <Left>386.3pt</Left>
+            <Top>48.6pt</Top>
             <Style>
               <BorderStyle />
               <BorderColor />
@@ -644,6 +589,75 @@ LEFT JOIN basis ON basis.id = orders.basis_id
             </Style>
             <CanGrow>true</CanGrow>
           </Textbox>
+          <Textbox Name="Textbox2" >
+            <Height>42.79pt</Height>
+            <Width>219.69pt</Width>
+            <Value>Договор № ____________________
+
+от "_____" _____________________ 20     г.</Value>
+            <ZIndex>1</ZIndex>
+            <Left>351.2pt</Left>
+            <Top>85.8pt</Top>
+            <Style>
+              <BorderStyle />
+              <BorderColor />
+              <BorderWidth />
+            </Style>
+          </Textbox>
+          <Textbox Name="Textbox3" >
+            <Height>14.25pt</Height>
+            <Width>447.97pt</Width>
+            <Value>="Телефоны: " + Iif(Fields.phone1.IsMissing, "", "(осн.) " + Fields.phone1) + Iif(Fields.phone2.IsMissing, "", " (доп.) " + Fields.phone2)</Value>
+            <ZIndex>1</ZIndex>
+            <Left>6.0pt</Left>
+            <Top>75.1pt</Top>
+            <Style>
+              <BorderStyle />
+              <BorderColor />
+              <BorderWidth />
+            </Style>
+          </Textbox>
+          <Textbox Name="Textbox35" >
+            <Height>15.03pt</Height>
+            <Width>443.51pt</Width>
+            <Value>= "Адрес доставки:" +{customaddress}</Value>
+            <ZIndex>1</ZIndex>
+            <Left>6.0pt</Left>
+            <Top>59.7pt</Top>
+            <Style>
+              <BorderStyle />
+              <BorderColor />
+              <BorderWidth />
+            </Style>
+            <CanGrow>true</CanGrow>
+          </Textbox>
+          <Textbox Name="Textbox4" >
+            <Height>15.76pt</Height>
+            <Width>310.13pt</Width>
+            <Value>="Дата сдачи Заказа: " &amp; Iif(Fields.delivery.IsMissing, "-----//-----", Format(Fields!delivery.Value, "dddd, dd MMMM yyyy"))</Value>
+            <ZIndex>1</ZIndex>
+            <Left>6.0pt</Left>
+            <Top>107.7pt</Top>
+            <Style>
+              <BorderStyle />
+              <BorderColor />
+              <BorderWidth />
+            </Style>
+          </Textbox>
+          <Textbox Name="Textbox5" >
+            <Height>13.50pt</Height>
+            <Width>173.10pt</Width>
+            <Value>={exphone2}</Value>
+            <ZIndex>1</ZIndex>
+            <Left>390.10pt</Left>
+            <Top>34.10pt</Top>
+            <Style>
+              <BorderStyle />
+              <BorderColor />
+              <BorderWidth />
+              <TextAlign>Right</TextAlign>
+            </Style>
+          </Textbox>
         </ReportItems>
         <DataSetName>Order</DataSetName>
       </List>
@@ -651,7 +665,7 @@ LEFT JOIN basis ON basis.id = orders.basis_id
         <Height>44.50pt</Height>
         <Width>570.03pt</Width>
         <Left>8.1pt</Left>
-        <Top>472.0pt</Top>
+        <Top>485.6pt</Top>
         <Style>
           <BorderStyle />
           <BorderColor />
@@ -662,7 +676,7 @@ LEFT JOIN basis ON basis.id = orders.basis_id
           <Textbox Name="Textbox28">
             <Height>12.00pt</Height>
             <Width>72.27pt</Width>
-            <Value>Комментарий:</Value>
+            <Value>Примечания:</Value>
             <ZIndex>1</ZIndex>
             <Left>9.8pt</Left>
             <Top>1.6pt</Top>
@@ -699,8 +713,8 @@ LEFT JOIN basis ON basis.id = orders.basis_id
       <Image Name="Image1">
         <Height>305.15pt</Height>
         <Width>562.20pt</Width>
-        <Left>13.00pt</Left>
-        <Top>137.80pt</Top>
+        <Left>13.0pt</Left>
+        <Top>145.0pt</Top>
         <Style>
           <BorderStyle>
             <Top>Dashed</Top>
@@ -717,10 +731,10 @@ LEFT JOIN basis ON basis.id = orders.basis_id
       <Textbox Name="Textbox32">
         <Height>12.75pt</Height>
         <Width>123.43pt</Width>
-        <Value>="Ширина (W) " + Convert.ToString(Max(Fields!widht.Value, "Data")) + "мм"</Value>
+        <Value>="Ширина (W) " + Convert.ToString(Max(Fields!widht.Value, "Data")) + " мм"</Value>
         <ZIndex>1</ZIndex>
-        <Left>8.60pt</Left>
-        <Top>173.80pt</Top>
+        <Left>10.0pt</Left>
+        <Top>187.4pt</Top>
         <Style>
           <BorderStyle />
           <BorderColor />
@@ -730,10 +744,10 @@ LEFT JOIN basis ON basis.id = orders.basis_id
       <Textbox Name="Textbox33">
         <Height>13.50pt</Height>
         <Width>124.89pt</Width>
-        <Value>="Высота (H) " + Convert.ToString(First(Fields!delta_h.Value, "Order") + {?baseh} * 400) + "мм"</Value>
+        <Value>="Высота (H) " + Convert.ToString(First(Fields!delta_h.Value, "Order") + {?baseh} * 400) + " мм"</Value>
         <ZIndex>1</ZIndex>
-        <Left>8.8pt</Left>
-        <Top>187.9pt</Top>
+        <Left>10.0pt</Left>
+        <Top>202.3pt</Top>
         <Style>
           <BorderStyle />
           <BorderColor />
@@ -743,10 +757,10 @@ LEFT JOIN basis ON basis.id = orders.basis_id
       <Textbox Name="Textbox34">
         <Height>12.00pt</Height>
         <Width>118.90pt</Width>
-        <Value>="Длина (L) " + Convert.ToString(First(Fields!delta_l.Value, "Order") + {?basel} * 400) + "мм"</Value>
+        <Value>="Длина (L) " + Convert.ToString(First(Fields!delta_l.Value, "Order") + {?basel} * 400) + " мм"</Value>
         <ZIndex>1</ZIndex>
-        <Left>8.90pt</Left>
-        <Top>158.80pt</Top>
+        <Left>10.0pt</Left>
+        <Top>173.2pt</Top>
         <Style>
           <BorderStyle />
           <BorderColor />
@@ -754,8 +768,8 @@ LEFT JOIN basis ON basis.id = orders.basis_id
         </Style>
       </Textbox>
       <Image Name="Image2">
-        <Height>52.16pt</Height>
-        <Width>236.66pt</Width>
+        <Height>42.41pt</Height>
+        <Width>205.91pt</Width>
         <Left>10.20pt</Left>
         <Top>8.50pt</Top>
         <Style>
@@ -768,20 +782,20 @@ LEFT JOIN basis ON basis.id = orders.basis_id
         <Sizing>FitProportional</Sizing>
       </Image>
     </ReportItems>
-    <Height>519.4pt</Height>
+    <Height>535.3pt</Height>
   </Body>
   <PageFooter>
-    <Height>33.6pt</Height>
+    <Height>32.8pt</Height>
     <PrintOnFirstPage>true</PrintOnFirstPage>
     <PrintOnLastPage>true</PrintOnLastPage>
     <ReportItems>
       <Textbox Name="Textbox1">
-        <Height>17.99pt</Height>
-        <Width>195.00pt</Width>
-        <Value>Подпись ____________________</Value>
+        <Height>16.50pt</Height>
+        <Width>297.30pt</Width>
+        <Value>Подпись Заказчика: ________________________</Value>
         <ZIndex>1</ZIndex>
-        <Left>372.1pt</Left>
-        <Top>3.4pt</Top>
+        <Left>269.80pt</Left>
+        <Top>3.40pt</Top>
         <Style>
           <BorderStyle />
           <BorderColor />

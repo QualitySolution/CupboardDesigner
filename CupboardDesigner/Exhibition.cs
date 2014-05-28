@@ -35,7 +35,8 @@ namespace CupboardDesigner
 
 					labelID.Text = rdr["id"].ToString();
 					entryName.Text = rdr["name"].ToString();
-					entryPhones.Text = DBWorks.GetString(rdr, "phone", "");
+					entryPhone1.Text = DBWorks.GetString(rdr, "phone", "");
+					entryPhone2.Text = DBWorks.GetString(rdr, "phone2", "");
 					textAddress.Buffer.Text = DBWorks.GetString(rdr, "address", "");
 				}
 
@@ -61,12 +62,12 @@ namespace CupboardDesigner
 			string sql;
 			if(NewItem)
 			{
-				sql = "INSERT INTO exhibition (name, phone, address) " +
-					"VALUES (@name, @phone, @address)";
+				sql = "INSERT INTO exhibition (name, phone, phone2, address) " +
+					"VALUES (@name, @phone, @phone2, @address)";
 			}
 			else
 			{
-				sql = "UPDATE exhibition SET name = @name, phone = @phone, " +
+				sql = "UPDATE exhibition SET name = @name, phone = @phone, phone = @phone, " +
 					"address = @address WHERE id = @id";
 			}
 			MainClass.StatusMessage("Запись номенклатуры...");
@@ -77,7 +78,8 @@ namespace CupboardDesigner
 
 				cmd.Parameters.AddWithValue("@id", ItemId);
 				cmd.Parameters.AddWithValue("@name", entryName.Text);
-				cmd.Parameters.AddWithValue("@phone", DBWorks.ValueOrNull(entryPhones.Text != "", entryPhones.Text));
+				cmd.Parameters.AddWithValue("@phone", DBWorks.ValueOrNull(entryPhone1.Text != "", entryPhone1.Text));
+				cmd.Parameters.AddWithValue("@phone2", DBWorks.ValueOrNull(entryPhone2.Text != "", entryPhone2.Text));
 				cmd.Parameters.AddWithValue("@address", DBWorks.ValueOrNull(textAddress.Buffer.Text != "", textAddress.Buffer.Text));
 				cmd.ExecuteNonQuery();
 
