@@ -50,18 +50,17 @@ namespace CupboardDesigner
 			base(Gtk.WindowType.Toplevel)
 		{
 			this.Build();
-			string sqlSelect = "SELECT name, id FROM exhibition ORDER BY ordinal";
-			ComboWorks.ComboFillUniversal(comboExhibition, sqlSelect, "{0}", null, 1, ComboWorks.ListMode.WithNo);
+			ComboWorks.ComboFillReference(comboExhibition, "exhibition", ComboWorks.ListMode.WithNo, true, "ordinal");
 			dateArrval.Date = DateTime.Today;
 
 			//Создаем таблицу номенклатуры
 			ComboBox TempCombo = new ComboBox();
-			ComboWorks.ComboFillReference(TempCombo, "materials", ComboWorks.ListMode.WithNo);
+			ComboWorks.ComboFillReference(TempCombo, "materials", ComboWorks.ListMode.WithNo, true, "ordinal");
 			MaterialNameList = TempCombo.Model;
 			TempCombo.Destroy ();
 
 			TempCombo = new ComboBox();
-			ComboWorks.ComboFillReference(TempCombo, "facing", ComboWorks.ListMode.WithNo);
+			ComboWorks.ComboFillReference(TempCombo, "facing", ComboWorks.ListMode.WithNo, true, "ordinal");
 			FacingNameList = TempCombo.Model;
 			TempCombo.Destroy ();
 
