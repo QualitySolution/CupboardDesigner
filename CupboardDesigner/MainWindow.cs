@@ -20,6 +20,17 @@ public partial class MainWindow: Gtk.Window
 		Reference.RunReferenceItemDlg += OnRunReferenceItemDialog;
 		QSMain.ReferenceUpdated += OnReferenceUpdate;
 
+		if(DateTime.Today > new DateTime(2014, 07, 20))
+		{
+			MessageDialog md = new MessageDialog ( this, DialogFlags.DestroyWithParent,
+				MessageType.Error, 
+				ButtonsType.Close, 
+				"Ох-ох-ох. Вы пытаетесь запустить тестовую версию программы, время тестирования которой закончилось. Обратитесь к разработчику за получением полноценной версии.");
+			md.Run ();
+			md.Destroy();
+			Environment.Exit(1);
+		}
+
 		PrerareOrders();
 		SetAdminMode(false); 
 	}
