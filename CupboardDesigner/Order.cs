@@ -49,6 +49,7 @@ namespace CupboardDesigner
 			base(Gtk.WindowType.Toplevel)
 		{
 			this.Build();
+			notebook1.CurrentPage = 0;
 			ComboWorks.ComboFillReference(comboExhibition, "exhibition", ComboWorks.ListMode.WithNo, true, "ordinal");
 			dateArrval.Date = DateTime.Today;
 
