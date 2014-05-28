@@ -19,10 +19,9 @@ namespace CupboardDesigner
 		private TreeModel MaterialNameList, FacingNameList;
 		private List<Cube> CubeList;
 		private int CubePxSize = 100;
-		private VBox vboxCubeList, vboxTypeList;
+		private VBox vboxCubeList;
 		private HBox hboxCubeList, hboxTypeList;
 		private int MaxCubeVSize;
-		private bool VerticalTypeList = false;
 		private bool VerticalCubeList = true;
 		private List<CupboardListItem> TypeWidgetList;
 		private List<CubeListItem> CubeWidgetList;
@@ -153,7 +152,6 @@ namespace CupboardDesigner
 			//Загрузка Списка типов шкафов
 			TypeWidgetList = new List<CupboardListItem>();
 			hboxTypeList = new HBox(false, 2);
-			vboxTypeList = new VBox(false, 2);
 			Stream stream = System.Reflection.Assembly.GetExecutingAssembly().GetManifestResourceStream( "CupboardDesigner.icons.Yes_check.svg" );
 			byte[] temparray;
 			using(MemoryStream mstream = new MemoryStream())
@@ -191,10 +189,10 @@ namespace CupboardDesigner
 						continue;
 					TempWidget.Button.Clicked += OnBasisChanged;
 					TypeWidgetList.Add(TempWidget);
+					hboxTypeList.Add(TempWidget);
 				}
-				UpdateTypeList();
-				scrolledTypesV.AddWithViewport(vboxTypeList);
 				scrolledTypesH.AddWithViewport(hboxTypeList);
+				hboxTypeList.ShowAll();
 			}
 
 			OrderCupboard = new Cupboard();
@@ -228,7 +226,9 @@ namespace CupboardDesigner
 
 					this.Title = String.Format("Заказ №{0}", rdr["id"].ToString());
 					entryCustomer.Text = rdr["customer"].ToString();
-
+					entryPhone1.Text = rdr["phone1"].ToString();
+					entryPhone2.Text = rdr["phone2"].ToString();
+					textAddress.Buffer.Text = rdr["address"].ToString();
 					dateArrval.Date = DBWorks.GetDateTime(rdr, "arrval", new DateTime());
 					dateDelivery.Date = DBWorks.GetDateTime(rdr, "delivery", new DateTime());
 					int basis_id = rdr.GetInt32(rdr.GetOrdinal("basis_id"));
@@ -238,7 +238,6 @@ namespace CupboardDesigner
 					OrderCupboard = Cupboard.Load(rdr["cupboard"].ToString(), CubeList);
 					comboCubeH.Active = OrderCupboard.CubesH - 1;
 					comboCubeV.Active = OrderCupboard.CubesV - 1;
-					SetInfo();
 					CalculateCubePxSize(drawCupboard.Allocation);
 				}
 
@@ -343,12 +342,13 @@ namespace CupboardDesigner
 			string sql;
 			if (NewItem)
 			{
-				sql = "INSERT INTO orders (customer, exhibition_id, basis_id, arrval, delivery, comment, cupboard) " +
-					"VALUES (@customer, @exhibition_id, @basis_id, @arrval, @delivery, @comment, @cupboard)";
+				sql = "INSERT INTO orders (customer, address, phone1, phone2, exhibition_id, basis_id, arrval, delivery, comment, cupboard) " +
+					"VALUES (@customer, @address, @phone1, @phone2, @exhibition_id, @basis_id, @arrval, @delivery, @comment, @cupboard)";
 			}
 			else
 			{
-				sql = "UPDATE orders SET customer = @customer, exhibition_id = @exhibition_id, basis_id = @basis_id, arrval = @arrval, " +
+				sql = "UPDATE orders SET customer = @customer, address = @address, phone1 = @phone1, phone2 = @phone2, " +
+					"exhibition_id = @exhibition_id, basis_id = @basis_id, arrval = @arrval, " +
 					"delivery = @delivery, comment = @comment, cupboard = @cupboard WHERE id = @id";
 			}
 			SqliteTransaction trans = ((SqliteConnection)QSMain.ConnectionDB).BeginTransaction();
@@ -359,6 +359,9 @@ namespace CupboardDesigner
 
 				cmd.Parameters.AddWithValue("@id", ItemId);
 				cmd.Parameters.AddWithValue("@customer", DBWorks.ValueOrNull(entryCustomer.Text != "", entryCustomer.Text));
+				cmd.Parameters.AddWithValue("@address", DBWorks.ValueOrNull(textAddress.Buffer.Text != "", textAddress.Buffer.Text));
+				cmd.Parameters.AddWithValue("@phone1", DBWorks.ValueOrNull(entryPhone1.Text != "", entryPhone1.Text));
+				cmd.Parameters.AddWithValue("@phone2", DBWorks.ValueOrNull(entryPhone2.Text != "", entryPhone2.Text));
 				cmd.Parameters.AddWithValue("@arrval", DBWorks.ValueOrNull(!dateArrval.IsEmpty, dateArrval.Date));
 				cmd.Parameters.AddWithValue("@delivery", DBWorks.ValueOrNull(!dateDelivery.IsEmpty, dateDelivery.Date));
 				CupboardListItem basis = TypeWidgetList.Find(w => w.Button.Active);
@@ -439,16 +442,6 @@ namespace CupboardDesigner
 			}
 		}
 
-		void SetInfo()
-		{
-			CupboardListItem basis = TypeWidgetList.Find(w => w.Button.Active);
-			string name = basis != null ? basis.ItemName : "Тип не выбран";
-
-			labelInfo.LabelProp = String.Format("{0} Длина (L):{1}мм Высота (H):{2}мм", name, 
-				int.Parse(comboCubeH.ActiveText) * 400 + basis.DeltaL, 
-				int.Parse(comboCubeV.ActiveText) * 400 + basis.DeltaH);
-		}
-
 		protected void OnBasisChanged(object sender, EventArgs e)
 		{
 			CupboardListItem basis = TypeWidgetList.Find(w => w.Button.Active);
@@ -458,13 +451,11 @@ namespace CupboardDesigner
 				return;
 			}
 			OrderCupboard.BorderImage.LoadImage(basis.Image.OriginalFile);
-			SetInfo();
 			UpdateBasisComponents(basis.id);
 		}
 
 		protected void OnComboCubeHChanged(object sender, EventArgs e)
 		{
-			SetInfo();
 			OrderCupboard.CubesH = int.Parse(comboCubeH.ActiveText);
 			if(OrderCupboard.BorderImage != null)
 				OrderCupboard.BorderImage.ModifyDrawingImage();
@@ -473,7 +464,6 @@ namespace CupboardDesigner
 
 		protected void OnComboCubeVChanged(object sender, EventArgs e)
 		{
-			SetInfo();
 			OrderCupboard.CubesV = int.Parse(comboCubeV.ActiveText);
 			if(OrderCupboard.BorderImage != null)
 				OrderCupboard.BorderImage.ModifyDrawingImage();
@@ -666,28 +656,6 @@ namespace CupboardDesigner
 				else
 					Gtk.Drag.SourceUnset(drawCupboard);
 			} */
-		}
-
-		protected void OnButtonTypeListOrientClicked(object sender, EventArgs e)
-		{
-			VerticalTypeList = !VerticalTypeList;
-			UpdateTypeList();
-		}
-
-		void UpdateTypeList()
-		{
-			scrolledTypesV.Visible = VerticalTypeList;
-			scrolledTypesH.Visible = !VerticalTypeList;
-			Box boxTypeList = VerticalTypeList ? (Box)vboxTypeList : (Box) hboxTypeList;
-			Box ForRemove = !VerticalTypeList ? (Box)vboxTypeList : (Box) hboxTypeList;
-
-			foreach( CupboardListItem item in TypeWidgetList)
-			{
-				if(item.Parent != null)
-					ForRemove.Remove(item);
-				boxTypeList.Add(item);
-			}
-			boxTypeList.ShowAll();
 		}
 
 		void UpdateCubeList()
