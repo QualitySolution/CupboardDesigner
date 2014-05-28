@@ -21,7 +21,7 @@ namespace CupboardDesigner
 		private int CubePxSize = 100;
 		private VBox vboxCubeList;
 		private HBox hboxCubeList, hboxTypeList;
-		private int MaxCubeVSize;
+		private int MaxCubeVSize, MaxCubeHSize;
 		private bool VerticalCubeList = true;
 		private List<CupboardListItem> TypeWidgetList;
 		private List<CubeListItem> CubeWidgetList;
@@ -135,6 +135,7 @@ namespace CupboardDesigner
 					TempCube.LoadSvg(ImageFile);
 					CubeList.Add(TempCube);
 					MaxCubeVSize = Math.Max(MaxCubeVSize, TempCube.CubesV);
+					MaxCubeHSize = Math.Max(MaxCubeHSize, TempCube.CubesH);
 
 					//Добавляем виджеты в лист
 					CubeListItem TempWidget = new CubeListItem();
@@ -487,20 +488,27 @@ namespace CupboardDesigner
 		private void CalculateCubePxSize(Gdk.Rectangle CupboardPlace)
 		{
 
-			int WidhtWithoutGrid = CupboardPlace.Width ;
+			int WidthWithoutGrid = CupboardPlace.Width ;
 			int HeightWithoutGrid = CupboardPlace.Height;
 			int HeightTable = tableConstructor.Allocation.Height;
+			int WidthTable = tableConstructor.Allocation.Width;
 
 			//Добавляем высоту листа кубов с низу, что бы ресайз не зацикливался.
 			int ListCybesV = !VerticalCubeList ? MaxCubeVSize : 0;
-			int ListPixelAdd = !VerticalCubeList ? scrolledCubeListH.HScrollbar.HeightRequest + 48 : 0;
-			if(!VerticalCubeList)
+			int ListCybesH = VerticalCubeList ? MaxCubeHSize : 0;
+			int ListPixelAddV = !VerticalCubeList ? scrolledCubeListH.HScrollbar.HeightRequest + 64 : 0;
+			int ListPixelAddH = VerticalCubeList ? scrolledCubeListV.VScrollbar.WidthRequest + 16 : 0;
+			if(VerticalCubeList)
 			{
-				HeightWithoutGrid = HeightTable - ListPixelAdd;
+				WidthWithoutGrid = WidthTable - ListPixelAddH;
+			}
+			else
+			{
+				HeightWithoutGrid = HeightTable - ListPixelAddV;
 			}
 
 			// 1.2 это 2 бортика по караям которые равны 60% от куба
-			int MinCubeSizeForH = Convert.ToInt32(WidhtWithoutGrid / (double.Parse(comboCubeH.ActiveText) + 1.2));
+			int MinCubeSizeForH = Convert.ToInt32(WidthWithoutGrid / (double.Parse(comboCubeH.ActiveText) + 1.2 + ListCybesH));
 			int MinCubeSizeForV = Convert.ToInt32(HeightWithoutGrid / (double.Parse(comboCubeV.ActiveText) + 1.2 + ListCybesV));
 
 			int NeedCubePxSize = Math.Min(MinCubeSizeForH, MinCubeSizeForV);
@@ -512,18 +520,16 @@ namespace CupboardDesigner
 			{
 				CubePxSize = NeedCubePxSize;
 
-				int MaxHeight = 0;
+				int MaxHeight = 0, MaxWidth = 0;
 				foreach(Cube cube in CubeList)
 				{
 					((CubeListItem)cube.Widget).CubePxSize = CubePxSize;
 					Requisition req = ((CubeListItem)cube.Widget).SizeRequest();
 					MaxHeight = Math.Max(MaxHeight, req.Height);
+					MaxWidth = Math.Max(MaxWidth, req.Width);
 				}
 				hboxCubeList.HeightRequest = MaxHeight;
-				int h = hboxCubeList.HeightRequest;
-				logger.Debug("h={0}", MaxHeight);
-				((Viewport)scrolledCubeListH.Child).CheckResize();
-				scrolledCubeListH.CheckResize();
+				vboxCubeList.WidthRequest = MaxWidth;
 			}
 		}
 
