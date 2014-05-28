@@ -100,7 +100,7 @@ namespace CupboardDesigner
 			ColumnComment.PackStart (CellComment, true);
 			ColumnComment.AddAttribute(CellComment, "text", (int)ComponentCol.comment);
 
-			treeviewComponents.AppendColumn("Наименование", new Gtk.CellRendererText (), "text", (int)ComponentCol.nomenclature);
+			treeviewComponents.AppendColumn("Название", new Gtk.CellRendererText (), "text", (int)ComponentCol.nomenclature);
 			treeviewComponents.AppendColumn("Кол-во", new Gtk.CellRendererText (), "text", (int)ComponentCol.count);
 			treeviewComponents.AppendColumn(ColumnMaterial);
 			treeviewComponents.AppendColumn(ColumnFacing);

@@ -50,7 +50,6 @@ namespace CupboardDesigner
 		private global::Gtk.ScrolledWindow scrolledCubeListV;
 		private global::Gtk.Label label8;
 		private global::Gtk.VBox vbox5;
-		private global::Gtk.Label label1;
 		private global::Gtk.ScrolledWindow GtkScrolledWindow1;
 		private global::Gtk.TreeView treeviewComponents;
 		private global::Gtk.Label labelTotalCount;
@@ -104,7 +103,7 @@ namespace CupboardDesigner
 			this.notebook1 = new global::Gtk.Notebook ();
 			this.notebook1.CanFocus = true;
 			this.notebook1.Name = "notebook1";
-			this.notebook1.CurrentPage = 2;
+			this.notebook1.CurrentPage = 0;
 			// Container child notebook1.Gtk.Notebook+NotebookChild
 			this.hbox1 = new global::Gtk.HBox ();
 			this.hbox1.Name = "hbox1";
@@ -297,6 +296,7 @@ namespace CupboardDesigner
 			this.label6 = new global::Gtk.Label ();
 			this.label6.Name = "label6";
 			this.label6.Xalign = 1F;
+			this.label6.Yalign = 0F;
 			this.label6.LabelProp = global::Mono.Unix.Catalog.GetString ("Адрес доставки:");
 			this.table3.Add (this.label6);
 			global::Gtk.Table.TableChild w19 = ((global::Gtk.Table.TableChild)(this.table3 [this.label6]));
@@ -493,15 +493,6 @@ namespace CupboardDesigner
 			this.vbox5.Name = "vbox5";
 			this.vbox5.Spacing = 6;
 			// Container child vbox5.Gtk.Box+BoxChild
-			this.label1 = new global::Gtk.Label ();
-			this.label1.Name = "label1";
-			this.label1.LabelProp = global::Mono.Unix.Catalog.GetString ("На этой странице для каждого элемента шкафа можно указать ма\nтериал и отделку.");
-			this.vbox5.Add (this.label1);
-			global::Gtk.Box.BoxChild w37 = ((global::Gtk.Box.BoxChild)(this.vbox5 [this.label1]));
-			w37.Position = 0;
-			w37.Expand = false;
-			w37.Fill = false;
-			// Container child vbox5.Gtk.Box+BoxChild
 			this.GtkScrolledWindow1 = new global::Gtk.ScrolledWindow ();
 			this.GtkScrolledWindow1.Name = "GtkScrolledWindow1";
 			this.GtkScrolledWindow1.ShadowType = ((global::Gtk.ShadowType)(1));
@@ -511,21 +502,21 @@ namespace CupboardDesigner
 			this.treeviewComponents.Name = "treeviewComponents";
 			this.GtkScrolledWindow1.Add (this.treeviewComponents);
 			this.vbox5.Add (this.GtkScrolledWindow1);
-			global::Gtk.Box.BoxChild w39 = ((global::Gtk.Box.BoxChild)(this.vbox5 [this.GtkScrolledWindow1]));
-			w39.Position = 1;
+			global::Gtk.Box.BoxChild w38 = ((global::Gtk.Box.BoxChild)(this.vbox5 [this.GtkScrolledWindow1]));
+			w38.Position = 0;
 			// Container child vbox5.Gtk.Box+BoxChild
 			this.labelTotalCount = new global::Gtk.Label ();
 			this.labelTotalCount.Name = "labelTotalCount";
 			this.labelTotalCount.Xalign = 1F;
 			this.labelTotalCount.LabelProp = global::Mono.Unix.Catalog.GetString ("label2");
 			this.vbox5.Add (this.labelTotalCount);
-			global::Gtk.Box.BoxChild w40 = ((global::Gtk.Box.BoxChild)(this.vbox5 [this.labelTotalCount]));
-			w40.Position = 2;
-			w40.Expand = false;
-			w40.Fill = false;
+			global::Gtk.Box.BoxChild w39 = ((global::Gtk.Box.BoxChild)(this.vbox5 [this.labelTotalCount]));
+			w39.Position = 1;
+			w39.Expand = false;
+			w39.Fill = false;
 			this.notebook1.Add (this.vbox5);
-			global::Gtk.Notebook.NotebookChild w41 = ((global::Gtk.Notebook.NotebookChild)(this.notebook1 [this.vbox5]));
-			w41.Position = 3;
+			global::Gtk.Notebook.NotebookChild w40 = ((global::Gtk.Notebook.NotebookChild)(this.notebook1 [this.vbox5]));
+			w40.Position = 3;
 			// Notebook tab
 			this.label15 = new global::Gtk.Label ();
 			this.label15.Name = "label15";
@@ -533,17 +524,17 @@ namespace CupboardDesigner
 			this.notebook1.SetTabLabel (this.vbox5, this.label15);
 			this.label15.ShowAll ();
 			// Notebook tab
-			global::Gtk.Label w42 = new global::Gtk.Label ();
-			w42.Visible = true;
-			this.notebook1.Add (w42);
+			global::Gtk.Label w41 = new global::Gtk.Label ();
+			w41.Visible = true;
+			this.notebook1.Add (w41);
 			this.label16 = new global::Gtk.Label ();
 			this.label16.Name = "label16";
 			this.label16.LabelProp = global::Mono.Unix.Catalog.GetString ("ШАГ-4 (предварительный просмотр)");
-			this.notebook1.SetTabLabel (w42, this.label16);
+			this.notebook1.SetTabLabel (w41, this.label16);
 			this.label16.ShowAll ();
 			this.vbox2.Add (this.notebook1);
-			global::Gtk.Box.BoxChild w43 = ((global::Gtk.Box.BoxChild)(this.vbox2 [this.notebook1]));
-			w43.Position = 1;
+			global::Gtk.Box.BoxChild w42 = ((global::Gtk.Box.BoxChild)(this.vbox2 [this.notebook1]));
+			w42.Position = 1;
 			this.Add (this.vbox2);
 			if ((this.Child != null)) {
 				this.Child.ShowAll ();
