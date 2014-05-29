@@ -1,6 +1,6 @@
 
 ;--------------------------------
-!define PRODUCT_VERSION "1.0"
+!define PRODUCT_VERSION "1.0.3"
 !define MIN_NET_MAJOR "4"
 !define MIN_NET_MINOR "0"
 !define MIN_NET_BUILD "*"
@@ -338,12 +338,15 @@ Section "MS .NET Framework ${MIN_NET_MAJOR}.${MIN_NET_MINOR}" SecFramework
 SectionEnd
 
 Section "GTK# 2.12.21" SecGTK
-	SectionIn RO
+  SectionIn RO
 ; Install 2.12.21
   File "gtk-sharp-2.12.21.msi"
   ExecWait '"msiexec" /i "$pluginsdir\Requires\gtk-sharp-2.12.21.msi"  /passive'
+
 ; Setup Gtk style
-  ${ConfigWrite} "$PROGRAMFILES\GtkSharp\2.12\share\themes\MS-Windows\gtk-2.0\gtkrc" "gtk-button-images =" "1" $R0
+  SetOutPath "$PROGRAMFILES\GtkSharp\2.12\share\themes\MS-Windows\gtk-2.0\"
+  File "gtkrc"
+
 SectionEnd
 
 Section /o "Пустая база данных" SecDataBase

@@ -10,6 +10,7 @@
     <widget-library name="../../../QSProjects/QSWidgetLib/bin/Debug/QSWidgetLib.dll" />
     <widget-library name="glade-sharp, Version=2.12.0.0, Culture=neutral, PublicKeyToken=35e10195dab3c99f" />
     <widget-library name="../../../QSProjects/QSSupportLib/bin/Debug/QSSupportLib.dll" />
+    <widget-library name="../../../My-FyiReporting/RdlGtkViewer/RdlGtkViewer/bin/Debug/RdlGtkViewer.exe" />
   </import>
   <widget class="Gtk.Window" id="MainWindow" design-size="725 465">
     <action-group name="Default">
@@ -1789,7 +1790,6 @@
               <node type="Toolitem" action="goForwardAction" />
               <node type="Toolitem" action="revertToSavedAction" />
               <node type="Toolitem" action="saveAction" />
-              <node type="Toolitem" action="printAction" />
             </node>
           </widget>
           <packing>
@@ -1803,7 +1803,7 @@
           <widget class="Gtk.Notebook" id="notebook1">
             <property name="MemberName" />
             <property name="CanFocus">True</property>
-            <property name="CurrentPage">0</property>
+            <property name="CurrentPage">4</property>
             <signal name="SwitchPage" handler="OnNotebook1SwitchPage" />
             <child>
               <widget class="Gtk.HBox" id="hbox1">
@@ -2543,7 +2543,17 @@
               </packing>
             </child>
             <child>
-              <placeholder />
+              <widget class="fyiReporting.RdlGtkViewer.ReportViewer" id="reportviewer1">
+                <property name="MemberName" />
+                <property name="WidthRequest">0</property>
+                <property name="HeightRequest">0</property>
+                <property name="Events">ButtonPressMask</property>
+                <property name="ShowErrors">False</property>
+                <property name="ShowParameters">False</property>
+              </widget>
+              <packing>
+                <property name="Position">4</property>
+              </packing>
             </child>
             <child>
               <widget class="Gtk.Label" id="label16">

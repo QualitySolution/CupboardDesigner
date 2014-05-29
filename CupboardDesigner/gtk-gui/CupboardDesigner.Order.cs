@@ -54,6 +54,7 @@ namespace CupboardDesigner
 		private global::Gtk.TreeView treeviewComponents;
 		private global::Gtk.Label labelTotalCount;
 		private global::Gtk.Label label15;
+		private global::fyiReporting.RdlGtkViewer.ReportViewer reportviewer1;
 		private global::Gtk.Label label16;
 
 		protected virtual void Build ()
@@ -88,7 +89,7 @@ namespace CupboardDesigner
 			this.vbox2.Name = "vbox2";
 			this.vbox2.Spacing = 6;
 			// Container child vbox2.Gtk.Box+BoxChild
-			this.UIManager.AddUiFromString ("<ui><toolbar name='toolbar1'><toolitem name='goBackAction' action='goBackAction'/><toolitem name='goForwardAction' action='goForwardAction'/><toolitem name='revertToSavedAction' action='revertToSavedAction'/><toolitem name='saveAction' action='saveAction'/><toolitem name='printAction' action='printAction'/></toolbar></ui>");
+			this.UIManager.AddUiFromString ("<ui><toolbar name='toolbar1'><toolitem name='goBackAction' action='goBackAction'/><toolitem name='goForwardAction' action='goForwardAction'/><toolitem name='revertToSavedAction' action='revertToSavedAction'/><toolitem name='saveAction' action='saveAction'/></toolbar></ui>");
 			this.toolbar1 = ((global::Gtk.Toolbar)(this.UIManager.GetWidget ("/toolbar1")));
 			this.toolbar1.Name = "toolbar1";
 			this.toolbar1.ShowArrow = false;
@@ -103,7 +104,7 @@ namespace CupboardDesigner
 			this.notebook1 = new global::Gtk.Notebook ();
 			this.notebook1.CanFocus = true;
 			this.notebook1.Name = "notebook1";
-			this.notebook1.CurrentPage = 0;
+			this.notebook1.CurrentPage = 4;
 			// Container child notebook1.Gtk.Notebook+NotebookChild
 			this.hbox1 = new global::Gtk.HBox ();
 			this.hbox1.Name = "hbox1";
@@ -523,14 +524,22 @@ namespace CupboardDesigner
 			this.label15.LabelProp = global::Mono.Unix.Catalog.GetString ("ШАГ-3 (выбор отделки)");
 			this.notebook1.SetTabLabel (this.vbox5, this.label15);
 			this.label15.ShowAll ();
+			// Container child notebook1.Gtk.Notebook+NotebookChild
+			this.reportviewer1 = new global::fyiReporting.RdlGtkViewer.ReportViewer ();
+			this.reportviewer1.WidthRequest = 0;
+			this.reportviewer1.HeightRequest = 0;
+			this.reportviewer1.Events = ((global::Gdk.EventMask)(256));
+			this.reportviewer1.Name = "reportviewer1";
+			this.reportviewer1.ShowErrors = false;
+			this.reportviewer1.ShowParameters = false;
+			this.notebook1.Add (this.reportviewer1);
+			global::Gtk.Notebook.NotebookChild w41 = ((global::Gtk.Notebook.NotebookChild)(this.notebook1 [this.reportviewer1]));
+			w41.Position = 4;
 			// Notebook tab
-			global::Gtk.Label w41 = new global::Gtk.Label ();
-			w41.Visible = true;
-			this.notebook1.Add (w41);
 			this.label16 = new global::Gtk.Label ();
 			this.label16.Name = "label16";
 			this.label16.LabelProp = global::Mono.Unix.Catalog.GetString ("ШАГ-4 (предварительный просмотр)");
-			this.notebook1.SetTabLabel (w41, this.label16);
+			this.notebook1.SetTabLabel (this.reportviewer1, this.label16);
 			this.label16.ShowAll ();
 			this.vbox2.Add (this.notebook1);
 			global::Gtk.Box.BoxChild w42 = ((global::Gtk.Box.BoxChild)(this.vbox2 [this.notebook1]));
