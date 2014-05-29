@@ -12,13 +12,15 @@ public partial class MainWindow: Gtk.Window
 	private enum OrdersCol{
 		id,
 		custom,
+		phones,
+		address,
 		arrval,
 		delivery
 	}
 
 	void PrerareOrders()
 	{
-		OrdersListStore = new ListStore (typeof (int), typeof (string), typeof (string), typeof (string));
+		OrdersListStore = new ListStore (typeof (int), typeof (string), typeof (string), typeof (string), typeof (string), typeof (string));
 
 		treeviewOrders.AppendColumn("Номер", new Gtk.CellRendererText (), "text", (int)OrdersCol.id);
 		treeviewOrders.AppendColumn("Ф.И.О. заказчика", new Gtk.CellRendererText (), "text", (int)OrdersCol.custom);
@@ -37,7 +39,7 @@ public partial class MainWindow: Gtk.Window
 	{
 		MainClass.StatusMessage("Получаем таблицу заказов...");
 
-		string sql = "SELECT orders.id, orders.customer, orders.arrval, orders.delivery FROM orders ";
+		string sql = "SELECT orders.id, orders.customer, orders.address, orders.phone1, orders.phone2, orders.arrval, orders.delivery FROM orders ";
 		SqliteCommand cmd = new SqliteCommand(sql, (SqliteConnection) QSMain.ConnectionDB);
 
 		using(SqliteDataReader rdr = cmd.ExecuteReader())
@@ -47,6 +49,8 @@ public partial class MainWindow: Gtk.Window
 			{
 				OrdersListStore.AppendValues(rdr.GetInt32(rdr.GetOrdinal("id")),
 					rdr["customer"].ToString(),
+					rdr["phone1"].ToString() + rdr["phone2"].ToString(),
+					rdr["address"].ToString(),
 					String.Format("{0:d}", rdr["arrval"]),
 					String.Format("{0:d}", rdr["delivery"])
 				);
@@ -62,6 +66,8 @@ public partial class MainWindow: Gtk.Window
 			return true;
 		bool filterCustom = false;
 		bool filterNumber = false;
+		bool filterPhones = false;
+		bool filterAddress = false;
 		string cellvalue;
 
 		if (model.GetValue (iter, (int)OrdersCol.custom) != null)
@@ -74,7 +80,17 @@ public partial class MainWindow: Gtk.Window
 			cellvalue  = model.GetValue (iter, (int)OrdersCol.id).ToString();
 			filterNumber = cellvalue.IndexOf (entrySearch.Text, StringComparison.CurrentCultureIgnoreCase) > -1;
 		}
-		return (filterCustom || filterNumber);
+		if (model.GetValue (iter, (int)OrdersCol.address) != null)
+		{
+			cellvalue  = model.GetValue (iter, (int)OrdersCol.address).ToString();
+			filterAddress = cellvalue.IndexOf (entrySearch.Text, StringComparison.CurrentCultureIgnoreCase) > -1;
+		}
+		if (model.GetValue (iter, (int)OrdersCol.phones) != null)
+		{
+			cellvalue  = model.GetValue (iter, (int)OrdersCol.phones).ToString();
+			filterPhones = cellvalue.IndexOf (entrySearch.Text, StringComparison.CurrentCultureIgnoreCase) > -1;
+		}
+		return (filterCustom || filterNumber || filterPhones || filterAddress);
 	}
 
 	protected void OnButtonClearSearchClicked(object sender, EventArgs e)
