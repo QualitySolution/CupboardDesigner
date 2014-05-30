@@ -700,7 +700,7 @@ namespace CupboardDesigner
 			}
 		
 			goBackAction.Sensitive = notebook1.CurrentPage != 0;
-			goForwardAction.Sensitive = notebook1.CurrentPage != 2;
+			goForwardAction.Sensitive = notebook1.CurrentPage != 4;
 		}
 
 		private void UpdateBasisComponents(int id)
