@@ -15,6 +15,7 @@ namespace CupboardDesigner
 		public static QSSupportLib.BaseParam Parameters;
 		private static Logger logger = LogManager.GetCurrentClassLogger();
 
+		[STAThread]
 		public static void Main(string[] args)
 		{
 			Application.Init();
