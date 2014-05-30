@@ -74,7 +74,7 @@ LEFT JOIN facing ON facing.id = facing_id
       </Fields>
     </DataSet>
     <DataSet Name="Order">
-      <Query >
+      <Query>
         <DataSourceName>DS1</DataSourceName>
         <CommandText>SELECT customer, orders.address as customaddress, phone1, orders.phone2, arrval, delivery, exhibition.name as exhibition, exhibition.phone as exphone1, exhibition.phone2 as exphone2, exhibition.address, comment, basis.delta_h, basis.delta_l FROM orders
 LEFT JOIN exhibition ON exhibition_id = exhibition.id
@@ -86,7 +86,7 @@ LEFT JOIN basis ON basis.id = orders.basis_id
           </QueryParameter>
         </QueryParameters>
       </Query>
-      <Fields >
+      <Fields>
         <Field Name="customer">
           <DataField>customer</DataField>
           <TypeName>System.String</TypeName>
@@ -541,16 +541,16 @@ LEFT JOIN basis ON basis.id = orders.basis_id
               <BorderStyle />
               <BorderColor />
               <BorderWidth />
-              <Format >None</Format>
+              <Format>None</Format>
             </Style>
           </Textbox>
           <Textbox Name="Textbox27">
-            <Height>15.00pt</Height>
-            <Width>188.87pt</Width>
+            <Height>15.75pt</Height>
+            <Width>336.22pt</Width>
             <Value>={exhibition}</Value>
             <ZIndex>1</ZIndex>
-            <Left>374.5pt</Left>
-            <Top>4.8pt</Top>
+            <Left>227.15pt</Left>
+            <Top>4.80pt</Top>
             <Style>
               <BorderStyle />
               <BorderColor />
@@ -561,12 +561,12 @@ LEFT JOIN basis ON basis.id = orders.basis_id
             </Style>
           </Textbox>
           <Textbox Name="Textbox30">
-            <Height>13.51pt</Height>
-            <Width>181.31pt</Width>
+            <Height>12.76pt</Height>
+            <Width>344.58pt</Width>
             <Value>={exphone1}</Value>
             <ZIndex>1</ZIndex>
-            <Left>382.4pt</Left>
-            <Top>19.4pt</Top>
+            <Left>219.13pt</Left>
+            <Top>19.40pt</Top>
             <Style>
               <BorderStyle />
               <BorderColor />
@@ -576,11 +576,11 @@ LEFT JOIN basis ON basis.id = orders.basis_id
           </Textbox>
           <Textbox Name="Textbox31">
             <Height>26.27pt</Height>
-            <Width>176.92pt</Width>
+            <Width>348.60pt</Width>
             <Value>={address}</Value>
             <ZIndex>1</ZIndex>
-            <Left>386.3pt</Left>
-            <Top>48.6pt</Top>
+            <Left>214.62pt</Left>
+            <Top>48.60pt</Top>
             <Style>
               <BorderStyle />
               <BorderColor />
@@ -589,22 +589,22 @@ LEFT JOIN basis ON basis.id = orders.basis_id
             </Style>
             <CanGrow>true</CanGrow>
           </Textbox>
-          <Textbox Name="Textbox2" >
+          <Textbox Name="Textbox2">
             <Height>42.79pt</Height>
             <Width>219.69pt</Width>
-            <Value>Договор № ____________________
-
-от "_____" _____________________ 20     г.</Value>
+            <Value>Договор № ________________
+от "____" _____________ 20     г.
+</Value>
             <ZIndex>1</ZIndex>
-            <Left>351.2pt</Left>
-            <Top>85.8pt</Top>
+            <Left>356.0pt</Left>
+            <Top>97.0pt</Top>
             <Style>
               <BorderStyle />
               <BorderColor />
               <BorderWidth />
             </Style>
           </Textbox>
-          <Textbox Name="Textbox3" >
+          <Textbox Name="Textbox3">
             <Height>14.25pt</Height>
             <Width>447.97pt</Width>
             <Value>="Телефоны: " + Iif(Fields.phone1.IsMissing, "", "(осн.) " + Fields.phone1) + Iif(Fields.phone2.IsMissing, "", " (доп.) " + Fields.phone2)</Value>
@@ -616,14 +616,15 @@ LEFT JOIN basis ON basis.id = orders.basis_id
               <BorderColor />
               <BorderWidth />
             </Style>
+            <CanGrow >true</CanGrow>
           </Textbox>
-          <Textbox Name="Textbox35" >
-            <Height>15.03pt</Height>
-            <Width>443.51pt</Width>
+          <Textbox Name="Textbox35">
+            <Height>15.78pt</Height>
+            <Width>558.61pt</Width>
             <Value>= "Адрес доставки:" +{customaddress}</Value>
             <ZIndex>1</ZIndex>
-            <Left>6.0pt</Left>
-            <Top>59.7pt</Top>
+            <Left>6.00pt</Left>
+            <Top>59.70pt</Top>
             <Style>
               <BorderStyle />
               <BorderColor />
@@ -631,7 +632,7 @@ LEFT JOIN basis ON basis.id = orders.basis_id
             </Style>
             <CanGrow>true</CanGrow>
           </Textbox>
-          <Textbox Name="Textbox4" >
+          <Textbox Name="Textbox4">
             <Height>15.76pt</Height>
             <Width>310.13pt</Width>
             <Value>="Дата сдачи Заказа: " &amp; Iif(Fields.delivery.IsMissing, "-----//-----", Format(Fields!delivery.Value, "dddd, dd MMMM yyyy"))</Value>
@@ -644,12 +645,12 @@ LEFT JOIN basis ON basis.id = orders.basis_id
               <BorderWidth />
             </Style>
           </Textbox>
-          <Textbox Name="Textbox5" >
-            <Height>13.50pt</Height>
-            <Width>173.10pt</Width>
+          <Textbox Name="Textbox5">
+            <Height>15.00pt</Height>
+            <Width>343.15pt</Width>
             <Value>={exphone2}</Value>
             <ZIndex>1</ZIndex>
-            <Left>390.10pt</Left>
+            <Left>220.05pt</Left>
             <Top>34.10pt</Top>
             <Style>
               <BorderStyle />
@@ -809,7 +810,7 @@ LEFT JOIN basis ON basis.id = orders.basis_id
     <DataSource Name="DS1">
       <ConnectionProperties>
         <DataProvider>SQLite</DataProvider>
-        <ConnectString>Data Source=C:\Users\виртуал\AppData\Roaming\CupboardDesigner\Cupboard.db3;Version=3;Pooling=True;Max Pool Size=100;</ConnectString>
+        <ConnectString>Data Source=/home/andrew/Projects/CupboardDesigner/Base/Cupboard.db3;Version=3;</ConnectString>
         <IntegratedSecurity>false</IntegratedSecurity>
       </ConnectionProperties>
     </DataSource>
