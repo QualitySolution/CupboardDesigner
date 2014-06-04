@@ -497,8 +497,8 @@ namespace CupboardDesigner
 			//Добавляем высоту листа кубов с низу, что бы ресайз не зацикливался.
 			int ListCybesV = !VerticalCubeList ? MaxCubeVSize : 0;
 			int ListCybesH = VerticalCubeList ? MaxCubeHSize : 0;
-			int ListPixelAddV = !VerticalCubeList ? scrolledCubeListH.HScrollbar.HeightRequest + 64 : 0;
-			int ListPixelAddH = VerticalCubeList ? scrolledCubeListV.VScrollbar.WidthRequest + 16 : 0;
+			int ListPixelAddV = !VerticalCubeList ? scrolledCubeListH.HScrollbar.Allocation.Height + 64 : 0;
+			int ListPixelAddH = VerticalCubeList ? scrolledCubeListV.VScrollbar.Allocation.Width + 16 : 0;
 			if(VerticalCubeList)
 			{
 				WidthWithoutGrid = WidthTable - ListPixelAddH;

@@ -104,7 +104,7 @@ namespace CupboardDesigner
 			this.notebook1 = new global::Gtk.Notebook ();
 			this.notebook1.CanFocus = true;
 			this.notebook1.Name = "notebook1";
-			this.notebook1.CurrentPage = 4;
+			this.notebook1.CurrentPage = 1;
 			// Container child notebook1.Gtk.Notebook+NotebookChild
 			this.hbox1 = new global::Gtk.HBox ();
 			this.hbox1.Name = "hbox1";
@@ -347,6 +347,11 @@ namespace CupboardDesigner
 			this.comboCubeH.AppendText (global::Mono.Unix.Catalog.GetString ("8"));
 			this.comboCubeH.AppendText (global::Mono.Unix.Catalog.GetString ("9"));
 			this.comboCubeH.AppendText (global::Mono.Unix.Catalog.GetString ("10"));
+			this.comboCubeH.AppendText (global::Mono.Unix.Catalog.GetString ("11"));
+			this.comboCubeH.AppendText (global::Mono.Unix.Catalog.GetString ("12"));
+			this.comboCubeH.AppendText (global::Mono.Unix.Catalog.GetString ("13"));
+			this.comboCubeH.AppendText (global::Mono.Unix.Catalog.GetString ("14"));
+			this.comboCubeH.AppendText (global::Mono.Unix.Catalog.GetString ("15"));
 			this.comboCubeH.Name = "comboCubeH";
 			this.comboCubeH.Active = 0;
 			this.table1.Add (this.comboCubeH);

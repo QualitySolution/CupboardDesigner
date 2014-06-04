@@ -1803,7 +1803,7 @@
           <widget class="Gtk.Notebook" id="notebook1">
             <property name="MemberName" />
             <property name="CanFocus">True</property>
-            <property name="CurrentPage">4</property>
+            <property name="CurrentPage">1</property>
             <signal name="SwitchPage" handler="OnNotebook1SwitchPage" />
             <child>
               <widget class="Gtk.HBox" id="hbox1">
@@ -2219,7 +2219,12 @@
 7
 8
 9
-10</property>
+10
+11
+12
+13
+14
+15</property>
                         <property name="Active">0</property>
                         <signal name="Changed" handler="OnComboCubeHChanged" />
                       </widget>
