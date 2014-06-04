@@ -40,8 +40,6 @@ namespace CupboardDesigner
 		{
 			QSMain.AdminFieldName = "admin";
 			QSMain.ProjectPermission = new Dictionary<string, UserPermission>();
-			//QSMain.ProjectPermission.Add("edit_slips", new UserPermission("edit_slips", "Изменение кассы задним числом",
-			//"Пользователь может изменять или добавлять кассовые документы задним числом."));
 
 			QSMain.User = new UserInfo();
 
@@ -133,7 +131,11 @@ namespace CupboardDesigner
 		{
 			string AppName = System.Reflection.Assembly.GetExecutingAssembly().GetName().Name.ToString();
 			string ConfigFileName = AppName + ".ini";
-			string AppFolder = System.IO.Path.Combine (Environment.GetFolderPath (Environment.SpecialFolder.ApplicationData), AppName);
+			string AppFolder;
+			if(Environment.OSVersion.Platform == PlatformID.Unix)
+				AppFolder = System.IO.Path.Combine (Environment.GetFolderPath (Environment.SpecialFolder.ApplicationData), AppName);
+			else
+				AppFolder = System.IO.Path.Combine (Environment.GetFolderPath (Environment.SpecialFolder.CommonApplicationData), AppName);
 			string DataBase = System.IO.Path.Combine (AppFolder, "Cupboard.db3");
 
 			string configfile = System.IO.Path.Combine (AppFolder, ConfigFileName);

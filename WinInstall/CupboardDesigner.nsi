@@ -1,6 +1,6 @@
 
 ;--------------------------------
-!define PRODUCT_VERSION "1.0.3"
+!define PRODUCT_VERSION "1.0.5"
 !define MIN_NET_MAJOR "4"
 !define MIN_NET_MINOR "0"
 !define MIN_NET_BUILD "*"
@@ -311,6 +311,7 @@ Section "${PRODUCT_NAME}" SecProgram
   WriteUninstaller "uninstall.exe"
 
   ; Start Menu Shortcuts
+  SetShellVarContext all
   CreateDirectory "$SMPROGRAMS\${MENU_DIR_NAME}"
   CreateShortCut "$SMPROGRAMS\${MENU_DIR_NAME}\”даление.lnk" "$INSTDIR\uninstall.exe" "" "$INSTDIR\uninstall.exe" 0
   CreateShortCut "$SMPROGRAMS\${MENU_DIR_NAME}\${PRODUCT_NAME}.lnk" "$INSTDIR\${EXE_NAME}.exe" "" "$INSTDIR\${EXE_NAME}.exe" 0
@@ -347,20 +348,26 @@ Section "GTK# 2.12.21" SecGTK
   SetOutPath "$PROGRAMFILES\GtkSharp\2.12\share\themes\MS-Windows\gtk-2.0\"
   File "gtkrc"
 
+; Fix Localication
+  SetOutPath "$PROGRAMFILES\GtkSharp\2.12\share\locale\ru\LC_MESSAGES"
+  File "LC_MESSAGES\*"
+
 SectionEnd
 
 Section /o "ѕуста€ база данных" SecDataBase
 
-	SetOutPath "$APPDATA\${EXE_NAME}"
+  SetShellVarContext all	
+  SetOutPath "$APPDATA\${EXE_NAME}"
 
-	File "Cupboard.db3"
+  File "Cupboard.db3"
  
 SectionEnd
 
 Section "ярлык на рабочий стол" SecDesktop
 
-	SetOutPath $INSTDIR
-	CreateShortCut "$DESKTOP\${PRODUCT_NAME}.lnk" "$INSTDIR\${EXE_NAME}.exe" "" "$INSTDIR\${EXE_NAME}.exe" 0
+  SetShellVarContext all
+  SetOutPath $INSTDIR
+  CreateShortCut "$DESKTOP\${PRODUCT_NAME}.lnk" "$INSTDIR\${EXE_NAME}.exe" "" "$INSTDIR\${EXE_NAME}.exe" 0
  
 SectionEnd
 
@@ -388,6 +395,7 @@ SectionEnd
 
 Section "Uninstall"
   
+  SetShellVarContext all
   ; Remove registry keys
   DeleteRegKey HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\${EXE_NAME}"
 
