@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using System.Globalization;
 using NLog;
 using Gtk;
 using Mono.Data.Sqlite;
@@ -234,7 +235,8 @@ namespace CupboardDesigner
 					entryPhone2.Text = rdr["phone2"].ToString();
 					textAddress.Buffer.Text = rdr["address"].ToString();
 					dateArrval.Date = DBWorks.GetDateTime(rdr, "arrval", new DateTime());
-					dateDelivery.Date = DBWorks.GetDateTime(rdr, "delivery", new DateTime());
+					dateDeadlineS.Date = DBWorks.GetDateTime(rdr, "deadline_s", new DateTime());
+					dateDeadlineE.Date = DBWorks.GetDateTime(rdr, "deadline_e", new DateTime());
 					int basis_id = rdr.GetInt32(rdr.GetOrdinal("basis_id"));
 					basis = TypeWidgetList.Find(w => w.id == basis_id);
 					ComboWorks.SetActiveItem(comboExhibition, DBWorks.GetInt(rdr, "exhibition_id", -1));
@@ -336,7 +338,7 @@ namespace CupboardDesigner
 
 		protected void TestCanSave ()
 		{
-			bool Dateok = dateArrval.IsEmpty || dateDelivery.IsEmpty || dateArrval.Date <= dateDelivery.Date;
+			bool Dateok = dateArrval.IsEmpty || dateDeadlineS.IsEmpty || dateArrval.Date <= dateDeadlineS.Date;
 
 			saveAction.Sensitive = printAction.Sensitive = Dateok;
 		}
@@ -346,14 +348,14 @@ namespace CupboardDesigner
 			string sql;
 			if (NewItem)
 			{
-				sql = "INSERT INTO orders (customer, estimation, contract, address, phone1, phone2, exhibition_id, basis_id, arrval, delivery, comment, cupboard) " +
-					"VALUES (@customer, @estimation, @contract, @address, @phone1, @phone2, @exhibition_id, @basis_id, @arrval, @delivery, @comment, @cupboard)";
+				sql = "INSERT INTO orders (customer, estimation, contract, address, phone1, phone2, exhibition_id, basis_id, arrval, deadline_s, deadline_e, comment, cupboard) " +
+					"VALUES (@customer, @estimation, @contract, @address, @phone1, @phone2, @exhibition_id, @basis_id, @arrval, @deadline_s, @deadline_e, @comment, @cupboard)";
 			}
 			else
 			{
 				sql = "UPDATE orders SET customer = @customer, estimation = @estimation, contract = @contract, address = @address, " +
 					"phone1 = @phone1, phone2 = @phone2, exhibition_id = @exhibition_id, basis_id = @basis_id, arrval = @arrval, " +
-					"delivery = @delivery, comment = @comment, cupboard = @cupboard WHERE id = @id";
+					"deadline_s = @deadline_s, deadline_e = @deadline_e, comment = @comment, cupboard = @cupboard WHERE id = @id";
 			}
 			SqliteTransaction trans = ((SqliteConnection)QSMain.ConnectionDB).BeginTransaction();
 			MainClass.StatusMessage("Запись заказа...");
@@ -370,7 +372,8 @@ namespace CupboardDesigner
 				cmd.Parameters.AddWithValue("@phone1", DBWorks.ValueOrNull(entryPhone1.Text != "", entryPhone1.Text));
 				cmd.Parameters.AddWithValue("@phone2", DBWorks.ValueOrNull(entryPhone2.Text != "", entryPhone2.Text));
 				cmd.Parameters.AddWithValue("@arrval", DBWorks.ValueOrNull(!dateArrval.IsEmpty, dateArrval.Date));
-				cmd.Parameters.AddWithValue("@delivery", DBWorks.ValueOrNull(!dateDelivery.IsEmpty, dateDelivery.Date));
+				cmd.Parameters.AddWithValue("@deadline_s", DBWorks.ValueOrNull(!dateDeadlineS.IsEmpty, dateDeadlineS.Date));
+				cmd.Parameters.AddWithValue("@deadline_e", DBWorks.ValueOrNull(!dateDeadlineE.IsEmpty, dateDeadlineE.Date));
 				CupboardListItem basis = TypeWidgetList.Find(w => w.Button.Active);
 				cmd.Parameters.AddWithValue("basis_id", DBWorks.ValueOrNull(basis != null, basis.id));
 				cmd.Parameters.AddWithValue("exhibition_id", ComboWorks.GetActiveIdOrNull(comboExhibition));
@@ -859,7 +862,7 @@ namespace CupboardDesigner
 		protected void OnOrderDatesChanged(object sender, EventArgs e)
 		{
 			TestCanSave();
-			bool Dateok = dateArrval.IsEmpty || dateDelivery.IsEmpty || dateArrval.Date <= dateDelivery.Date;
+			bool Dateok = dateArrval.IsEmpty || dateDeadlineS.IsEmpty || dateArrval.Date <= dateDeadlineS.Date;
 			if(!Dateok)
 			{
 				MessageDialog md = new MessageDialog ( this, DialogFlags.DestroyWithParent,
@@ -904,6 +907,18 @@ namespace CupboardDesigner
 				entryContract.ModifyText(StateType.Normal);
 			else
 				entryContract.ModifyText(StateType.Normal, new Gdk.Color(255,0,0)); 
+		}
+
+		protected void OnDateDeadlineSDateChanged(object sender, EventArgs e)
+		{
+			CultureInfo currentCulture = CultureInfo.CurrentCulture;
+			int WeekS = currentCulture.Calendar.GetWeekOfYear(dateDeadlineS.Date, currentCulture.DateTimeFormat.CalendarWeekRule,
+				           currentCulture.DateTimeFormat.FirstDayOfWeek);
+			int WeekE = currentCulture.Calendar.GetWeekOfYear(dateDeadlineE.Date, currentCulture.DateTimeFormat.CalendarWeekRule,
+				currentCulture.DateTimeFormat.FirstDayOfWeek);
+			if (WeekE != WeekS)
+				dateDeadlineE.Date = dateDeadlineS.Date.AddDays((double)(5 - currentCulture.Calendar.GetDayOfWeek(dateDeadlineS.Date)));
+			OnOrderDatesChanged(sender, e);
 		}
 
 	}

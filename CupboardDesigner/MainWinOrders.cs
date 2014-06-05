@@ -25,7 +25,7 @@ public partial class MainWindow: Gtk.Window
 		treeviewOrders.AppendColumn("Номер", new Gtk.CellRendererText (), "text", (int)OrdersCol.id);
 		treeviewOrders.AppendColumn("Ф.И.О. заказчика", new Gtk.CellRendererText (), "text", (int)OrdersCol.custom);
 		treeviewOrders.AppendColumn("Дата прихода", new Gtk.CellRendererText (), "text", (int)OrdersCol.arrval);
-		treeviewOrders.AppendColumn("Дата сдачи", new Gtk.CellRendererText (), "text", (int)OrdersCol.delivery);
+		treeviewOrders.AppendColumn("Срок сдачи", new Gtk.CellRendererText (), "text", (int)OrdersCol.delivery);
 
 		OrdersFilter = new TreeModelFilter (OrdersListStore, null);
 		OrdersFilter.VisibleFunc = new TreeModelFilterVisibleFunc (FilterTreeOrders);
@@ -39,7 +39,7 @@ public partial class MainWindow: Gtk.Window
 	{
 		MainClass.StatusMessage("Получаем таблицу заказов...");
 
-		string sql = "SELECT orders.id, orders.customer, orders.address, orders.phone1, orders.phone2, orders.arrval, orders.delivery FROM orders ";
+		string sql = "SELECT orders.id, orders.customer, orders.address, orders.phone1, orders.phone2, orders.arrval, orders.deadline_s, orders.deadline_e FROM orders ";
 		SqliteCommand cmd = new SqliteCommand(sql, (SqliteConnection) QSMain.ConnectionDB);
 
 		using(SqliteDataReader rdr = cmd.ExecuteReader())
@@ -52,7 +52,7 @@ public partial class MainWindow: Gtk.Window
 					rdr["phone1"].ToString() + rdr["phone2"].ToString(),
 					rdr["address"].ToString(),
 					String.Format("{0:d}", rdr["arrval"]),
-					String.Format("{0:d}", rdr["delivery"])
+					DateWorks.GetDateRangeText(DBWorks.GetDateTime(rdr, "deadline_s", new DateTime()), DBWorks.GetDateTime(rdr, "deadline_e", new DateTime()))
 				);
 			}
 
