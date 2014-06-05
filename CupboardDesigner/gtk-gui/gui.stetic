@@ -26,7 +26,7 @@
         <property name="StockId">gtk-quit</property>
         <signal name="Activated" handler="OnQuitActionActivated" />
       </action>
-      <action id="Action1">
+      <action id="Action14">
         <property name="Type">Action</property>
         <property name="Label" translatable="yes">Справочники</property>
         <property name="ShortLabel" translatable="yes">Справочники</property>
@@ -61,16 +61,16 @@
         <property name="ShortLabel" translatable="yes">Типы компонентов</property>
         <signal name="Activated" handler="OnAction5Activated" />
       </action>
-      <action id="Action8">
+      <action id="Action12">
         <property name="Type">Action</property>
-        <property name="Label" translatable="yes">Материалы</property>
-        <property name="ShortLabel" translatable="yes">Материалы</property>
+        <property name="Label" translatable="yes">Отделка кубов</property>
+        <property name="ShortLabel" translatable="yes">Отделка кубов</property>
         <signal name="Activated" handler="OnAction8Activated" />
       </action>
-      <action id="Action7">
+      <action id="Action13">
         <property name="Type">Action</property>
-        <property name="Label" translatable="yes">Отделка</property>
-        <property name="ShortLabel" translatable="yes">Отделка</property>
+        <property name="Label" translatable="yes">Отделка фасадов</property>
+        <property name="ShortLabel" translatable="yes">Отделка фасадов</property>
         <signal name="Activated" handler="OnAction7Activated" />
       </action>
       <action id="dialogAuthenticationAction">
@@ -109,14 +109,14 @@
                 <node type="Separator" />
                 <node type="Menuitem" action="quitAction" />
               </node>
-              <node type="Menu" action="Action1">
+              <node type="Menu" action="Action14">
                 <node type="Menuitem" action="Action9" />
                 <node type="Menuitem" action="Action11" />
                 <node type="Separator" />
                 <node type="Menuitem" action="Action10" />
                 <node type="Separator" />
-                <node type="Menuitem" action="Action8" />
-                <node type="Menuitem" action="Action7" />
+                <node type="Menuitem" action="Action12" />
+                <node type="Menuitem" action="Action13" />
               </node>
               <node type="Menu" action="Action2">
                 <node type="Menuitem" action="aboutAction" />

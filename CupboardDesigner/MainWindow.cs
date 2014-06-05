@@ -88,7 +88,7 @@ public partial class MainWindow: Gtk.Window
 	protected void SetAdminMode(bool admin)
 	{
 		ActionPassword.Sensitive = Action9.Sensitive = Action11.Sensitive = Action10.Sensitive 
-			= Action8.Sensitive = Action7.Sensitive = admin;
+			= Action12.Sensitive = Action13.Sensitive = admin;
 	}
 
 	protected void OnDeleteEvent(object sender, DeleteEventArgs a)
@@ -116,7 +116,7 @@ public partial class MainWindow: Gtk.Window
 		winref.SqlSelect = "SELECT id, name FROM @tablename ORDER BY ordinal";
 		winref.OrdinalField = "ordinal";
 		winref.SetMode(true,false,true,true,true);
-		winref.FillList("materials","материал", "Материалы");
+		winref.FillList("materials","отделка куба", "Отделка кубов");
 		winref.Show();
 		winref.Run();
 		winref.Destroy();
@@ -128,7 +128,7 @@ public partial class MainWindow: Gtk.Window
 		winref.SqlSelect = "SELECT id, name FROM @tablename ORDER BY ordinal";
 		winref.OrdinalField = "ordinal";
 		winref.SetMode(true,false,true,true,true);
-		winref.FillList("facing","вид облицовки", "Виды облицовок");
+		winref.FillList("facing","отделка фасада", "Отделка фасадов");
 		winref.Show();
 		winref.Run();
 		winref.Destroy();

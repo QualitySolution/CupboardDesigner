@@ -68,7 +68,7 @@ namespace CupboardDesigner
 			ComponentsStore = new ListStore(typeof(long), typeof(Nomenclature.NomType), typeof(int), typeof(string), typeof(int), typeof(int), typeof(string), typeof(int), typeof(string), typeof(string));
 
 			Gtk.TreeViewColumn ColumnMaterial = new Gtk.TreeViewColumn ();
-			ColumnMaterial.Title = "Материал";
+			ColumnMaterial.Title = "Отделка кубов";
 			ColumnMaterial.MinWidth = 180;
 			Gtk.CellRendererCombo CellMaterial = new CellRendererCombo();
 			CellMaterial.TextColumn = 0;
@@ -80,7 +80,7 @@ namespace CupboardDesigner
 			ColumnMaterial.AddAttribute(CellMaterial, "text", (int)ComponentCol.material);
 
 			Gtk.TreeViewColumn ColumnFacing = new Gtk.TreeViewColumn ();
-			ColumnFacing.Title = "Отделка";
+			ColumnFacing.Title = "Отделка фасада";
 			ColumnFacing.MinWidth = 180;
 			Gtk.CellRendererCombo CellFacing = new CellRendererCombo();
 			CellFacing.TextColumn = 0;
