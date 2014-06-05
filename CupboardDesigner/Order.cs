@@ -227,6 +227,8 @@ namespace CupboardDesigner
 					rdr.Read();
 
 					this.Title = String.Format("Заказ №{0}", rdr["id"].ToString());
+					checkEstimation.Active = DBWorks.GetBoolean(rdr, "estimation", true);
+					entryContract.Text = rdr["contract"].ToString();
 					entryCustomer.Text = rdr["customer"].ToString();
 					entryPhone1.Text = rdr["phone1"].ToString();
 					entryPhone2.Text = rdr["phone2"].ToString();
@@ -344,23 +346,26 @@ namespace CupboardDesigner
 			string sql;
 			if (NewItem)
 			{
-				sql = "INSERT INTO orders (customer, address, phone1, phone2, exhibition_id, basis_id, arrval, delivery, comment, cupboard) " +
-					"VALUES (@customer, @address, @phone1, @phone2, @exhibition_id, @basis_id, @arrval, @delivery, @comment, @cupboard)";
+				sql = "INSERT INTO orders (customer, estimation, contract, address, phone1, phone2, exhibition_id, basis_id, arrval, delivery, comment, cupboard) " +
+					"VALUES (@customer, @estimation, @contract, @address, @phone1, @phone2, @exhibition_id, @basis_id, @arrval, @delivery, @comment, @cupboard)";
 			}
 			else
 			{
-				sql = "UPDATE orders SET customer = @customer, address = @address, phone1 = @phone1, phone2 = @phone2, " +
-					"exhibition_id = @exhibition_id, basis_id = @basis_id, arrval = @arrval, " +
+				sql = "UPDATE orders SET customer = @customer, estimation = @estimation, contract = @contract, address = @address, " +
+					"phone1 = @phone1, phone2 = @phone2, exhibition_id = @exhibition_id, basis_id = @basis_id, arrval = @arrval, " +
 					"delivery = @delivery, comment = @comment, cupboard = @cupboard WHERE id = @id";
 			}
 			SqliteTransaction trans = ((SqliteConnection)QSMain.ConnectionDB).BeginTransaction();
 			MainClass.StatusMessage("Запись заказа...");
 			try
 			{
+				int contract;
 				SqliteCommand cmd = new SqliteCommand(sql, (SqliteConnection)QSMain.ConnectionDB, trans);
 
 				cmd.Parameters.AddWithValue("@id", ItemId);
 				cmd.Parameters.AddWithValue("@customer", DBWorks.ValueOrNull(entryCustomer.Text != "", entryCustomer.Text));
+				cmd.Parameters.AddWithValue("@estimation", checkEstimation.Active);
+				cmd.Parameters.AddWithValue("@contract", DBWorks.ValueOrNull(int.TryParse(entryContract.Text, out contract), contract));
 				cmd.Parameters.AddWithValue("@address", DBWorks.ValueOrNull(textAddress.Buffer.Text != "", textAddress.Buffer.Text));
 				cmd.Parameters.AddWithValue("@phone1", DBWorks.ValueOrNull(entryPhone1.Text != "", entryPhone1.Text));
 				cmd.Parameters.AddWithValue("@phone2", DBWorks.ValueOrNull(entryPhone2.Text != "", entryPhone2.Text));
@@ -885,6 +890,20 @@ namespace CupboardDesigner
 		protected void OnRevertToSavedActionActivated(object sender, EventArgs e)
 		{
 			this.Destroy();
+		}
+
+		protected void OnCheckEstimationClicked(object sender, EventArgs e)
+		{
+			entryContract.Sensitive = !checkEstimation.Active;
+		}
+
+		protected void OnEntryContractChanged(object sender, EventArgs e)
+		{
+			int number;
+			if(int.TryParse(entryContract.Text, out number))
+				entryContract.ModifyText(StateType.Normal);
+			else
+				entryContract.ModifyText(StateType.Normal, new Gdk.Color(255,0,0)); 
 		}
 
 	}
