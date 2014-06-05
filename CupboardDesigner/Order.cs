@@ -34,6 +34,7 @@ namespace CupboardDesigner
 			nomenclature_type,
 			nomenclature_id,
 			nomenclature,
+			nomenclature_description,
 			count,
 			material_id,
 			material,
@@ -65,7 +66,7 @@ namespace CupboardDesigner
 			FacingNameList = TempCombo.Model;
 			TempCombo.Destroy ();
 
-			ComponentsStore = new ListStore(typeof(long), typeof(Nomenclature.NomType), typeof(int), typeof(string), typeof(int), typeof(int), typeof(string), typeof(int), typeof(string), typeof(string));
+			ComponentsStore = new ListStore(typeof(long), typeof(Nomenclature.NomType), typeof(int), typeof(string), typeof(string), typeof(int), typeof(int), typeof(string), typeof(int), typeof(string), typeof(string));
 
 			Gtk.TreeViewColumn ColumnMaterial = new Gtk.TreeViewColumn ();
 			ColumnMaterial.Title = "Отделка кубов";
@@ -109,6 +110,7 @@ namespace CupboardDesigner
 			treeviewComponents.AppendColumn(ColumnComment);
 
 			treeviewComponents.Model = ComponentsStore;
+			treeviewComponents.TooltipColumn = (int)ComponentCol.nomenclature_description;
 			treeviewComponents.ShowAll();
 
 			CurrentDrag = new DragInformation();
@@ -129,6 +131,7 @@ namespace CupboardDesigner
 					Cube TempCube = new Cube();
 					TempCube.NomenclatureId = rdr.GetInt32(rdr.GetOrdinal("id"));
 					TempCube.Name = DBWorks.GetString(rdr, "name", "");
+					TempCube.Description = DBWorks.GetString(rdr, "description", "");
 					TempCube.Height = DBWorks.GetInt(rdr, "height", 0);
 					TempCube.Widht = DBWorks.GetInt(rdr, "lenght", 0);
 					int size = DBWorks.GetInt(rdr, "image_size", 0);
@@ -248,7 +251,7 @@ namespace CupboardDesigner
 				}
 
 				sql = "SELECT order_components.*, materials.name as material, facing.name as facing, " +
-					"nomenclature.name as nomenclature, nomenclature.type " +
+					"nomenclature.name as nomenclature, nomenclature.description, nomenclature.type " +
 					"FROM order_components " +
 					"LEFT JOIN nomenclature ON nomenclature.id = order_components.nomenclature_id " +
 					"LEFT JOIN materials ON materials.id = order_components.material_id " +
@@ -265,6 +268,7 @@ namespace CupboardDesigner
 							Enum.Parse(typeof(Nomenclature.NomType), rdr["type"].ToString()),
 							DBWorks.GetInt(rdr, "nomenclature_id", -1),
 							DBWorks.GetString(rdr, "nomenclature", "нет"),
+							DBWorks.GetString(rdr, "description", ""),
 							DBWorks.GetInt(rdr, "count", 0),
 							DBWorks.GetInt(rdr, "material_id", -1),
 							DBWorks.GetString(rdr, "material", "нет"),
@@ -729,7 +733,7 @@ namespace CupboardDesigner
 				while(ComponentsStore.IterNext(ref iter));
 			}
 
-			string sql = "SELECT nomenclature.name as nomenclature, nomenclature.type, basis_items.* FROM basis_items " +
+			string sql = "SELECT nomenclature.name as nomenclature, nomenclature.type, nomenclature.description, basis_items.* FROM basis_items " +
 				"LEFT JOIN nomenclature ON nomenclature.id = basis_items.item_id " +
 				"WHERE basis_id = @basis_id";
 			SqliteCommand cmd = new SqliteCommand(sql, (SqliteConnection)QSMain.ConnectionDB);
@@ -759,6 +763,7 @@ namespace CupboardDesigner
 							Enum.Parse(typeof(Nomenclature.NomType), rdr["type"].ToString()),
 							DBWorks.GetInt(rdr, "item_id", -1),
 							DBWorks.GetString(rdr, "nomenclature", "нет"),
+							DBWorks.GetString(rdr, "description", ""),
 							1,
 							-1,
 							"",
@@ -805,6 +810,7 @@ namespace CupboardDesigner
 					Nomenclature.NomType.cube,
 					pair.Key,
 					cube.Name,
+					cube.Description,
 					1,
 					-1,
 					"",

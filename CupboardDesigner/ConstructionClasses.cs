@@ -14,6 +14,8 @@ namespace CupboardDesigner
 		[XmlIgnore]
 		public string Name;
 		[XmlIgnore]
+		public string Description;
+		[XmlIgnore]
 		public int Widht;
 		[XmlIgnore]
 		public int Height;
