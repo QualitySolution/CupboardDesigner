@@ -169,10 +169,7 @@ LEFT JOIN basis ON basis.id = orders.basis_id
         </Style>
         <TableColumns>
           <TableColumn>
-            <Width>45.9pt</Width>
-          </TableColumn>
-          <TableColumn>
-            <Width>89.0pt</Width>
+            <Width>92.2pt</Width>
           </TableColumn>
           <TableColumn>
             <Width>27.4pt</Width>
@@ -193,7 +190,7 @@ LEFT JOIN basis ON basis.id = orders.basis_id
             <Width>89.8pt</Width>
           </TableColumn>
           <TableColumn>
-            <Width>119.5pt</Width>
+            <Width>163.3pt</Width>
           </TableColumn>
         </TableColumns>
         <Header>
@@ -201,23 +198,6 @@ LEFT JOIN basis ON basis.id = orders.basis_id
             <TableRow>
               <Height>12 pt</Height>
               <TableCells>
-                <TableCell>
-                  <ReportItems>
-                    <Textbox Name="Textbox9">
-                      <Value>Артикул</Value>
-                      <Style>
-                        <TextAlign>Center</TextAlign>
-                        <BorderStyle>
-                          <Default>Solid</Default>
-                        </BorderStyle>
-                        <FontWeight>Bold</FontWeight>
-                        <BorderColor />
-                        <BorderWidth />
-                        <FontSize>9pt</FontSize>
-                      </Style>
-                    </Textbox>
-                  </ReportItems>
-                </TableCell>
                 <TableCell>
                   <ReportItems>
                     <Textbox Name="Textbox10">
@@ -238,7 +218,7 @@ LEFT JOIN basis ON basis.id = orders.basis_id
                 <TableCell>
                   <ReportItems>
                     <Textbox Name="Textbox11">
-                      <Value>КЛЧ</Value>
+                      <Value>Кол.</Value>
                       <Style>
                         <TextAlign>Center</TextAlign>
                         <BorderStyle>
@@ -306,7 +286,7 @@ LEFT JOIN basis ON basis.id = orders.basis_id
                 <TableCell>
                   <ReportItems>
                     <Textbox Name="Textbox15">
-                      <Value>Материал</Value>
+                      <Value>Отделка куба</Value>
                       <Style>
                         <TextAlign>Center</TextAlign>
                         <BorderStyle>
@@ -323,7 +303,7 @@ LEFT JOIN basis ON basis.id = orders.basis_id
                 <TableCell>
                   <ReportItems>
                     <Textbox Name="Textbox16">
-                      <Value>Отделка</Value>
+                      <Value>Отделка фасада</Value>
                       <Style>
                         <TextAlign>Center</TextAlign>
                         <BorderStyle>
@@ -366,24 +346,8 @@ LEFT JOIN basis ON basis.id = orders.basis_id
               <TableCells>
                 <TableCell>
                   <ReportItems>
-                    <Textbox Name="Textbox18">
-                      <Value>=Replace(Convert.ToString(Replace(Convert.ToString(Fields!article.Value), "{H}", Convert.ToString({?baseh} * 40))), "{L}", Convert.ToString({?basel} * 40))</Value>
-                      <CanGrow>true</CanGrow>
-                      <Style>
-                        <BorderStyle>
-                          <Default>Solid</Default>
-                        </BorderStyle>
-                        <BorderColor />
-                        <BorderWidth />
-                        <FontSize>9pt</FontSize>
-                      </Style>
-                    </Textbox>
-                  </ReportItems>
-                </TableCell>
-                <TableCell>
-                  <ReportItems>
                     <Textbox Name="Textbox19">
-                      <Value>=Fields!nomenclature.Value</Value>
+                      <Value>=Replace(Convert.ToString(Replace(Convert.ToString(Fields!nomenclature.Value), "{H}", Convert.ToString({?baseh} * 40))), "{L}", Convert.ToString({?basel} * 40))</Value>
                       <CanGrow>true</CanGrow>
                       <Style>
                         <BorderStyle>
