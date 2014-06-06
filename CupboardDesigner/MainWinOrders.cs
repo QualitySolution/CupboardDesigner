@@ -12,6 +12,7 @@ public partial class MainWindow: Gtk.Window
 	private enum OrdersCol{
 		id,
 		custom,
+		contract,
 		phones,
 		address,
 		arrval,
@@ -20,11 +21,12 @@ public partial class MainWindow: Gtk.Window
 
 	void PrerareOrders()
 	{
-		OrdersListStore = new ListStore (typeof (int), typeof (string), typeof (string), typeof (string), typeof (string), typeof (string));
+		OrdersListStore = new ListStore (typeof (int), typeof (string), typeof (string), typeof (string), typeof (string), typeof (string), typeof (string));
 
 		treeviewOrders.AppendColumn("Номер", new Gtk.CellRendererText (), "text", (int)OrdersCol.id);
 		treeviewOrders.AppendColumn("Ф.И.О. заказчика", new Gtk.CellRendererText (), "text", (int)OrdersCol.custom);
 		treeviewOrders.AppendColumn("Дата прихода", new Gtk.CellRendererText (), "text", (int)OrdersCol.arrval);
+		treeviewOrders.AppendColumn("Договор", new Gtk.CellRendererText (), "text", (int)OrdersCol.contract);
 		treeviewOrders.AppendColumn("Срок сдачи", new Gtk.CellRendererText (), "text", (int)OrdersCol.delivery);
 
 		OrdersFilter = new TreeModelFilter (OrdersListStore, null);
@@ -39,7 +41,7 @@ public partial class MainWindow: Gtk.Window
 	{
 		MainClass.StatusMessage("Получаем таблицу заказов...");
 
-		string sql = "SELECT orders.id, orders.customer, orders.address, orders.phone1, orders.phone2, orders.arrval, orders.deadline_s, orders.deadline_e FROM orders ";
+		string sql = "SELECT orders.id, orders.customer, orders.contract, orders.address, orders.phone1, orders.phone2, orders.arrval, orders.deadline_s, orders.deadline_e FROM orders ";
 		SqliteCommand cmd = new SqliteCommand(sql, (SqliteConnection) QSMain.ConnectionDB);
 
 		using(SqliteDataReader rdr = cmd.ExecuteReader())
@@ -49,6 +51,7 @@ public partial class MainWindow: Gtk.Window
 			{
 				OrdersListStore.AppendValues(rdr.GetInt32(rdr.GetOrdinal("id")),
 					rdr["customer"].ToString(),
+					rdr["contract"].ToString(),
 					rdr["phone1"].ToString() + rdr["phone2"].ToString(),
 					rdr["address"].ToString(),
 					String.Format("{0:d}", rdr["arrval"]),
