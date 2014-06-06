@@ -74,9 +74,9 @@ LEFT JOIN facing ON facing.id = facing_id
       </Fields>
     </DataSet>
     <DataSet Name="Order">
-      <Query>
+      <Query >
         <DataSourceName>DS1</DataSourceName>
-        <CommandText>SELECT customer, orders.address as customaddress, phone1, orders.phone2, arrval, delivery, exhibition.name as exhibition, exhibition.phone as exphone1, exhibition.phone2 as exphone2, exhibition.address, comment, basis.delta_h, basis.delta_l FROM orders
+        <CommandText>SELECT customer, orders.address as customaddress, phone1, orders.phone2, arrval, deadline_s, deadline_e, contract, exhibition.name as exhibition, exhibition.phone as exphone1, exhibition.phone2 as exphone2, exhibition.address, comment, basis.delta_h, basis.delta_l FROM orders
 LEFT JOIN exhibition ON exhibition_id = exhibition.id
 LEFT JOIN basis ON basis.id = orders.basis_id
  WHERE orders.id = @id</CommandText>
@@ -86,7 +86,7 @@ LEFT JOIN basis ON basis.id = orders.basis_id
           </QueryParameter>
         </QueryParameters>
       </Query>
-      <Fields>
+      <Fields >
         <Field Name="customer">
           <DataField>customer</DataField>
           <TypeName>System.String</TypeName>
@@ -107,8 +107,8 @@ LEFT JOIN basis ON basis.id = orders.basis_id
           <DataField>arrval</DataField>
           <TypeName>System.DateTime</TypeName>
         </Field>
-        <Field Name="delivery">
-          <DataField>delivery</DataField>
+        <Field Name="deadline_s">
+          <DataField>deadline_s</DataField>
           <TypeName>System.DateTime</TypeName>
         </Field>
         <Field Name="exhibition">
@@ -138,6 +138,14 @@ LEFT JOIN basis ON basis.id = orders.basis_id
         <Field Name="exphone2">
           <DataField>exphone2</DataField>
           <TypeName>System.String</TypeName>
+        </Field>
+        <Field Name="deadline_e">
+          <DataField>deadline_e</DataField>
+          <TypeName>System.DateTime</TypeName>
+        </Field>
+        <Field Name="contract">
+          <DataField>contract</DataField>
+          <TypeName>System.Int32</TypeName>
         </Field>
       </Fields>
     </DataSet>
@@ -533,7 +541,7 @@ LEFT JOIN basis ON basis.id = orders.basis_id
           <Textbox Name="Textbox7">
             <Height>12.00pt</Height>
             <Width>338.31pt</Width>
-            <Value>="Дата прихода Заказа: " + Iif(Fields.arrval.IsMissing, "------//-----", Format(Fields!arrval.Value, "dddd, dd MMMM yyyy"))</Value>
+            <Value>="Договор № "+ Iif(Fields.contract.IsMissing, "____", Fields!contract.Value) + " от " + Iif(Fields.arrval.IsMissing, "------//-----", Format(Fields!arrval.Value, "d"))</Value>
             <ZIndex>1</ZIndex>
             <Left>6.0pt</Left>
             <Top>90.3pt</Top>
@@ -589,21 +597,6 @@ LEFT JOIN basis ON basis.id = orders.basis_id
             </Style>
             <CanGrow>true</CanGrow>
           </Textbox>
-          <Textbox Name="Textbox2">
-            <Height>42.79pt</Height>
-            <Width>219.69pt</Width>
-            <Value>Договор № ________________
-от "____" _____________ 20     г.
-</Value>
-            <ZIndex>1</ZIndex>
-            <Left>356.0pt</Left>
-            <Top>97.0pt</Top>
-            <Style>
-              <BorderStyle />
-              <BorderColor />
-              <BorderWidth />
-            </Style>
-          </Textbox>
           <Textbox Name="Textbox3">
             <Height>14.25pt</Height>
             <Width>447.97pt</Width>
@@ -616,7 +609,7 @@ LEFT JOIN basis ON basis.id = orders.basis_id
               <BorderColor />
               <BorderWidth />
             </Style>
-            <CanGrow >true</CanGrow>
+            <CanGrow>true</CanGrow>
           </Textbox>
           <Textbox Name="Textbox35">
             <Height>15.78pt</Height>
@@ -633,12 +626,12 @@ LEFT JOIN basis ON basis.id = orders.basis_id
             <CanGrow>true</CanGrow>
           </Textbox>
           <Textbox Name="Textbox4">
-            <Height>15.76pt</Height>
-            <Width>310.13pt</Width>
-            <Value>="Дата сдачи Заказа: " &amp; Iif(Fields.delivery.IsMissing, "-----//-----", Format(Fields!delivery.Value, "dddd, dd MMMM yyyy"))</Value>
+            <Height>14.26pt</Height>
+            <Width>417.03pt</Width>
+            <Value>="Срок сдачи: " &amp; Iif(Fields.deadline_s.IsMissing, "XX", Format(Fields!deadline_s.Value, "d")) &amp; " - " &amp; Iif(Fields.deadline_e.IsMissing, "XX", Format(Fields!deadline_e.Value, "d"))</Value>
             <ZIndex>1</ZIndex>
-            <Left>6.0pt</Left>
-            <Top>107.7pt</Top>
+            <Left>6.00pt</Left>
+            <Top>107.70pt</Top>
             <Style>
               <BorderStyle />
               <BorderColor />
