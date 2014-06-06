@@ -113,6 +113,7 @@ public partial class MainWindow: Gtk.Window
 		bool isSelect = treeviewOrders.Selection.CountSelectedRows() == 1;
 		buttonEdit.Sensitive = isSelect;
 		buttonDel.Sensitive = isSelect;
+		buttonCopy.Sensitive = isSelect;
 	}
 
 	protected void OnButtonAddClicked(object sender, EventArgs e)
@@ -135,7 +136,7 @@ public partial class MainWindow: Gtk.Window
 		treeviewOrders.Selection.GetSelected(out iter);
 		int itemid = Convert.ToInt32(OrdersFilter.GetValue(iter,0));
 		Order winOrder = new Order();
-		winOrder.Fill(itemid);
+		winOrder.Fill(itemid, false);
 		winOrder.DeleteEvent += OnDeleteOrderEvent;
 		winOrder.Show();
 	}
@@ -149,6 +150,17 @@ public partial class MainWindow: Gtk.Window
 		int itemid = (int) OrdersFilter.GetValue(iter, (int)OrdersCol.id);
 		winDelete.RunDeletion("orders", itemid);
 		UpdateOrders();
+	}
+
+	protected void OnButtonCopyClicked(object sender, EventArgs e)
+	{
+		TreeIter iter;
+		treeviewOrders.Selection.GetSelected(out iter);
+		int itemid = Convert.ToInt32(OrdersFilter.GetValue(iter,0));
+		Order winOrder = new Order();
+		winOrder.Fill(itemid, true);
+		winOrder.DeleteEvent += OnDeleteOrderEvent;
+		winOrder.Show();
 	}
 
 }

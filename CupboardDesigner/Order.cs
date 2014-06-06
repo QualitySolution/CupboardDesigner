@@ -212,10 +212,11 @@ namespace CupboardDesigner
 			hboxCubeList.DragDrop += OnCubeListDragDrop;
 		}
 
-		public void Fill(int id)
+		public void Fill(int id, bool copy)
 		{
-			ItemId = id;
-			NewItem = false;
+			NewItem = copy;
+			if(!copy)
+				ItemId = id;
 
 			MainClass.StatusMessage(String.Format ("Запрос заказа №{0}...", id));
 			string sql = "SELECT orders.* FROM orders WHERE orders.id = @id";
@@ -230,14 +231,17 @@ namespace CupboardDesigner
 				{
 					rdr.Read();
 
-					this.Title = String.Format("Заказ №{0}", rdr["id"].ToString());
+					if(!copy)
+					{
+						this.Title = String.Format("Заказ №{0}", rdr["id"].ToString());
+						dateArrval.Date = DBWorks.GetDateTime(rdr, "arrval", new DateTime());
+					}
 					checkEstimation.Active = DBWorks.GetBoolean(rdr, "estimation", true);
 					entryContract.Text = rdr["contract"].ToString();
 					entryCustomer.Text = rdr["customer"].ToString();
 					entryPhone1.Text = rdr["phone1"].ToString();
 					entryPhone2.Text = rdr["phone2"].ToString();
 					textAddress.Buffer.Text = rdr["address"].ToString();
-					dateArrval.Date = DBWorks.GetDateTime(rdr, "arrval", new DateTime());
 					dateDeadlineS.Date = DBWorks.GetDateTime(rdr, "deadline_s", new DateTime());
 					dateDeadlineE.Date = DBWorks.GetDateTime(rdr, "deadline_e", new DateTime());
 					int basis_id = rdr.GetInt32(rdr.GetOrdinal("basis_id"));
@@ -264,7 +268,7 @@ namespace CupboardDesigner
 					while(rdr.Read())
 					{
 						ComponentsStore.AppendValues(
-							DBWorks.GetLong(rdr, "id", -1),
+							copy ? -1 : DBWorks.GetLong(rdr, "id", -1),
 							Enum.Parse(typeof(Nomenclature.NomType), rdr["type"].ToString()),
 							DBWorks.GetInt(rdr, "nomenclature_id", -1),
 							DBWorks.GetString(rdr, "nomenclature", "нет"),

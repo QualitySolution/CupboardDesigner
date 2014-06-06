@@ -27,6 +27,7 @@ public partial class MainWindow
 	private global::Gtk.HBox hbox4;
 	private global::Gtk.Button buttonAdd;
 	private global::Gtk.Button buttonEdit;
+	private global::Gtk.Button buttonCopy;
 	private global::Gtk.Button buttonDel;
 	private global::Gtk.Statusbar statusbar1;
 	private global::Gtk.Label labelStatus;
@@ -178,25 +179,40 @@ public partial class MainWindow
 		w13.Expand = false;
 		w13.Fill = false;
 		// Container child hbox4.Gtk.Box+BoxChild
+		this.buttonCopy = new global::Gtk.Button ();
+		this.buttonCopy.Sensitive = false;
+		this.buttonCopy.CanFocus = true;
+		this.buttonCopy.Name = "buttonCopy";
+		this.buttonCopy.UseUnderline = true;
+		this.buttonCopy.Label = global::Mono.Unix.Catalog.GetString ("Копировать");
+		global::Gtk.Image w14 = new global::Gtk.Image ();
+		w14.Pixbuf = global::Stetic.IconLoader.LoadIcon (this, "gtk-copy", global::Gtk.IconSize.Menu);
+		this.buttonCopy.Image = w14;
+		this.hbox4.Add (this.buttonCopy);
+		global::Gtk.Box.BoxChild w15 = ((global::Gtk.Box.BoxChild)(this.hbox4 [this.buttonCopy]));
+		w15.Position = 2;
+		w15.Expand = false;
+		w15.Fill = false;
+		// Container child hbox4.Gtk.Box+BoxChild
 		this.buttonDel = new global::Gtk.Button ();
 		this.buttonDel.Sensitive = false;
 		this.buttonDel.CanFocus = true;
 		this.buttonDel.Name = "buttonDel";
 		this.buttonDel.UseUnderline = true;
 		this.buttonDel.Label = global::Mono.Unix.Catalog.GetString ("Удалить");
-		global::Gtk.Image w14 = new global::Gtk.Image ();
-		w14.Pixbuf = global::Stetic.IconLoader.LoadIcon (this, "gtk-delete", global::Gtk.IconSize.Menu);
-		this.buttonDel.Image = w14;
+		global::Gtk.Image w16 = new global::Gtk.Image ();
+		w16.Pixbuf = global::Stetic.IconLoader.LoadIcon (this, "gtk-delete", global::Gtk.IconSize.Menu);
+		this.buttonDel.Image = w16;
 		this.hbox4.Add (this.buttonDel);
-		global::Gtk.Box.BoxChild w15 = ((global::Gtk.Box.BoxChild)(this.hbox4 [this.buttonDel]));
-		w15.Position = 2;
-		w15.Expand = false;
-		w15.Fill = false;
+		global::Gtk.Box.BoxChild w17 = ((global::Gtk.Box.BoxChild)(this.hbox4 [this.buttonDel]));
+		w17.Position = 3;
+		w17.Expand = false;
+		w17.Fill = false;
 		this.vbox1.Add (this.hbox4);
-		global::Gtk.Box.BoxChild w16 = ((global::Gtk.Box.BoxChild)(this.vbox1 [this.hbox4]));
-		w16.Position = 3;
-		w16.Expand = false;
-		w16.Fill = false;
+		global::Gtk.Box.BoxChild w18 = ((global::Gtk.Box.BoxChild)(this.vbox1 [this.hbox4]));
+		w18.Position = 3;
+		w18.Expand = false;
+		w18.Fill = false;
 		// Container child vbox1.Gtk.Box+BoxChild
 		this.statusbar1 = new global::Gtk.Statusbar ();
 		this.statusbar1.Name = "statusbar1";
@@ -206,15 +222,15 @@ public partial class MainWindow
 		this.labelStatus.Name = "labelStatus";
 		this.labelStatus.LabelProp = global::Mono.Unix.Catalog.GetString ("label4");
 		this.statusbar1.Add (this.labelStatus);
-		global::Gtk.Box.BoxChild w17 = ((global::Gtk.Box.BoxChild)(this.statusbar1 [this.labelStatus]));
-		w17.Position = 2;
-		w17.Expand = false;
-		w17.Fill = false;
+		global::Gtk.Box.BoxChild w19 = ((global::Gtk.Box.BoxChild)(this.statusbar1 [this.labelStatus]));
+		w19.Position = 2;
+		w19.Expand = false;
+		w19.Fill = false;
 		this.vbox1.Add (this.statusbar1);
-		global::Gtk.Box.BoxChild w18 = ((global::Gtk.Box.BoxChild)(this.vbox1 [this.statusbar1]));
-		w18.Position = 4;
-		w18.Expand = false;
-		w18.Fill = false;
+		global::Gtk.Box.BoxChild w20 = ((global::Gtk.Box.BoxChild)(this.vbox1 [this.statusbar1]));
+		w20.Position = 4;
+		w20.Expand = false;
+		w20.Fill = false;
 		this.Add (this.vbox1);
 		if ((this.Child != null)) {
 			this.Child.ShowAll ();
@@ -237,6 +253,7 @@ public partial class MainWindow
 		this.treeviewOrders.RowActivated += new global::Gtk.RowActivatedHandler (this.OnTreeviewOrdersRowActivated);
 		this.buttonAdd.Clicked += new global::System.EventHandler (this.OnButtonAddClicked);
 		this.buttonEdit.Clicked += new global::System.EventHandler (this.OnButtonEditClicked);
+		this.buttonCopy.Clicked += new global::System.EventHandler (this.OnButtonCopyClicked);
 		this.buttonDel.Clicked += new global::System.EventHandler (this.OnButtonDelClicked);
 	}
 }
