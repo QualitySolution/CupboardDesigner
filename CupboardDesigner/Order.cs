@@ -34,6 +34,7 @@ namespace CupboardDesigner
 			nomenclature_type,
 			nomenclature_id,
 			nomenclature,
+			nomenclature_title,
 			nomenclature_description,
 			count,
 			material_id,
@@ -66,7 +67,7 @@ namespace CupboardDesigner
 			FacingNameList = TempCombo.Model;
 			TempCombo.Destroy ();
 
-			ComponentsStore = new ListStore(typeof(long), typeof(Nomenclature.NomType), typeof(int), typeof(string), typeof(string), typeof(int), typeof(int), typeof(string), typeof(int), typeof(string), typeof(string));
+			ComponentsStore = new ListStore(typeof(long), typeof(Nomenclature.NomType), typeof(int), typeof(string), typeof(string), typeof(string), typeof(int), typeof(int), typeof(string), typeof(int), typeof(string), typeof(string));
 
 			Gtk.TreeViewColumn ColumnMaterial = new Gtk.TreeViewColumn ();
 			ColumnMaterial.Title = "Отделка кубов";
@@ -103,7 +104,7 @@ namespace CupboardDesigner
 			ColumnComment.PackStart (CellComment, true);
 			ColumnComment.AddAttribute(CellComment, "text", (int)ComponentCol.comment);
 
-			treeviewComponents.AppendColumn("Название", new Gtk.CellRendererText (), "text", (int)ComponentCol.nomenclature);
+			treeviewComponents.AppendColumn("Название", new Gtk.CellRendererText (), "text", (int)ComponentCol.nomenclature_title);
 			treeviewComponents.AppendColumn("Кол-во", new Gtk.CellRendererText (), "text", (int)ComponentCol.count);
 			treeviewComponents.AppendColumn(ColumnMaterial);
 			treeviewComponents.AppendColumn(ColumnFacing);
@@ -272,6 +273,7 @@ namespace CupboardDesigner
 							Enum.Parse(typeof(Nomenclature.NomType), rdr["type"].ToString()),
 							DBWorks.GetInt(rdr, "nomenclature_id", -1),
 							DBWorks.GetString(rdr, "nomenclature", "нет"),
+							ReplaceArticle(DBWorks.GetString(rdr, "nomenclature", "нет")),
 							DBWorks.GetString(rdr, "description", ""),
 							DBWorks.GetInt(rdr, "count", 0),
 							DBWorks.GetInt(rdr, "material_id", -1),
@@ -478,6 +480,7 @@ namespace CupboardDesigner
 			if(OrderCupboard.BorderImage != null)
 				OrderCupboard.BorderImage.ModifyDrawingImage();
 			CalculateCubePxSize(drawCupboard.Allocation);
+			UpdateArticles();
 		}
 
 		protected void OnComboCubeVChanged(object sender, EventArgs e)
@@ -486,6 +489,7 @@ namespace CupboardDesigner
 			if(OrderCupboard.BorderImage != null)
 				OrderCupboard.BorderImage.ModifyDrawingImage();
 			CalculateCubePxSize(drawCupboard.Allocation);
+			UpdateArticles();
 		}
 
 		protected void OnDrawCupboardExposeEvent(object o, ExposeEventArgs args)
@@ -767,6 +771,7 @@ namespace CupboardDesigner
 							Enum.Parse(typeof(Nomenclature.NomType), rdr["type"].ToString()),
 							DBWorks.GetInt(rdr, "item_id", -1),
 							DBWorks.GetString(rdr, "nomenclature", "нет"),
+							ReplaceArticle(DBWorks.GetString(rdr, "nomenclature", "нет")),
 							DBWorks.GetString(rdr, "description", ""),
 							1,
 							-1,
@@ -779,6 +784,26 @@ namespace CupboardDesigner
 				}
 			}
 			CalculateTotalCount();
+		}
+
+		private void UpdateArticles()
+		{
+			TreeIter iter;
+			if (ComponentsStore.GetIterFirst(out iter))
+			{
+				do
+				{
+					ComponentsStore.SetValue(iter, (int)ComponentCol.nomenclature_title, 
+						ReplaceArticle((string)ComponentsStore.GetValue(iter, (int)ComponentCol.nomenclature)));
+				}
+				while(ComponentsStore.IterNext(ref iter));
+			}
+		}
+
+		private string ReplaceArticle(string text)
+		{
+			string half = text.Replace("{L}", String.Format("{0}", OrderCupboard.CubesH * 40));
+			return half.Replace("{H}", String.Format("{0}", OrderCupboard.CubesV * 40));
 		}
 
 		private void UpdateCubeComponents()
@@ -814,6 +839,7 @@ namespace CupboardDesigner
 					Nomenclature.NomType.cube,
 					pair.Key,
 					cube.Name,
+					ReplaceArticle(cube.Name),
 					cube.Description,
 					1,
 					-1,
