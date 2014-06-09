@@ -49,6 +49,7 @@ namespace CupboardDesigner
 		{
 			Cube NewCube = new Cube();
 			NewCube.Name = Name;
+			NewCube.Description = Description;
 			NewCube.Widht = Widht;
 			NewCube.Height = Height;
 			NewCube.NomenclatureId = NomenclatureId;
