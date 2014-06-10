@@ -14,24 +14,56 @@ namespace CupboardDesigner
 		private static Logger logger = LogManager.GetCurrentClassLogger();
 		public bool NewItem;
 		private int ItemId;
-		private Dictionary<string, bool> NomenclatureInDB;
 		private SVGHelper ImageHelper;
 		private bool ImageChanged = false;
+		private ListStore NomenclatureStore;
+
+		enum NomenclatureCol {
+			id,
+			selected,
+			nomenclature_id,
+			nomenclature,
+			count
+		}
 
 		public Basis()
 		{
 			this.Build();
 			drawBasis.SetSizeRequest(250, 250);
+			//Создаем таблицу номенклатур
+			NomenclatureStore = new ListStore(typeof(long), typeof(bool), typeof(int), typeof(string), typeof(int));
+
+			CellRendererToggle CellSelected = new CellRendererToggle();
+			CellSelected.Activatable = true;
+			CellSelected.Toggled += onCellSelectToggled;
+
+			Gtk.CellRendererSpin CellCount = new CellRendererSpin();
+			CellCount.Editable = true;
+
+			Adjustment adjCost = new Adjustment(0,0,100,1,5,0);
+			CellCount.Adjustment = adjCost;
+			CellCount.Edited += OnCountSpinEdited;
+
+			treeviewNomenclature.AppendColumn("", CellSelected, "active", (int)NomenclatureCol.selected);
+			treeviewNomenclature.AppendColumn("Название", new CellRendererText(), "text", (int)NomenclatureCol.nomenclature);
+			treeviewNomenclature.AppendColumn("Количество", CellCount, "text", (int)NomenclatureCol.count);
+
+			treeviewNomenclature.Model = NomenclatureStore;
+			treeviewNomenclature.ShowAll();
+
 			//Загрузка списка номенклатур
 			string sql = "SELECT id, name FROM nomenclature WHERE type = 'construct'";
 			SqliteCommand cmd = new SqliteCommand(sql, (SqliteConnection)QSMain.ConnectionDB);
-			NomenclatureInDB = new Dictionary<string, bool>();
 			using (SqliteDataReader rdr = cmd.ExecuteReader())
 			{
 				while(rdr.Read())
 				{
-					checksNom.AddCheckButton(rdr["id"].ToString(), rdr["name"].ToString());
-					NomenclatureInDB.Add(rdr["id"].ToString(), false);
+					NomenclatureStore.AppendValues((long) -1,
+						false,
+						DBWorks.GetInt(rdr, "id", -1),
+						DBWorks.GetString(rdr, "name", ""),
+						1
+					);
 				}
 			}
 
@@ -77,8 +109,21 @@ namespace CupboardDesigner
 				{
 					while(rdr.Read())
 					{
-						checksNom.CheckButtons[rdr["item_id"].ToString()].Active = true;
-						NomenclatureInDB[rdr["item_id"].ToString()] = true;
+						TreeIter iter;
+						int nomenclatureId = rdr.GetInt32(rdr.GetOrdinal("item_id"));
+						if(NomenclatureStore.GetIterFirst(out iter))
+						{
+							do
+							{
+								if((int) NomenclatureStore.GetValue(iter, (int)NomenclatureCol.nomenclature_id) == nomenclatureId)
+								{
+									NomenclatureStore.SetValue(iter, (int)NomenclatureCol.id, (object) rdr.GetInt64(rdr.GetOrdinal("id")));
+									NomenclatureStore.SetValue(iter, (int)NomenclatureCol.count, rdr.GetInt32(rdr.GetOrdinal("count")));
+									NomenclatureStore.SetValue(iter, (int)NomenclatureCol.selected, true);
+								}
+							}
+							while(NomenclatureStore.IterNext(ref iter));
+						}
 					}
 				}
 
@@ -97,6 +142,29 @@ namespace CupboardDesigner
 		{
 			bool Nameok = entryName.Text != "";
 			buttonOk.Sensitive = Nameok;
+		}
+
+		void OnCountSpinEdited (object o, EditedArgs args)
+		{
+			TreeIter iter;
+			if (!NomenclatureStore.GetIterFromString (out iter, args.Path))
+				return;
+			int count;
+			if (int.TryParse (args.NewText, out count)) 
+			{
+				NomenclatureStore.SetValue (iter, (int)NomenclatureCol.count, count);
+			}
+		}
+
+		void onCellSelectToggled(object o, ToggledArgs args) 
+		{
+			TreeIter iter;
+
+			if (NomenclatureStore.GetIter (out iter, new TreePath(args.Path))) 
+			{
+				bool old = (bool) NomenclatureStore.GetValue(iter, (int)NomenclatureCol.selected);
+				NomenclatureStore.SetValue(iter, (int)NomenclatureCol.selected, !old);
+			}
 		}
 
 		protected void OnButtonOkClicked(object sender, EventArgs e)
@@ -137,24 +205,29 @@ namespace CupboardDesigner
 				}
 
 				// Запись Номенклатур
-				foreach(KeyValuePair<string, CheckButton> pair in checksNom.CheckButtons)
+				foreach(object[] nomenclature in NomenclatureStore)
 				{
-					if(pair.Value.Active && !NomenclatureInDB[pair.Key])
+					if((bool) nomenclature[(int)NomenclatureCol.selected])
 					{
-						sql = "INSERT INTO basis_items (basis_id, item_id) VALUES (@basis_id, @item_id)";
+						if((long) nomenclature[(int)NomenclatureCol.id] > 0)
+							sql = "UPDATE basis_items SET count = @count WHERE id = @id";
+						else
+							sql = "INSERT INTO basis_items (basis_id, item_id, count) VALUES (@basis_id, @item_id, @count)";
 
 						cmd = new SqliteCommand(sql, (SqliteConnection)QSMain.ConnectionDB, trans);
 						cmd.Parameters.AddWithValue("@basis_id", ItemId);
-						cmd.Parameters.AddWithValue("@item_id", pair.Key);
+						cmd.Parameters.AddWithValue("@id", nomenclature[(int)NomenclatureCol.id]);
+						cmd.Parameters.AddWithValue("@item_id", nomenclature[(int)NomenclatureCol.nomenclature_id]);
+						cmd.Parameters.AddWithValue("@count", nomenclature[(int)NomenclatureCol.count]);
 						cmd.ExecuteNonQuery();
 					}
-					if(!pair.Value.Active && NomenclatureInDB[pair.Key])
+					else if((long) nomenclature[(int)NomenclatureCol.id] > 0)
 					{
 						sql = "DELETE FROM basis_items WHERE basis_id = @basis_id AND item_id = @item_id";
 
 						cmd = new SqliteCommand(sql, (SqliteConnection)QSMain.ConnectionDB, trans);
 						cmd.Parameters.AddWithValue("@basis_id", ItemId);
-						cmd.Parameters.AddWithValue("@item_id", pair.Key);
+						cmd.Parameters.AddWithValue("@item_id", nomenclature[(int)NomenclatureCol.nomenclature_id]);
 						cmd.ExecuteNonQuery();
 					}
 				}
