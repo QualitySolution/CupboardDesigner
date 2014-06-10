@@ -1,6 +1,6 @@
 
 ;--------------------------------
-!define PRODUCT_VERSION "1.0.5"
+!define PRODUCT_VERSION "1.0.6"
 !define MIN_NET_MAJOR "4"
 !define MIN_NET_MINOR "0"
 !define MIN_NET_BUILD "*"
@@ -18,6 +18,7 @@ Name "${PRODUCT_NAME}"
 OutFile "${EXE_NAME}-${PRODUCT_VERSION}.exe"
 
 !include "MUI.nsh"
+!include "x64.nsh"
 
 ; The default installation directory
 InstallDir "$PROGRAMFILES\${MENU_DIR_NAME}"
@@ -299,6 +300,9 @@ Section "${PRODUCT_NAME}" SecProgram
   
   ; Put file there
   File /r "Files\*.*"
+  AccessControl::GrantOnFile \
+    "$INSTDIR\Reports\order.rdl" "(BU)" "FullAccess"
+
   
   ; Write the uninstall keys for Windows
   WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\${EXE_NAME}" "DisplayName" "${PRODUCT_NAME}"
@@ -338,6 +342,29 @@ Section "MS .NET Framework ${MIN_NET_MAJOR}.${MIN_NET_MINOR}" SecFramework
  
 SectionEnd
 
+Section "Visual C++ 2010" SecVisual
+	SectionIn RO
+	InitPluginsDir
+	SetOutPath "$pluginsdir\Requires"
+
+  ${If} ${RunningX64}
+	ReadRegStr $1 HKLM "SOFTWARE\Microsoft\VisualStudio\10.0\VC\VCRedist\x64" "Installed"
+	StrCmp $1 1 VisualInstalled
+  ${Else}
+	ReadRegStr $1 HKLM "SOFTWARE\Microsoft\VisualStudio\10.0\VC\VCRedist\x86" "Installed"
+	StrCmp $1 1 VisualInstalled
+  ${EndIf}
+  
+  File "vcredist_x86.exe"
+  DetailPrint "Starting Microsoft Visual C++ 2010 (x86) Setup..."
+  ExecWait "$pluginsdir\Requires\vcredist_x86.exe /q"
+  Return
+ 
+  VisualInstalled:
+  DetailPrint "Microsoft Visual C++ 2010 (x86) is already installed!"
+ 
+SectionEnd
+
 Section "GTK# 2.12.21" SecGTK
   SectionIn RO
 ; Install 2.12.21
@@ -360,6 +387,9 @@ Section /o "Пустая база данных" SecDataBase
   SetOutPath "$APPDATA\${EXE_NAME}"
 
   File "Cupboard.db3"
+  AccessControl::GrantOnFile \
+    "$APPDATA\${EXE_NAME}" "(BU)" "FullAccess"
+
  
 SectionEnd
 
@@ -377,6 +407,7 @@ SectionEnd
   ;Language strings
   LangString DESC_SecProgram ${LANG_Russian} "Основные файлы программы"
   LangString DESC_SecFramework ${LANG_Russian} "Для работы программы необходима платформа .NET Framework. При необходимости будет выполнена установка через интернет."
+  LangString DESC_SecVisual ${LANG_Russian} "Для работы программы необходимы библиотеки Microsoft Visual C++ 2010"
   LangString DESC_SecGTK ${LANG_Russian} "Библиотеки GTK#, необходимые для работы программы"
   LangString DESC_SecDesktop ${LANG_Russian} "Установит ярлык программы на рабочий стол"
   LangString DESC_SecDataBase ${LANG_Russian} "Установит пустую базу данных. ВНИМАНИЕ если у вас уже установлена база данных она будте перезаписана."
@@ -385,6 +416,7 @@ SectionEnd
   !insertmacro MUI_FUNCTION_DESCRIPTION_BEGIN
     !insertmacro MUI_DESCRIPTION_TEXT ${SecProgram} $(DESC_SecProgram)
     !insertmacro MUI_DESCRIPTION_TEXT ${SecFramework} $(DESC_SecFramework)
+    !insertmacro MUI_DESCRIPTION_TEXT ${SecVisual} $(DESC_SecVisual)
     !insertmacro MUI_DESCRIPTION_TEXT ${SecGTK} $(DESC_SecGTK)
     !insertmacro MUI_DESCRIPTION_TEXT ${SecDesktop} $(DESC_SecDesktop)
     !insertmacro MUI_DESCRIPTION_TEXT ${SecDataBase} $(DESC_SecDataBase)
