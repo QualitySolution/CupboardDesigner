@@ -758,7 +758,7 @@ namespace CupboardDesigner
 							if ((int)ComponentsStore.GetValue(iter, (int)ComponentCol.nomenclature_id) == rdr.GetInt32(rdr.GetOrdinal("item_id")))
 							{
 								Found = true;
-								ComponentsStore.SetValue(iter, (int)ComponentCol.count, 1);
+								ComponentsStore.SetValue(iter, (int)ComponentCol.count, rdr.GetInt32(rdr.GetOrdinal("count")));
 								break;
 							}
 						}
@@ -773,7 +773,7 @@ namespace CupboardDesigner
 							DBWorks.GetString(rdr, "nomenclature", "нет"),
 							ReplaceArticle(DBWorks.GetString(rdr, "nomenclature", "нет")),
 							DBWorks.GetString(rdr, "description", ""),
-							1,
+							DBWorks.GetInt(rdr, "count", 1),
 							-1,
 							"",
 							-1,
