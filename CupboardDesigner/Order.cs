@@ -270,7 +270,7 @@ namespace CupboardDesigner
 					while(rdr.Read())
 					{
 						ComponentsStore.AppendValues(
-							copy ? -1 : DBWorks.GetLong(rdr, "id", -1),
+							copy ? 0 : DBWorks.GetLong(rdr, "id", -1), // 0 Специальное значение поля, что бы компоненты не удалялись при копировании.
 							Enum.Parse(typeof(Nomenclature.NomType), rdr["type"].ToString()),
 							DBWorks.GetInt(rdr, "nomenclature_id", -1),
 							DBWorks.GetString(rdr, "nomenclature", "нет"),
@@ -733,7 +733,7 @@ namespace CupboardDesigner
 				{
 					if ((Nomenclature.NomType)ComponentsStore.GetValue(iter, (int)ComponentCol.nomenclature_type) == Nomenclature.NomType.construct)
 					{
-						if((long)ComponentsStore.GetValue(iter, (int)ComponentCol.row_id) > 0)
+						if((long)ComponentsStore.GetValue(iter, (int)ComponentCol.row_id) >= 0)
 							ComponentsStore.SetValue(iter, (int)ComponentCol.count, 0);
 						else
 							ComponentsStore.Remove(ref iter);
@@ -823,7 +823,7 @@ namespace CupboardDesigner
 							ComponentsStore.SetValue(iter, (int)ComponentCol.count, Counts[NomId]);
 							Counts.Remove(NomId);
 						}
-						else if((long)ComponentsStore.GetValue(iter, (int)ComponentCol.row_id) > 0)
+						else if((long)ComponentsStore.GetValue(iter, (int)ComponentCol.row_id) >= 0)
 							ComponentsStore.SetValue(iter, (int)ComponentCol.count, 0);
 						else
 							ComponentsStore.Remove(ref iter);
