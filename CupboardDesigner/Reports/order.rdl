@@ -74,7 +74,7 @@ LEFT JOIN facing ON facing.id = facing_id
       </Fields>
     </DataSet>
     <DataSet Name="Order">
-      <Query >
+      <Query>
         <DataSourceName>DS1</DataSourceName>
         <CommandText>SELECT customer, orders.address as customaddress, phone1, orders.phone2, arrval, deadline_s, deadline_e, contract, exhibition.name as exhibition, exhibition.phone as exphone1, exhibition.phone2 as exphone2, exhibition.address, comment, basis.delta_h, basis.delta_l FROM orders
 LEFT JOIN exhibition ON exhibition_id = exhibition.id
@@ -86,7 +86,7 @@ LEFT JOIN basis ON basis.id = orders.basis_id
           </QueryParameter>
         </QueryParameters>
       </Query>
-      <Fields >
+      <Fields>
         <Field Name="customer">
           <DataField>customer</DataField>
           <TypeName>System.String</TypeName>
@@ -169,28 +169,19 @@ LEFT JOIN basis ON basis.id = orders.basis_id
         </Style>
         <TableColumns>
           <TableColumn>
-            <Width>92.2pt</Width>
+            <Width>188.9pt</Width>
           </TableColumn>
           <TableColumn>
             <Width>27.4pt</Width>
           </TableColumn>
           <TableColumn>
-            <Width>34.4pt</Width>
+            <Width>75.4pt</Width>
           </TableColumn>
           <TableColumn>
-            <Width>36.7pt</Width>
+            <Width>79.4pt</Width>
           </TableColumn>
           <TableColumn>
-            <Width>35.0pt</Width>
-          </TableColumn>
-          <TableColumn>
-            <Width>96.2pt</Width>
-          </TableColumn>
-          <TableColumn>
-            <Width>89.8pt</Width>
-          </TableColumn>
-          <TableColumn>
-            <Width>163.3pt</Width>
+            <Width>203.9pt</Width>
           </TableColumn>
         </TableColumns>
         <Header>
@@ -219,57 +210,6 @@ LEFT JOIN basis ON basis.id = orders.basis_id
                   <ReportItems>
                     <Textbox Name="Textbox11">
                       <Value>Кол.</Value>
-                      <Style>
-                        <TextAlign>Center</TextAlign>
-                        <BorderStyle>
-                          <Default>Solid</Default>
-                        </BorderStyle>
-                        <FontWeight>Bold</FontWeight>
-                        <BorderColor />
-                        <BorderWidth />
-                        <FontSize>9pt</FontSize>
-                      </Style>
-                    </Textbox>
-                  </ReportItems>
-                </TableCell>
-                <TableCell>
-                  <ReportItems>
-                    <Textbox Name="Textbox12">
-                      <Value>Длина</Value>
-                      <Style>
-                        <TextAlign>Center</TextAlign>
-                        <BorderStyle>
-                          <Default>Solid</Default>
-                        </BorderStyle>
-                        <FontWeight>Bold</FontWeight>
-                        <BorderColor />
-                        <BorderWidth />
-                        <FontSize>9pt</FontSize>
-                      </Style>
-                    </Textbox>
-                  </ReportItems>
-                </TableCell>
-                <TableCell>
-                  <ReportItems>
-                    <Textbox Name="Textbox13">
-                      <Value>Ширина</Value>
-                      <Style>
-                        <TextAlign>Center</TextAlign>
-                        <BorderStyle>
-                          <Default>Solid</Default>
-                        </BorderStyle>
-                        <FontWeight>Bold</FontWeight>
-                        <BorderColor />
-                        <BorderWidth />
-                        <FontSize>9pt</FontSize>
-                      </Style>
-                    </Textbox>
-                  </ReportItems>
-                </TableCell>
-                <TableCell>
-                  <ReportItems>
-                    <Textbox Name="Textbox14">
-                      <Value>Высота</Value>
                       <Style>
                         <TextAlign>Center</TextAlign>
                         <BorderStyle>
@@ -372,57 +312,6 @@ LEFT JOIN basis ON basis.id = orders.basis_id
                         <BorderColor />
                         <BorderWidth />
                         <TextAlign>Center</TextAlign>
-                        <FontSize>9pt</FontSize>
-                      </Style>
-                    </Textbox>
-                  </ReportItems>
-                </TableCell>
-                <TableCell>
-                  <ReportItems>
-                    <Textbox Name="Textbox21">
-                      <Value>=Fields!lenght.Value</Value>
-                      <CanGrow>true</CanGrow>
-                      <Style>
-                        <BorderStyle>
-                          <Default>Solid</Default>
-                        </BorderStyle>
-                        <TextAlign>Center</TextAlign>
-                        <BorderColor />
-                        <BorderWidth />
-                        <FontSize>9pt</FontSize>
-                      </Style>
-                    </Textbox>
-                  </ReportItems>
-                </TableCell>
-                <TableCell>
-                  <ReportItems>
-                    <Textbox Name="Textbox22">
-                      <Value>=Fields!widht.Value</Value>
-                      <CanGrow>true</CanGrow>
-                      <Style>
-                        <BorderStyle>
-                          <Default>Solid</Default>
-                        </BorderStyle>
-                        <TextAlign>Center</TextAlign>
-                        <BorderColor />
-                        <BorderWidth />
-                        <FontSize>9pt</FontSize>
-                      </Style>
-                    </Textbox>
-                  </ReportItems>
-                </TableCell>
-                <TableCell>
-                  <ReportItems>
-                    <Textbox Name="Textbox23">
-                      <Value>=Fields!height.Value</Value>
-                      <CanGrow>true</CanGrow>
-                      <Style>
-                        <BorderStyle>
-                          <Default>Solid</Default>
-                        </BorderStyle>
-                        <TextAlign>Center</TextAlign>
-                        <BorderColor />
-                        <BorderWidth />
                         <FontSize>9pt</FontSize>
                       </Style>
                     </Textbox>
