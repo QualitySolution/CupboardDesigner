@@ -203,6 +203,7 @@ namespace CupboardDesigner
 			}
 
 			OrderCupboard = new Cupboard();
+			OnBasisChanged(null, EventArgs.Empty);
 
 			//Настраиваем DND
 			Gtk.Drag.DestSet(drawCupboard, DestDefaults.Motion, TargetTable, Gdk.DragAction.Move);
@@ -284,7 +285,7 @@ namespace CupboardDesigner
 						);
 					}
 				}
-				basis.Button.Active = true;
+				basis.Button.Click();
 
 				MainClass.StatusMessage("Ok");
 			}
