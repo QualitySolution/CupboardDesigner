@@ -1,6 +1,6 @@
 
 ;--------------------------------
-!define PRODUCT_VERSION "1.0.6"
+!define PRODUCT_VERSION "1.0.9"
 !define MIN_NET_MAJOR "4"
 !define MIN_NET_MINOR "0"
 !define MIN_NET_BUILD "*"
@@ -367,7 +367,19 @@ SectionEnd
 
 Section "GTK# 2.12.21" SecGTK
   SectionIn RO
+  
+  ; Test 2.12.25
+  System::Call "msi::MsiQueryProductStateA(t '{889E7D77-2A98-4020-83B1-0296FA1BDE8A}') i.r0"
+  StrCmp $0 "5" GTKDone
+  DetailPrint "GTK# 2.12.25 не установлен"
+
+  ; Test 2.12.21
+  System::Call "msi::MsiQueryProductStateA(t '{71109D19-D8C1-437D-A6DA-03B94F5187FB}') i.r0"
+  StrCmp $0 "5" GTKDone
+  DetailPrint "GTK# 2.12.21 не установлен"
+
 ; Install 2.12.21
+  DetailPrint "Запуск установщика GTK# 2.12.21"
   File "gtk-sharp-2.12.21.msi"
   ExecWait '"msiexec" /i "$pluginsdir\Requires\gtk-sharp-2.12.21.msi"  /passive'
 
@@ -378,7 +390,7 @@ Section "GTK# 2.12.21" SecGTK
 ; Fix Localication
   SetOutPath "$PROGRAMFILES\GtkSharp\2.12\share\locale\ru\LC_MESSAGES"
   File "LC_MESSAGES\*"
-
+  GTKDone:
 SectionEnd
 
 Section /o "Пустая база данных" SecDataBase
@@ -445,6 +457,6 @@ Section "Uninstall"
 
   ; Remove GTK#
   MessageBox MB_YESNO "Удалить библиотеки GTK#? Они были установлены для ${PRODUCT_NAME}, но могут использоваться другими приложениями." /SD IDYES IDNO endGTK
-    ExecWait '"msiexec" /X{06AF6533-F201-47C0-8675-AAAE5CB81B41} /passive'
+    ExecWait '"msiexec" /X{71109D19-D8C1-437D-A6DA-03B94F5187FB} /passive'
   endGTK:
 SectionEnd
