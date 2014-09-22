@@ -3,7 +3,7 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">x86</Platform>
-    <ProductVersion>10.0.0</ProductVersion>
+    <ProductVersion>8.0.30703</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>{C030F268-0345-4DE4-B8A5-6A51AB93522E}</ProjectGuid>
     <OutputType>WinExe</OutputType>
@@ -46,16 +46,12 @@
       <HintPath>..\..\QSProjects\lib\Nini.dll</HintPath>
     </Reference>
     <Reference Include="System.Data" />
-    <Reference Include="QSWidgetLib">
-      <HintPath>..\..\QSProjects\QSWidgetLib\bin\Debug\QSWidgetLib.dll</HintPath>
-    </Reference>
     <Reference Include="gtk-sharp, Version=2.12.0.0, Culture=neutral, PublicKeyToken=35e10195dab3c99f" />
     <Reference Include="gdk-sharp, Version=2.12.0.0, Culture=neutral, PublicKeyToken=35e10195dab3c99f" />
     <Reference Include="glib-sharp, Version=2.12.0.0, Culture=neutral, PublicKeyToken=35e10195dab3c99f" />
     <Reference Include="pango-sharp, Version=2.12.0.0, Culture=neutral, PublicKeyToken=35e10195dab3c99f" />
     <Reference Include="atk-sharp, Version=2.12.0.0, Culture=neutral, PublicKeyToken=35e10195dab3c99f" />
     <Reference Include="glade-sharp, Version=2.12.0.0, Culture=neutral, PublicKeyToken=35e10195dab3c99f" />
-    <Reference Include="rsvg2-sharp, Version=2.18.0.0, Culture=neutral, PublicKeyToken=35e10195dab3c99f" />
     <Reference Include="Mono.Cairo" />
     <Reference Include="System.Xml" />
     <Reference Include="Svg">
@@ -63,6 +59,9 @@
     </Reference>
     <Reference Include="System.Web" />
     <Reference Include="System.Drawing" />
+    <Reference Include="rsvg2-sharp">
+      <HintPath>..\..\Libs\rsvg2-sharp.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="gtk-gui\gui.stetic">
@@ -96,6 +95,8 @@
     <Compile Include="gtk-gui\CupboardDesigner.Exhibition.cs" />
     <Compile Include="Order.cs" />
     <Compile Include="gtk-gui\CupboardDesigner.Order.cs" />
+    <Compile Include="gtk-gui\CupboardDesigner.CubesDlg.cs" />
+    <Compile Include="CubesDlg.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>
@@ -114,6 +115,10 @@
     <ProjectReference Include="..\..\My-FyiReporting\RdlEngine\RdlEngine.csproj">
       <Project>{C97E91F4-B310-44E2-9B6C-96775395722D}</Project>
       <Name>RdlEngine</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\QSProjects\QSWidgetLib\QSWidgetLib.csproj">
+      <Project>{5A2BB01E-E124-432E-8099-D1343D3897B9}</Project>
+      <Name>QSWidgetLib</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>

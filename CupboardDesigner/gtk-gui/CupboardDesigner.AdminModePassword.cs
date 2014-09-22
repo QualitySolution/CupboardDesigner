@@ -5,10 +5,15 @@ namespace CupboardDesigner
 	public partial class AdminModePassword
 	{
 		private global::Gtk.Label label2;
+		
 		private global::Gtk.HBox hbox1;
+		
 		private global::Gtk.Label label3;
+		
 		private global::Gtk.Entry entryPassword;
+		
 		private global::Gtk.Button buttonCancel;
+		
 		private global::Gtk.Button buttonOk;
 
 		protected virtual void Build ()

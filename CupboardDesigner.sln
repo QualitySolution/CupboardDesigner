@@ -17,6 +17,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RdlCri", "..\My-FyiReportin
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RdlGtkViewer", "..\My-FyiReporting\RdlGtkViewer\RdlGtkViewer\RdlGtkViewer.csproj", "{921488F1-F4FC-4438-920E-86E57442B253}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "QSWidgetLib", "..\QSProjects\QSWidgetLib\QSWidgetLib.csproj", "{5A2BB01E-E124-432E-8099-D1343D3897B9}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x86 = Debug|x86
@@ -35,6 +37,20 @@ Global
 		{546DF04A-5E3F-47AE-8975-302F78DE53A2}.Debug|x86.ActiveCfg = Debug|Any CPU
 		{546DF04A-5E3F-47AE-8975-302F78DE53A2}.Release|x64.ActiveCfg = Release|Any CPU
 		{546DF04A-5E3F-47AE-8975-302F78DE53A2}.Release|x86.ActiveCfg = Release|Any CPU
+		{5A2BB01E-E124-432E-8099-D1343D3897B9}.BundleLinux|Any CPU.ActiveCfg = Debug|Any CPU
+		{5A2BB01E-E124-432E-8099-D1343D3897B9}.BundleLinux|Any CPU.Build.0 = Debug|Any CPU
+		{5A2BB01E-E124-432E-8099-D1343D3897B9}.BundleLinux|x64.ActiveCfg = Debug|Any CPU
+		{5A2BB01E-E124-432E-8099-D1343D3897B9}.BundleLinux|x64.Build.0 = Debug|Any CPU
+		{5A2BB01E-E124-432E-8099-D1343D3897B9}.BundleLinux|x86.ActiveCfg = Debug|Any CPU
+		{5A2BB01E-E124-432E-8099-D1343D3897B9}.BundleLinux|x86.Build.0 = Debug|Any CPU
+		{5A2BB01E-E124-432E-8099-D1343D3897B9}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{5A2BB01E-E124-432E-8099-D1343D3897B9}.Debug|x64.Build.0 = Debug|Any CPU
+		{5A2BB01E-E124-432E-8099-D1343D3897B9}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{5A2BB01E-E124-432E-8099-D1343D3897B9}.Debug|x86.Build.0 = Debug|Any CPU
+		{5A2BB01E-E124-432E-8099-D1343D3897B9}.Release|x64.ActiveCfg = Release|Any CPU
+		{5A2BB01E-E124-432E-8099-D1343D3897B9}.Release|x64.Build.0 = Release|Any CPU
+		{5A2BB01E-E124-432E-8099-D1343D3897B9}.Release|x86.ActiveCfg = Release|Any CPU
+		{5A2BB01E-E124-432E-8099-D1343D3897B9}.Release|x86.Build.0 = Release|Any CPU
 		{921488F1-F4FC-4438-920E-86E57442B253}.BundleLinux|Any CPU.ActiveCfg = Debug|x86
 		{921488F1-F4FC-4438-920E-86E57442B253}.BundleLinux|Any CPU.Build.0 = Debug|x86
 		{921488F1-F4FC-4438-920E-86E57442B253}.BundleLinux|x64.ActiveCfg = Debug|x86

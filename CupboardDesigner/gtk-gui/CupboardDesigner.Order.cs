@@ -5,62 +5,119 @@ namespace CupboardDesigner
 	public partial class Order
 	{
 		private global::Gtk.UIManager UIManager;
+		
 		private global::Gtk.Action revertToSavedAction;
+		
 		private global::Gtk.Action goBackAction;
+		
 		private global::Gtk.Action goForwardAction;
+		
 		private global::Gtk.Action saveAction;
+		
 		private global::Gtk.Action printAction;
+		
 		private global::Gtk.VBox vbox2;
+		
 		private global::Gtk.Toolbar toolbar1;
+		
 		private global::Gtk.Notebook notebook1;
+		
 		private global::Gtk.HBox hbox1;
+		
 		private global::Gtk.Table table3;
+		
 		private global::Gtk.CheckButton checkEstimation;
+		
 		private global::Gtk.ComboBox comboExhibition;
+		
 		private global::QSWidgetLib.DatePicker dateArrval;
+		
 		private global::Gtk.Entry entryContract;
+		
 		private global::Gtk.Entry entryCustomer;
+		
 		private global::Gtk.Entry entryPhone1;
+		
 		private global::Gtk.Entry entryPhone2;
+		
 		private global::Gtk.ScrolledWindow GtkScrolledWindow;
+		
 		private global::Gtk.TextView textviewComments;
+		
 		private global::Gtk.ScrolledWindow GtkScrolledWindow2;
+		
 		private global::Gtk.TextView textAddress;
+		
 		private global::Gtk.HBox hbox4;
+		
 		private global::QSWidgetLib.DatePicker dateDeadlineS;
+		
 		private global::Gtk.Label label17;
+		
 		private global::QSWidgetLib.DatePicker dateDeadlineE;
+		
 		private global::Gtk.Label label1;
+		
 		private global::Gtk.Label label10;
+		
 		private global::Gtk.Label label11;
+		
 		private global::Gtk.Label label12;
+		
 		private global::Gtk.Label label13;
+		
 		private global::Gtk.Label label14;
+		
 		private global::Gtk.Label label4;
+		
 		private global::Gtk.Label label6;
+		
 		private global::Gtk.Label label9;
+		
 		private global::Gtk.Label label7;
+		
 		private global::Gtk.VBox vbox7;
+		
 		private global::Gtk.Table table1;
+		
 		private global::Gtk.ComboBox comboCubeH;
+		
 		private global::Gtk.ComboBox comboCubeV;
+		
 		private global::Gtk.Label label2;
+		
 		private global::Gtk.Label label3;
+		
 		private global::Gtk.ScrolledWindow scrolledTypesH;
+		
 		private global::Gtk.Label label5;
+		
 		private global::Gtk.VBox vbox3;
+		
 		private global::Gtk.Table tableConstructor;
+		
 		private global::Gtk.Button buttonCubeListOrientation;
+		
 		private global::Gtk.DrawingArea drawCupboard;
+		
 		private global::Gtk.ScrolledWindow scrolledCubeListH;
+		
 		private global::Gtk.ScrolledWindow scrolledCubeListV;
+		
 		private global::Gtk.Label label8;
+		
 		private global::Gtk.VBox vbox5;
+		
 		private global::Gtk.ScrolledWindow GtkScrolledWindow1;
+		
 		private global::Gtk.TreeView treeviewComponents;
+		
 		private global::Gtk.Label labelTotalCount;
+		
 		private global::Gtk.Label label15;
+		
 		private global::fyiReporting.RdlGtkViewer.ReportViewer reportviewer1;
+		
 		private global::Gtk.Label label16;
 
 		protected virtual void Build ()
@@ -110,7 +167,7 @@ namespace CupboardDesigner
 			this.notebook1 = new global::Gtk.Notebook ();
 			this.notebook1.CanFocus = true;
 			this.notebook1.Name = "notebook1";
-			this.notebook1.CurrentPage = 0;
+			this.notebook1.CurrentPage = 2;
 			// Container child notebook1.Gtk.Notebook+NotebookChild
 			this.hbox1 = new global::Gtk.HBox ();
 			this.hbox1.Name = "hbox1";

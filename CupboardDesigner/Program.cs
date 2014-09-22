@@ -59,6 +59,16 @@ namespace CupboardDesigner
 			Tables.Add("basis", PrepareTable);
 
 			PrepareTable = new TableInfo();
+			PrepareTable.ObjectsName = "Кубы";
+			PrepareTable.ObjectName = "куб"; 
+			PrepareTable.SqlSelect = "SELECT name, id FROM cubes ";
+			PrepareTable.DisplayString = "{0}";
+			PrepareTable.PrimaryKey = new TableInfo.PrimaryKeys("id");
+			PrepareTable.DeleteItems.Add("orders", 
+				new TableInfo.DeleteDependenceItem("WHERE cubes_id = @id ", "", "@id"));
+			Tables.Add("cubes", PrepareTable);
+
+			PrepareTable = new TableInfo();
 			PrepareTable.ObjectsName = "Компоненты каркаса";
 			PrepareTable.ObjectName = "компонент каркаса";
 			PrepareTable.SqlSelect = "SELECT nomenclature.name, basis_items.id FROM basis_items " +

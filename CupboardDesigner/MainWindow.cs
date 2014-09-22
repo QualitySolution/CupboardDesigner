@@ -58,6 +58,16 @@ public partial class MainWindow: Gtk.Window
 				Result = (ResponseType)BasisEdit.Run();
 				BasisEdit.Destroy();
 				break;
+			case "cubes":
+				CubesDlg CubesEdit = new CubesDlg();
+				if(e.NewItem)
+					CubesEdit.NewItem = true;
+				else 
+				CubesEdit.Fill(e.ItemId);
+				CubesEdit.Show();
+				Result = (ResponseType)CubesEdit.Run();
+				CubesEdit.Destroy();
+				break;
 			case "exhibition":
 				Exhibition ExhibitionEdit = new Exhibition();
 				if(!e.NewItem)
@@ -77,7 +87,7 @@ public partial class MainWindow: Gtk.Window
 	protected void SetAdminMode(bool admin)
 	{
 		ActionPassword.Sensitive = Action9.Sensitive = Action11.Sensitive = Action10.Sensitive 
-			= Action12.Sensitive = Action13.Sensitive = admin;
+			= Action12.Sensitive = Action13.Sensitive = Action15.Sensitive = admin;
 	}
 
 	protected void OnDeleteEvent(object sender, DeleteEventArgs a)
@@ -205,5 +215,16 @@ public partial class MainWindow: Gtk.Window
 			MainClass.Parameters.UpdateParameter(QSMain.ConnectionDB, "admin_password", WinPass.NewPassword);
 		}
 		WinPass.Destroy();
+	}
+	protected void OnAction15Activated (object sender, EventArgs e)
+	{
+		Reference winref = new Reference();
+		winref.SqlSelect = "SELECT id, name FROM @tablename ORDER BY ordinal";
+		winref.OrdinalField = "ordinal";
+		winref.SetMode(false,false,true,true,true);
+		winref.FillList("cubes", "куб", "Виды кубов");
+		winref.Show();
+		winref.Run();
+		winref.Destroy();
 	}
 }

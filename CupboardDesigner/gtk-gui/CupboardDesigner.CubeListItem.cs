@@ -5,7 +5,9 @@ namespace CupboardDesigner
 	public partial class CubeListItem
 	{
 		private global::Gtk.Table table1;
+		
 		private global::Gtk.DrawingArea drawCube;
+		
 		private global::Gtk.Label labelName;
 
 		protected virtual void Build ()
