@@ -72,22 +72,14 @@ namespace CupboardDesigner
 
 			ComponentsStore = new TreeStore(typeof(long), typeof(Nomenclature.NomType), typeof(int), typeof(string), typeof(string), typeof(string), typeof(int), typeof(int), typeof(string), typeof(int), typeof(string), typeof(string), typeof(string), typeof(string));
 
-			Gtk.TreeViewColumn ColumnPrice = new Gtk.TreeViewColumn ();
-			ColumnPrice.Title = "Цена";
-			ColumnPrice.MinWidth = 90;
-			Gtk.CellRendererText CellPrice = new CellRendererText ();
-			CellPrice.Editable = true;
-			CellPrice.Edited += OnPriceEdited;
-			ColumnPrice.PackStart (CellPrice, true);
-			ColumnPrice.AddAttribute(CellPrice, "text", (int)ComponentCol.price);
-
-			Gtk.TreeViewColumn ColumnPriceTotal = new Gtk.TreeViewColumn ();
-			ColumnPriceTotal.Title = "Сумма";
-			ColumnPriceTotal.MinWidth = 90;
-			Gtk.CellRendererText CellPriceTotal = new CellRendererText ();
-			CellPriceTotal.Editable = false;
-			ColumnPriceTotal.PackStart (CellPriceTotal, true);
-			ColumnPriceTotal.AddAttribute(CellPriceTotal, "text", (int)ComponentCol.price_total);
+			Gtk.TreeViewColumn ColumnCount = new Gtk.TreeViewColumn ();
+			ColumnCount.Title = "Кол-во";
+			ColumnCount.MinWidth = 50;
+			Gtk.CellRendererText CellCount = new CellRendererText ();
+			CellCount.Editable = true;
+			CellCount.Edited += OnCountEdited;
+			ColumnCount.PackStart (CellCount, true);
+			ColumnCount.AddAttribute(CellCount, "text", (int)ComponentCol.count);
 
 			Gtk.TreeViewColumn ColumnMaterial = new Gtk.TreeViewColumn ();
 			ColumnMaterial.Title = "Отделка кубов";
@@ -113,6 +105,24 @@ namespace CupboardDesigner
 			ColumnFacing.PackStart (CellFacing, true);
 			ColumnFacing.AddAttribute(CellFacing, "text", (int)ComponentCol.facing);
 
+			Gtk.TreeViewColumn ColumnPrice = new Gtk.TreeViewColumn ();
+			ColumnPrice.Title = "Цена";
+			ColumnPrice.MinWidth = 90;
+			Gtk.CellRendererText CellPrice = new CellRendererText ();
+			CellPrice.Editable = true;
+			CellPrice.Edited += OnPriceEdited;
+			ColumnPrice.PackStart (CellPrice, true);
+			ColumnPrice.AddAttribute(CellPrice, "text", (int)ComponentCol.price);
+
+			Gtk.TreeViewColumn ColumnPriceTotal = new Gtk.TreeViewColumn ();
+			ColumnPriceTotal.Title = "Сумма";
+			ColumnPriceTotal.MinWidth = 90;
+			Gtk.CellRendererText CellPriceTotal = new CellRendererText ();
+			CellPriceTotal.Editable = false;
+			ColumnPriceTotal.PackStart (CellPriceTotal, true);
+			ColumnPriceTotal.AddAttribute(CellPriceTotal, "text", (int)ComponentCol.price_total);
+
+
 			Gtk.TreeViewColumn ColumnComment = new Gtk.TreeViewColumn ();
 			ColumnComment.Title = "Комментарий";
 			Gtk.CellRendererText CellComment = new Gtk.CellRendererText ();
@@ -125,7 +135,7 @@ namespace CupboardDesigner
 			ColumnComment.AddAttribute(CellComment, "text", (int)ComponentCol.comment);
 
 			treeviewComponents.AppendColumn("Название", new Gtk.CellRendererText (), "text", (int)ComponentCol.nomenclature_title);
-			treeviewComponents.AppendColumn("Кол-во", new Gtk.CellRendererText (), "text", (int)ComponentCol.count);
+			treeviewComponents.AppendColumn(ColumnCount);
 			treeviewComponents.AppendColumn(ColumnMaterial);
 			treeviewComponents.AppendColumn(ColumnFacing);
 			treeviewComponents.AppendColumn (ColumnPrice);
@@ -236,7 +246,7 @@ namespace CupboardDesigner
 			vboxCubeList.DragDrop += OnCubeListDragDrop;
 			hboxCubeList.DragDrop += OnCubeListDragDrop;
 		}
-
+//TODO:FIX
 		private bool Save()
 		{
 			string sql;
@@ -357,7 +367,7 @@ namespace CupboardDesigner
 			}
 		}
 
-
+//TODO:FIX
 		public void Fill(int id, bool copy)
 		{
 			NewItem = copy;
@@ -441,24 +451,42 @@ namespace CupboardDesigner
 			TestCanSave();
 		}
 
-		//TODO: Realize
-		void OnPriceEdited(object o,EditedArgs args) 
+		void OnCountEdited(object o, EditedArgs args)
+		{
+			TreeIter iter;
+			int NewValue;
+			Decimal Price;
+
+			if (!ComponentsStore.GetIterFromString (out iter, args.Path) || ComponentsStore.IterHasChild (iter))
+				return;
+			try { 
+				if (args.NewText == null)
+					NewValue = 1;
+				else
+					NewValue = int.Parse (args.NewText); 
+				Price = Decimal.Parse((String)ComponentsStore.GetValue(iter, (int)ComponentCol.price));
+				ComponentsStore.SetValue(iter, (int)ComponentCol.count, NewValue);
+				ComponentsStore.SetValue(iter, (int)ComponentCol.price_total, (Price * NewValue).ToString());
+			} catch(Exception e) { return; }
+		}
+
+		void OnPriceEdited(object o, EditedArgs args) 
 		{
 			TreeIter iter;
 			Decimal NewValue;
-			if (!ComponentsStore.GetIterFromString (out iter, args.Path))
+			if (!ComponentsStore.GetIterFromString (out iter, args.Path) || ComponentsStore.IterHasChild (iter))
 				return;
-			if (ComponentsStore.IterHasChild (iter))
+			try {
+				if (args.NewText == null)
+					NewValue = 0;
+				else
+					NewValue = Decimal.Parse (args.NewText);
+				int count = (int)ComponentsStore.GetValue (iter, (int)ComponentCol.count);
+				ComponentsStore.SetValue(iter, (int)ComponentCol.price_total, (count * NewValue).ToString());
+				ComponentsStore.SetValue(iter, (int)ComponentCol.price, (NewValue).ToString());
+				CalculateTotalCount ();
 				return;
-			if (args.NewText == null)
-				NewValue = 0;
-			else
-				NewValue = Decimal.Parse (args.NewText);
-			int count = (int)ComponentsStore.GetValue (iter, (int)ComponentCol.count);
-			ComponentsStore.SetValue(iter, (int)ComponentCol.price_total, (count * NewValue).ToString());
-			ComponentsStore.SetValue(iter, (int)ComponentCol.price, (NewValue).ToString());
-			CalculateTotalCount ();
-			return;
+			} catch(Exception e) {return; }
 		}
 
 		void OnMaterialComboEdited (object o, EditedArgs args)
@@ -466,14 +494,11 @@ namespace CupboardDesigner
 			TreeIter iter, RefIter;
 			if (!ComponentsStore.GetIterFromString (out iter, args.Path))
 				return;
-			if(args.NewText == null)
-			{
+			if(args.NewText == null) {
 				logger.Warn("newtext is empty");
 				return;
 			}
-
-			if(ListStoreWorks.SearchListStore((ListStore)MaterialNameList, args.NewText, out RefIter))
-			{
+			if(ListStoreWorks.SearchListStore((ListStore)MaterialNameList, args.NewText, out RefIter)) {
 				ComponentsStore.SetValue(iter, (int)ComponentCol.material, args.NewText);
 				ComponentsStore.SetValue(iter, (int)ComponentCol.material_id, MaterialNameList.GetValue(RefIter, 1));
 			}
@@ -484,14 +509,11 @@ namespace CupboardDesigner
 			TreeIter iter, RefIter;
 			if (!ComponentsStore.GetIterFromString (out iter, args.Path))
 				return;
-			if(args.NewText == null)
-			{
+			if(args.NewText == null) {
 				logger.Warn("newtext is empty");
 				return;
 			}
-
-			if(ListStoreWorks.SearchListStore((ListStore)FacingNameList, args.NewText, out RefIter))
-			{
+			if(ListStoreWorks.SearchListStore((ListStore)FacingNameList, args.NewText, out RefIter)) {
 				ComponentsStore.SetValue(iter, (int)ComponentCol.facing, args.NewText);
 				ComponentsStore.SetValue(iter, (int)ComponentCol.facing_id, FacingNameList.GetValue(RefIter, 1));
 			}
@@ -708,7 +730,7 @@ namespace CupboardDesigner
 			}
 			args.RetVal = true;
 		}
-
+//Do I need this?
 		protected void OnDrawCupboardMotionNotifyEvent(object o, MotionNotifyEventArgs args)
 		{
 			/*int CubePosX = ((int)args.Event.X - CupboardZeroX) / CubePxSize;
@@ -723,7 +745,7 @@ namespace CupboardDesigner
 				Gtk.Drag.SourceSet(drawCupboard, ModifierType.Button1Mask, TargetTable, Gdk.DragAction.Move);
 			} */
 		}
-
+//And this???
 		protected void OnDrawCupboardButtonPressEvent(object o, ButtonPressEventArgs args)
 		{
 			/*logger.Debug("Button");
@@ -887,6 +909,8 @@ namespace CupboardDesigner
 			}
 			CalculateTotalCount();
 		}
+
+//TODO
 		private void UpdateArticles()
 		{
 			/*TreeIter iter;
