@@ -5,18 +5,31 @@ namespace CupboardDesigner
 	public partial class Exhibition
 	{
 		private global::Gtk.Table table1;
+		
 		private global::Gtk.Entry entryName;
+		
 		private global::Gtk.Entry entryPhone1;
+		
 		private global::Gtk.Entry entryPhone2;
+		
 		private global::Gtk.ScrolledWindow GtkScrolledWindow;
+		
 		private global::Gtk.TextView textAddress;
+		
 		private global::Gtk.Label label1;
+		
 		private global::Gtk.Label label2;
+		
 		private global::Gtk.Label label3;
+		
 		private global::Gtk.Label label4;
+		
 		private global::Gtk.Label label6;
+		
 		private global::Gtk.Label labelID;
+		
 		private global::Gtk.Button buttonCancel;
+		
 		private global::Gtk.Button buttonOk;
 
 		protected virtual void Build ()

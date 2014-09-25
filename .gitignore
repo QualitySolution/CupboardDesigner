@@ -6,3 +6,13 @@
 #Mono Project Files
 bin/
 obj/
+
+packages/repositories.config
+
+packages/Svg.1.6.1/lib/Svg.dll
+
+packages/Svg.1.6.1/lib/Svg.pdb
+
+packages/Svg.1.6.1/lib/Svg.XML
+
+packages/Svg.1.6.1/Svg.1.6.1.nupkg

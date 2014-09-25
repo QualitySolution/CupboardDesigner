@@ -5,33 +5,61 @@ namespace CupboardDesigner
 	public partial class Nomenclature
 	{
 		private global::Gtk.HBox hbox1;
+		
 		private global::Gtk.Table table1;
+		
 		private global::Gtk.ComboBox comboType;
+		
 		private global::Gtk.Entry entryArticle;
+		
 		private global::Gtk.Entry entryDescription;
+		
 		private global::Gtk.Entry entryName;
+		
 		private global::Gtk.HBox hbox2;
+		
 		private global::Gtk.SpinButton spinL;
+		
 		private global::Gtk.CheckButton checkPlusL;
+		
 		private global::Gtk.HBox hbox3;
+		
 		private global::Gtk.SpinButton spinH;
+		
 		private global::Gtk.CheckButton checkPlusH;
+		
 		private global::Gtk.Label label1;
+		
 		private global::Gtk.Label label2;
+		
 		private global::Gtk.Label label3;
+		
 		private global::Gtk.Label label4;
+		
 		private global::Gtk.Label label5;
+		
 		private global::Gtk.Label label6;
+		
 		private global::Gtk.Label label7;
+		
 		private global::Gtk.Label label8;
+		
 		private global::Gtk.Label labelId;
+		
 		private global::Gtk.SpinButton spinW;
+		
 		private global::Gtk.VBox vbox2;
+		
 		private global::Gtk.Frame frame1;
+		
 		private global::Gtk.Alignment GtkAlignment3;
+		
 		private global::Gtk.DrawingArea drawCube;
+		
 		private global::Gtk.Button buttonLoadImage;
+		
 		private global::Gtk.Button buttonCancel;
+		
 		private global::Gtk.Button buttonOk;
 
 		protected virtual void Build ()

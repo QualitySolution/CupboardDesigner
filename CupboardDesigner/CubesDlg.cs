@@ -339,8 +339,6 @@ namespace CupboardDesigner
 				svg.RenderCairo(cr);
 			}
 		}
-
-
 	}
 }
 

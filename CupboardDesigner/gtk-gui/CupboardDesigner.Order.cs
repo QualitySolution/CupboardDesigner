@@ -167,7 +167,7 @@ namespace CupboardDesigner
 			this.notebook1 = new global::Gtk.Notebook ();
 			this.notebook1.CanFocus = true;
 			this.notebook1.Name = "notebook1";
-			this.notebook1.CurrentPage = 2;
+			this.notebook1.CurrentPage = 3;
 			// Container child notebook1.Gtk.Notebook+NotebookChild
 			this.hbox1 = new global::Gtk.HBox ();
 			this.hbox1.Name = "hbox1";
@@ -695,10 +695,6 @@ namespace CupboardDesigner
 			this.saveAction.Activated += new global::System.EventHandler (this.OnSaveActionActivated);
 			this.printAction.Activated += new global::System.EventHandler (this.OnPrintActionActivated);
 			this.notebook1.SwitchPage += new global::Gtk.SwitchPageHandler (this.OnNotebook1SwitchPage);
-			this.dateDeadlineS.DateChanged += new global::System.EventHandler (this.OnDateDeadlineSDateChanged);
-			this.entryContract.Changed += new global::System.EventHandler (this.OnEntryContractChanged);
-			this.dateArrval.DateChanged += new global::System.EventHandler (this.OnOrderDatesChanged);
-			this.checkEstimation.Clicked += new global::System.EventHandler (this.OnCheckEstimationClicked);
 			this.comboCubeV.Changed += new global::System.EventHandler (this.OnComboCubeVChanged);
 			this.comboCubeH.Changed += new global::System.EventHandler (this.OnComboCubeHChanged);
 			this.drawCupboard.ExposeEvent += new global::Gtk.ExposeEventHandler (this.OnDrawCupboardExposeEvent);

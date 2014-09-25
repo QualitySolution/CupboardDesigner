@@ -5,7 +5,9 @@ namespace CupboardDesigner
 	public partial class CupboardListItem
 	{
 		private global::Gtk.Table table1;
+		
 		private global::Gtk.DrawingArea drawImage;
+		
 		private global::Gtk.Label labelName;
 
 		protected virtual void Build ()

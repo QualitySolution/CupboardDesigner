@@ -16,7 +16,7 @@ namespace CupboardDesigner
 		private static Logger logger = LogManager.GetCurrentClassLogger();
 		private bool NewItem = true;
 		private int ItemId;
-		private ListStore ComponentsStore;
+		private TreeStore ComponentsStore;
 		private TreeModel MaterialNameList, FacingNameList;
 		private List<Cube> CubeList;
 		private int CubePxSize = 100;
@@ -28,6 +28,7 @@ namespace CupboardDesigner
 		private List<CubeListItem> CubeWidgetList;
 		private Cupboard OrderCupboard;
 		private DragInformation CurrentDrag;
+		private TreeIter BasisIter;
 
 		private enum ComponentCol{
 			row_id,
@@ -41,7 +42,9 @@ namespace CupboardDesigner
 			material,
 			facing_id,
 			facing,
-			comment
+			comment,
+			price,
+			price_total
 		}
 
 		Gtk.TargetEntry[] TargetTable = new Gtk.TargetEntry[] {
@@ -67,7 +70,24 @@ namespace CupboardDesigner
 			FacingNameList = TempCombo.Model;
 			TempCombo.Destroy ();
 
-			ComponentsStore = new ListStore(typeof(long), typeof(Nomenclature.NomType), typeof(int), typeof(string), typeof(string), typeof(string), typeof(int), typeof(int), typeof(string), typeof(int), typeof(string), typeof(string));
+			ComponentsStore = new TreeStore(typeof(long), typeof(Nomenclature.NomType), typeof(int), typeof(string), typeof(string), typeof(string), typeof(int), typeof(int), typeof(string), typeof(int), typeof(string), typeof(string), typeof(string), typeof(string));
+
+			Gtk.TreeViewColumn ColumnPrice = new Gtk.TreeViewColumn ();
+			ColumnPrice.Title = "Цена";
+			ColumnPrice.MinWidth = 90;
+			Gtk.CellRendererText CellPrice = new CellRendererText ();
+			CellPrice.Editable = true;
+			CellPrice.Edited += OnPriceEdited;
+			ColumnPrice.PackStart (CellPrice, true);
+			ColumnPrice.AddAttribute(CellPrice, "text", (int)ComponentCol.price);
+
+			Gtk.TreeViewColumn ColumnPriceTotal = new Gtk.TreeViewColumn ();
+			ColumnPriceTotal.Title = "Сумма";
+			ColumnPriceTotal.MinWidth = 90;
+			Gtk.CellRendererText CellPriceTotal = new CellRendererText ();
+			CellPriceTotal.Editable = false;
+			ColumnPriceTotal.PackStart (CellPriceTotal, true);
+			ColumnPriceTotal.AddAttribute(CellPriceTotal, "text", (int)ComponentCol.price_total);
 
 			Gtk.TreeViewColumn ColumnMaterial = new Gtk.TreeViewColumn ();
 			ColumnMaterial.Title = "Отделка кубов";
@@ -108,11 +128,14 @@ namespace CupboardDesigner
 			treeviewComponents.AppendColumn("Кол-во", new Gtk.CellRendererText (), "text", (int)ComponentCol.count);
 			treeviewComponents.AppendColumn(ColumnMaterial);
 			treeviewComponents.AppendColumn(ColumnFacing);
+			treeviewComponents.AppendColumn (ColumnPrice);
+			treeviewComponents.AppendColumn (ColumnPriceTotal);
 			treeviewComponents.AppendColumn(ColumnComment);
-
 			treeviewComponents.Model = ComponentsStore;
 			treeviewComponents.TooltipColumn = (int)ComponentCol.nomenclature_description;
 			treeviewComponents.ShowAll();
+
+			BasisIter = ComponentsStore.AppendValues ((long)-1, Enum.Parse(typeof(Nomenclature.NomType), "construct"), 1, null, "Каркас", null, 1, -1, "", -1, "", "");
 
 			CurrentDrag = new DragInformation();
 			//Загрузка списка кубов
@@ -120,9 +143,9 @@ namespace CupboardDesigner
 			CubeWidgetList = new List<CubeListItem>();
 			vboxCubeList = new VBox(false, 6);
 			hboxCubeList = new HBox(false, 20);
-			string sql = "SELECT * FROM nomenclature WHERE type = @type ORDER BY ordinal";
+			string sql = "SELECT * FROM cubes ORDER BY ordinal";
+
 			SqliteCommand cmd = new SqliteCommand(sql, (SqliteConnection)QSMain.ConnectionDB);
-			cmd.Parameters.AddWithValue("@type", Nomenclature.NomType.cube.ToString());
 			using (SqliteDataReader rdr = cmd.ExecuteReader())
 			{
 				while(rdr.Read())
@@ -133,8 +156,8 @@ namespace CupboardDesigner
 					TempCube.NomenclatureId = rdr.GetInt32(rdr.GetOrdinal("id"));
 					TempCube.Name = DBWorks.GetString(rdr, "name", "");
 					TempCube.Description = DBWorks.GetString(rdr, "description", "");
-					TempCube.Height = DBWorks.GetInt(rdr, "height", 0);
-					TempCube.Widht = DBWorks.GetInt(rdr, "lenght", 0);
+					TempCube.Height = DBWorks.GetInt(rdr, "height", 0) * 400;
+					TempCube.Widht = DBWorks.GetInt(rdr, "width", 0) * 400;
 					int size = DBWorks.GetInt(rdr, "image_size", 0);
 					byte[] ImageFile = new byte[size];
 					rdr.GetBytes(rdr.GetOrdinal("image"), 0, ImageFile, 0, size);
@@ -214,6 +237,130 @@ namespace CupboardDesigner
 			hboxCubeList.DragDrop += OnCubeListDragDrop;
 		}
 
+		private bool Save()
+		{
+			string sql;
+			if (NewItem)
+			{
+				sql = "INSERT INTO orders (customer, estimation, contract, address, phone1, phone2, exhibition_id, basis_id, arrval, deadline_s, deadline_e, comment, cupboard) " +
+					"VALUES (@customer, @estimation, @contract, @address, @phone1, @phone2, @exhibition_id, @basis_id, @arrval, @deadline_s, @deadline_e, @comment, @cupboard)";
+			}
+			else
+			{
+				sql = "UPDATE orders SET customer = @customer, estimation = @estimation, contract = @contract, address = @address, " +
+					"phone1 = @phone1, phone2 = @phone2, exhibition_id = @exhibition_id, basis_id = @basis_id, arrval = @arrval, " +
+					"deadline_s = @deadline_s, deadline_e = @deadline_e, comment = @comment, cupboard = @cupboard WHERE id = @id";
+			}
+			SqliteTransaction trans = ((SqliteConnection)QSMain.ConnectionDB).BeginTransaction();
+			MainClass.StatusMessage("Запись заказа...");
+			try
+			{
+				int contract;
+				SqliteCommand cmd = new SqliteCommand(sql, (SqliteConnection)QSMain.ConnectionDB, trans);
+
+				cmd.Parameters.AddWithValue("@id", ItemId);
+				cmd.Parameters.AddWithValue("@customer", DBWorks.ValueOrNull(entryCustomer.Text != "", entryCustomer.Text));
+				cmd.Parameters.AddWithValue("@estimation", checkEstimation.Active);
+				cmd.Parameters.AddWithValue("@contract", DBWorks.ValueOrNull(int.TryParse(entryContract.Text, out contract), contract));
+				cmd.Parameters.AddWithValue("@address", DBWorks.ValueOrNull(textAddress.Buffer.Text != "", textAddress.Buffer.Text));
+				cmd.Parameters.AddWithValue("@phone1", DBWorks.ValueOrNull(entryPhone1.Text != "", entryPhone1.Text));
+				cmd.Parameters.AddWithValue("@phone2", DBWorks.ValueOrNull(entryPhone2.Text != "", entryPhone2.Text));
+				cmd.Parameters.AddWithValue("@arrval", DBWorks.ValueOrNull(!dateArrval.IsEmpty, dateArrval.Date));
+				cmd.Parameters.AddWithValue("@deadline_s", DBWorks.ValueOrNull(!dateDeadlineS.IsEmpty, dateDeadlineS.Date));
+				cmd.Parameters.AddWithValue("@deadline_e", DBWorks.ValueOrNull(!dateDeadlineE.IsEmpty, dateDeadlineE.Date));
+				CupboardListItem basis = TypeWidgetList.Find(w => w.Button.Active);
+				cmd.Parameters.AddWithValue("basis_id", DBWorks.ValueOrNull(basis != null, basis.id));
+				cmd.Parameters.AddWithValue("exhibition_id", ComboWorks.GetActiveIdOrNull(comboExhibition));
+				cmd.Parameters.AddWithValue("@comment", DBWorks.ValueOrNull(textviewComments.Buffer.Text != "", textviewComments.Buffer.Text));
+				cmd.Parameters.AddWithValue("@cupboard", OrderCupboard.SaveToString());
+
+				cmd.ExecuteNonQuery();
+
+				if(NewItem)
+				{
+					sql = @"select last_insert_rowid()";
+					cmd = new SqliteCommand(sql, (SqliteConnection)QSMain.ConnectionDB, trans);
+					ItemId = Convert.ToInt32(cmd.ExecuteScalar());
+					NewItem = false;
+				}
+
+				// Запись компонент
+				TreeIter iter, childIter;
+				/*sql = "DELETE * FROM order_components WHERE order_id = @id";
+				cmd = new SqliteCommand(sql, (SqliteConnection)QSMain.ConnectionDB, trans);
+				cmd.Parameters.AddWithValue("@id", ItemId);*/
+				if(ComponentsStore.GetIterFirst(out iter))
+				{
+					do //Selecting parental iters
+					{
+						if (ComponentsStore.IterHasChild(iter))
+						{
+							ComponentsStore.IterChildren(out childIter, iter);
+							do //Selecting child iters
+							{
+								bool HasValue = (int) ComponentsStore.GetValue(childIter, (int)ComponentCol.count) > 0;
+								bool InDB = (long)ComponentsStore.GetValue(childIter, (int)ComponentCol.row_id) > 0;
+								if(HasValue)
+								{
+								if(!InDB)
+									sql = "INSERT INTO order_components (order_id, nomenclature_id, count, material_id, facing_id, comment, basis_id, cubes_id) " +
+										"VALUES (@order_id, @nomenclature_id, @count, @material_id, @facing_id, @comment, @basis_id, @cubes_id)";
+								else
+										sql = "UPDATE order_components SET material_id = @material_id, facing_id = @facing_id, count = @count, " +
+											"comment = @comment, basis_id = @basis_id, cubes_id = @cubes_id" +
+											"WHERE id = @id";
+								cmd = new SqliteCommand(sql, (SqliteConnection)QSMain.ConnectionDB, trans);
+								cmd.Parameters.AddWithValue("@id", (long)ComponentsStore.GetValue(childIter, (int)ComponentCol.row_id));
+								cmd.Parameters.AddWithValue("@order_id", ItemId);
+								cmd.Parameters.AddWithValue("@nomenclature_id", ComponentsStore.GetValue(childIter,(int)ComponentCol.nomenclature_id));
+								cmd.Parameters.AddWithValue("@count", ComponentsStore.GetValue(childIter,(int)ComponentCol.count));
+								cmd.Parameters.AddWithValue("@material_id", DBWorks.ValueOrNull((int) ComponentsStore.GetValue(childIter,(int)ComponentCol.material_id) > 0, ComponentsStore.GetValue(childIter, (int)ComponentCol.material_id)));
+								cmd.Parameters.AddWithValue("@facing_id", DBWorks.ValueOrNull((int)ComponentsStore.GetValue(childIter, (int)ComponentCol.facing_id) > 0, ComponentsStore.GetValue(childIter, (int)ComponentCol.facing_id)));
+								cmd.Parameters.AddWithValue("@comment", DBWorks.ValueOrNull((string)ComponentsStore.GetValue(childIter, (int)ComponentCol.comment) != "", ComponentsStore.GetValue(childIter, (int)ComponentCol.comment)));
+								if ((Nomenclature.NomType)ComponentsStore.GetValue(iter, (int)ComponentCol.nomenclature_type) == Nomenclature.NomType.construct) {
+									cmd.Parameters.AddWithValue("@basis_id", ComponentsStore.GetValue(iter, (int)ComponentCol.nomenclature_id));
+									cmd.Parameters.AddWithValue("@cubes_id", 0);
+								}
+								else{
+									cmd.Parameters.AddWithValue("@basis_id", 0);
+									cmd.Parameters.AddWithValue("@cubes_id", ComponentsStore.GetValue(iter, (int)ComponentCol.nomenclature_id));
+								}
+								cmd.ExecuteNonQuery();
+								if(!InDB)
+									{
+										sql = @"select last_insert_rowid()";
+										cmd = new SqliteCommand(sql, (SqliteConnection)QSMain.ConnectionDB, trans);
+										long RowId = (long) cmd.ExecuteScalar();
+										ComponentsStore.SetValue(iter, (int)ComponentCol.row_id, (object)RowId);
+									}
+								}
+								else if(InDB)
+								{
+									sql = "DELETE FROM order_components WHERE id = @id";
+									cmd = new SqliteCommand(sql, (SqliteConnection)QSMain.ConnectionDB, trans);
+									cmd.Parameters.AddWithValue("@id", ComponentsStore.GetValue(iter, (int)ComponentCol.row_id));
+									cmd.ExecuteNonQuery();
+								}
+							}while(ComponentsStore.IterNext(ref childIter));
+						}
+					} while (ComponentsStore.IterNext(ref iter));
+				} 
+
+				trans.Commit();
+				MainClass.StatusMessage("Ok");
+				MainClass.MainWin.UpdateOrders();
+				return true;
+			}
+			catch (Exception ex)
+			{
+				trans.Rollback();
+				logger.ErrorException("Ошибка записи заказа!", ex);
+				QSMain.ErrorMessage(this, ex);
+				return false;
+			}
+		}
+
+
 		public void Fill(int id, bool copy)
 		{
 			NewItem = copy;
@@ -255,13 +402,12 @@ namespace CupboardDesigner
 					comboCubeV.Active = OrderCupboard.CubesV - 1;
 					CalculateCubePxSize(drawCupboard.Allocation);
 				}
-
 				sql = "SELECT order_components.*, materials.name as material, facing.name as facing, " +
 					"nomenclature.name as nomenclature, nomenclature.description, nomenclature.type " +
 					"FROM order_components " +
 					"LEFT JOIN nomenclature ON nomenclature.id = order_components.nomenclature_id " +
 					"LEFT JOIN materials ON materials.id = order_components.material_id " +
-					"LEFT JOIN facing ON facing.id = order_components.facing_id " +
+					"LEFT JOIN facing ON facing.id = order_components.facing_id" +
 					"WHERE order_components.order_id = @id";
 				cmd = new SqliteCommand(sql, (SqliteConnection)QSMain.ConnectionDB);
 				cmd.Parameters.AddWithValue("@id", id);
@@ -270,6 +416,7 @@ namespace CupboardDesigner
 					while(rdr.Read())
 					{
 						ComponentsStore.AppendValues(
+							BasisIter,
 							copy ? 0 : DBWorks.GetLong(rdr, "id", -1), // 0 Специальное значение поля, что бы компоненты не удалялись при копировании.
 							Enum.Parse(typeof(Nomenclature.NomType), rdr["type"].ToString()),
 							DBWorks.GetInt(rdr, "nomenclature_id", -1),
@@ -295,6 +442,12 @@ namespace CupboardDesigner
 				QSMain.ErrorMessage(this, ex);
 			}
 			TestCanSave();
+		}
+
+		//TODO: Realize
+		void OnPriceEdited(object o,EditedArgs args) 
+		{
+			return;
 		}
 
 		void OnMaterialComboEdited (object o, EditedArgs args)
@@ -354,114 +507,6 @@ namespace CupboardDesigner
 			saveAction.Sensitive = printAction.Sensitive = Dateok;
 		}
 
-		private bool Save()
-		{
-			string sql;
-			if (NewItem)
-			{
-				sql = "INSERT INTO orders (customer, estimation, contract, address, phone1, phone2, exhibition_id, basis_id, arrval, deadline_s, deadline_e, comment, cupboard) " +
-					"VALUES (@customer, @estimation, @contract, @address, @phone1, @phone2, @exhibition_id, @basis_id, @arrval, @deadline_s, @deadline_e, @comment, @cupboard)";
-			}
-			else
-			{
-				sql = "UPDATE orders SET customer = @customer, estimation = @estimation, contract = @contract, address = @address, " +
-					"phone1 = @phone1, phone2 = @phone2, exhibition_id = @exhibition_id, basis_id = @basis_id, arrval = @arrval, " +
-					"deadline_s = @deadline_s, deadline_e = @deadline_e, comment = @comment, cupboard = @cupboard WHERE id = @id";
-			}
-			SqliteTransaction trans = ((SqliteConnection)QSMain.ConnectionDB).BeginTransaction();
-			MainClass.StatusMessage("Запись заказа...");
-			try
-			{
-				int contract;
-				SqliteCommand cmd = new SqliteCommand(sql, (SqliteConnection)QSMain.ConnectionDB, trans);
-
-				cmd.Parameters.AddWithValue("@id", ItemId);
-				cmd.Parameters.AddWithValue("@customer", DBWorks.ValueOrNull(entryCustomer.Text != "", entryCustomer.Text));
-				cmd.Parameters.AddWithValue("@estimation", checkEstimation.Active);
-				cmd.Parameters.AddWithValue("@contract", DBWorks.ValueOrNull(int.TryParse(entryContract.Text, out contract), contract));
-				cmd.Parameters.AddWithValue("@address", DBWorks.ValueOrNull(textAddress.Buffer.Text != "", textAddress.Buffer.Text));
-				cmd.Parameters.AddWithValue("@phone1", DBWorks.ValueOrNull(entryPhone1.Text != "", entryPhone1.Text));
-				cmd.Parameters.AddWithValue("@phone2", DBWorks.ValueOrNull(entryPhone2.Text != "", entryPhone2.Text));
-				cmd.Parameters.AddWithValue("@arrval", DBWorks.ValueOrNull(!dateArrval.IsEmpty, dateArrval.Date));
-				cmd.Parameters.AddWithValue("@deadline_s", DBWorks.ValueOrNull(!dateDeadlineS.IsEmpty, dateDeadlineS.Date));
-				cmd.Parameters.AddWithValue("@deadline_e", DBWorks.ValueOrNull(!dateDeadlineE.IsEmpty, dateDeadlineE.Date));
-				CupboardListItem basis = TypeWidgetList.Find(w => w.Button.Active);
-				cmd.Parameters.AddWithValue("basis_id", DBWorks.ValueOrNull(basis != null, basis.id));
-				cmd.Parameters.AddWithValue("exhibition_id", ComboWorks.GetActiveIdOrNull(comboExhibition));
-				cmd.Parameters.AddWithValue("@comment", DBWorks.ValueOrNull(textviewComments.Buffer.Text != "", textviewComments.Buffer.Text));
-				cmd.Parameters.AddWithValue("@cupboard", OrderCupboard.SaveToString());
-
-				cmd.ExecuteNonQuery();
-
-				if(NewItem)
-				{
-					sql = @"select last_insert_rowid()";
-					cmd = new SqliteCommand(sql, (SqliteConnection)QSMain.ConnectionDB, trans);
-					ItemId = Convert.ToInt32(cmd.ExecuteScalar());
-					NewItem = false;
-				}
-
-				// Запись компонент
-				TreeIter iter;
-				if(ComponentsStore.GetIterFirst(out iter))
-
-				{
-					do
-					{
-						bool HasValue = (int) ComponentsStore.GetValue(iter, (int)ComponentCol.count) > 0;
-						bool InDB = (long)ComponentsStore.GetValue(iter, (int)ComponentCol.row_id) > 0;
-						if(HasValue)
-						{
-							if(!InDB)
-								sql = "INSERT INTO order_components (order_id, nomenclature_id, count, material_id, facing_id, comment) " +
-									"VALUES (@order_id, @nomenclature_id, @count, @material_id, @facing_id, @comment)";
-							else
-								sql = "UPDATE order_components SET material_id = @material_id, facing_id = @facing_id, count = @count, " +
-									"comment = @comment " +
-									"WHERE id = @id";
-
-							cmd = new SqliteCommand(sql, (SqliteConnection)QSMain.ConnectionDB, trans);
-							cmd.Parameters.AddWithValue("@id", (long)ComponentsStore.GetValue(iter, (int)ComponentCol.row_id));
-							cmd.Parameters.AddWithValue("@order_id", ItemId);
-							cmd.Parameters.AddWithValue("@nomenclature_id", ComponentsStore.GetValue(iter,(int)ComponentCol.nomenclature_id));
-							cmd.Parameters.AddWithValue("@count", ComponentsStore.GetValue(iter,(int)ComponentCol.count));
-							cmd.Parameters.AddWithValue("@material_id", DBWorks.ValueOrNull((int) ComponentsStore.GetValue(iter,(int)ComponentCol.material_id) > 0, ComponentsStore.GetValue(iter, (int)ComponentCol.material_id)));
-							cmd.Parameters.AddWithValue("@facing_id", DBWorks.ValueOrNull((int)ComponentsStore.GetValue(iter, (int)ComponentCol.facing_id) > 0, ComponentsStore.GetValue(iter, (int)ComponentCol.facing_id)));
-							cmd.Parameters.AddWithValue("@comment", DBWorks.ValueOrNull((string)ComponentsStore.GetValue(iter, (int)ComponentCol.comment) != "", ComponentsStore.GetValue(iter, (int)ComponentCol.comment)));
-							cmd.ExecuteNonQuery();
-							if(!InDB)
-							{
-								sql = @"select last_insert_rowid()";
-								cmd = new SqliteCommand(sql, (SqliteConnection)QSMain.ConnectionDB, trans);
-								long RowId = (long) cmd.ExecuteScalar();
-								ComponentsStore.SetValue(iter, (int)ComponentCol.row_id, (object)RowId);
-							}
-						}
-						else if(InDB)
-						{
-							sql = "DELETE FROM order_components WHERE id = @id";
-
-							cmd = new SqliteCommand(sql, (SqliteConnection)QSMain.ConnectionDB, trans);
-							cmd.Parameters.AddWithValue("@id", ComponentsStore.GetValue(iter, (int)ComponentCol.row_id));
-							cmd.ExecuteNonQuery();
-						}
-					}
-					while(ComponentsStore.IterNext(ref iter));
-				}
-
-				trans.Commit();
-				MainClass.StatusMessage("Ok");
-				MainClass.MainWin.UpdateOrders();
-				return true;
-			}
-			catch (Exception ex)
-			{
-				trans.Rollback();
-				logger.ErrorException("Ошибка записи заказа!", ex);
-				QSMain.ErrorMessage(this, ex);
-				return false;
-			}
-		}
 
 		protected void OnBasisChanged(object sender, EventArgs e)
 		{
@@ -629,7 +674,7 @@ namespace CupboardDesigner
 			CurrentDrag.IconPosY = MousePosY - OrderCupboard.CupboardZeroY - (cube.BoardPositionY * CubePxSize);
 
 			Gtk.Drag.SetIconPixbuf(args.Context, pixbuf, CurrentDrag.IconPosX, CurrentDrag.IconPosY);
-			CurrentDrag.FromList = false;
+			CurrentDrag.FromList = false;	
 			CurrentDrag.cube = cube;
 		}
 
@@ -726,85 +771,40 @@ namespace CupboardDesigner
 
 		private void UpdateBasisComponents(int id)
 		{
-			TreeIter iter;
-			if (ComponentsStore.GetIterFirst(out iter))
-			{
-				do
-				{
-					if ((Nomenclature.NomType)ComponentsStore.GetValue(iter, (int)ComponentCol.nomenclature_type) == Nomenclature.NomType.construct)
-					{
-						if((long)ComponentsStore.GetValue(iter, (int)ComponentCol.row_id) >= 0)
-							ComponentsStore.SetValue(iter, (int)ComponentCol.count, 0);
-						else
-							ComponentsStore.Remove(ref iter);
-					}
-				}
-				while(ComponentsStore.IterNext(ref iter));
-			}
-
-			string sql = "SELECT nomenclature.name as nomenclature, nomenclature.type, nomenclature.description, basis_items.* FROM basis_items " +
+			ComponentsStore.Remove(ref BasisIter);
+			BasisIter = ComponentsStore.AppendValues ((long)-1, Enum.Parse(typeof(Nomenclature.NomType), "construct"), id, null, "Каркас", null, 1, -1, "", -1, "", "");
+			string sql = "SELECT nomenclature.name as nomenclature, nomenclature.type, nomenclature.description, nomenclature.price, basis_items.* FROM basis_items " +
 				"LEFT JOIN nomenclature ON nomenclature.id = basis_items.item_id " +
 				"WHERE basis_id = @basis_id";
 			SqliteCommand cmd = new SqliteCommand(sql, (SqliteConnection)QSMain.ConnectionDB);
 			cmd.Parameters.AddWithValue("@basis_id", id);
+			Decimal Price = 0;
 			using (SqliteDataReader rdr = cmd.ExecuteReader())
 			{
 				while (rdr.Read())
 				{
-					bool Found = false;
-					if (ComponentsStore.GetIterFirst(out iter))
-					{
-						do
-						{
-							if ((int)ComponentsStore.GetValue(iter, (int)ComponentCol.nomenclature_id) == rdr.GetInt32(rdr.GetOrdinal("item_id")))
-							{
-								Found = true;
-								ComponentsStore.SetValue(iter, (int)ComponentCol.count, rdr.GetInt32(rdr.GetOrdinal("count")));
-								break;
-							}
-						}
-						while(ComponentsStore.IterNext(ref iter));
-					}
-					if(!Found)
-					{
-						ComponentsStore.AppendValues(
-							(long)-1,
-							Enum.Parse(typeof(Nomenclature.NomType), rdr["type"].ToString()),
-							DBWorks.GetInt(rdr, "item_id", -1),
-							DBWorks.GetString(rdr, "nomenclature", "нет"),
-							ReplaceArticle(DBWorks.GetString(rdr, "nomenclature", "нет")),
-							DBWorks.GetString(rdr, "description", ""),
-							DBWorks.GetInt(rdr, "count", 1),
-							-1,
-							"",
-							-1,
-							"",
-							""
-						);
-					}
+					Price += DBWorks.GetDecimal (rdr, "price", 0);
+					ComponentsStore.AppendValues(
+						BasisIter,
+						(long)-1,
+						Enum.Parse(typeof(Nomenclature.NomType), rdr["type"].ToString()),
+						DBWorks.GetInt(rdr, "item_id", -1),
+						DBWorks.GetString(rdr, "nomenclature", "нет"),
+						ReplaceArticle(DBWorks.GetString(rdr, "nomenclature", "нет")),
+						DBWorks.GetString(rdr, "description", ""),
+						DBWorks.GetInt(rdr, "count", 1),
+						-1,
+						"",
+						-1,
+						"",
+						"",
+						DBWorks.GetDecimal(rdr, "price", 0).ToString(),
+						DBWorks.GetDecimal(rdr, "price", 0).ToString()
+					);
 				}
+				ComponentsStore.SetValue (BasisIter, (int)ComponentCol.price_total, Price.ToString ());
 			}
 			CalculateTotalCount();
-		}
-
-		private void UpdateArticles()
-		{
-			TreeIter iter;
-			if (ComponentsStore.GetIterFirst(out iter))
-			{
-				do
-				{
-					ComponentsStore.SetValue(iter, (int)ComponentCol.nomenclature_title, 
-						ReplaceArticle((string)ComponentsStore.GetValue(iter, (int)ComponentCol.nomenclature)));
-				}
-				while(ComponentsStore.IterNext(ref iter));
-			}
-		}
-
-		private string ReplaceArticle(string text)
-		{
-			string half = text.Replace("{L}", String.Format("{0}", OrderCupboard.CubesH * 40));
-			return half.Replace("{H}", String.Format("{0}", OrderCupboard.CubesV * 40));
 		}
 
 		private void UpdateCubeComponents()
@@ -813,55 +813,78 @@ namespace CupboardDesigner
 			Dictionary<int, int> Counts = OrderCupboard.GetAmounts();
 			if (ComponentsStore.GetIterFirst(out iter))
 			{
+				do {
+					if ((Nomenclature.NomType)ComponentsStore.GetValue(iter, (int)ComponentCol.nomenclature_type) == Nomenclature.NomType.cube)
+						ComponentsStore.Remove(ref iter);
+				} while(ComponentsStore.IterNext (ref iter));
+			}
+
+			foreach (KeyValuePair<int, int> pair in Counts) {
+				Cube cube = OrderCupboard.Cubes.Find (c => c.NomenclatureId == pair.Key);
+				TreeIter CubeIter = ComponentsStore.AppendValues ((long)-1, Enum.Parse (typeof(Nomenclature.NomType), "cube"), pair.Key, null, cube.Description, null, pair.Value, -1, "", -1, "", "");
+				string sql = "SELECT nomenclature.name as nomenclature, nomenclature.type, nomenclature.description, nomenclature.price, cubes_items.* FROM cubes_items " +
+					"LEFT JOIN nomenclature ON nomenclature.id = cubes_items.item_id " +
+					"WHERE cubes_id = @cubes_id";
+				SqliteCommand cmd = new SqliteCommand (sql, (SqliteConnection)QSMain.ConnectionDB);
+				cmd.Parameters.AddWithValue ("@cubes_id", pair.Key);
+				Decimal Price = 0;
+				using (SqliteDataReader rdr = cmd.ExecuteReader ()) {
+					while (rdr.Read ()) {
+						Price += (DBWorks.GetDecimal (rdr, "price", 0) * pair.Value);
+						ComponentsStore.AppendValues (
+							CubeIter,
+							(long)-1,
+							Enum.Parse (typeof(Nomenclature.NomType), rdr ["type"].ToString ()),
+							DBWorks.GetInt (rdr, "item_id", -1),
+							DBWorks.GetString (rdr, "nomenclature", "нет"),
+							ReplaceArticle (DBWorks.GetString (rdr, "nomenclature", "нет")),
+							DBWorks.GetString (rdr, "description", ""),
+							DBWorks.GetInt (rdr, "count", 1) * pair.Value,
+							-1,
+							"",
+							-1,
+							"",
+							"",
+							(DBWorks.GetDecimal(rdr, "price", 0)).ToString(),
+							(DBWorks.GetDecimal(rdr, "price", 0) * DBWorks.GetInt (rdr, "count", 1) * pair.Value).ToString()
+						);
+					}
+					ComponentsStore.SetValue (CubeIter, (int)ComponentCol.price_total, Price.ToString ());
+				}
+				CalculateTotalCount();
+			}
+		}
+		private void UpdateArticles()
+		{
+			/*TreeIter iter;
+			if (ComponentsStore.GetIterFirst(out iter))
+			{
 				do
 				{
-					if ((Nomenclature.NomType)ComponentsStore.GetValue(iter, (int)ComponentCol.nomenclature_type) == Nomenclature.NomType.cube)
-					{
-						int NomId = (int)ComponentsStore.GetValue(iter, (int)ComponentCol.nomenclature_id);
-						if(Counts.ContainsKey(NomId))
-						{
-							ComponentsStore.SetValue(iter, (int)ComponentCol.count, Counts[NomId]);
-							Counts.Remove(NomId);
-						}
-						else if((long)ComponentsStore.GetValue(iter, (int)ComponentCol.row_id) >= 0)
-							ComponentsStore.SetValue(iter, (int)ComponentCol.count, 0);
-						else
-							ComponentsStore.Remove(ref iter);
-					}
+					ComponentsStore.SetValue(iter, (int)ComponentCol.nomenclature_title, 
+						ReplaceArticle((string)ComponentsStore.GetValue(iter, (int)ComponentCol.nomenclature)));
 				}
 				while(ComponentsStore.IterNext(ref iter));
-			}
-
-			foreach (KeyValuePair<int, int> pair in Counts)
-			{
-				Cube cube = OrderCupboard.Cubes.Find(c => c.NomenclatureId == pair.Key);
-				ComponentsStore.AppendValues(
-					(long)-1,
-					Nomenclature.NomType.cube,
-					pair.Key,
-					cube.Name,
-					ReplaceArticle(cube.Name),
-					cube.Description,
-					1,
-					-1,
-					"",
-					-1,
-					"",
-					""
-				);
-			}
-			CalculateTotalCount();
+			}*/
 		}
 
+		private string ReplaceArticle(string text)
+		{
+			string half = text.Replace("{L}", String.Format("{0}", OrderCupboard.CubesH * 40));
+			return half.Replace("{H}", String.Format("{0}", OrderCupboard.CubesV * 40));
+		}
+			
 		void CalculateTotalCount()
 		{
-			int TotalCount = 0;
-			foreach(object[] row in ComponentsStore)
+			Decimal Total = 0;
+			TreeIter iter;
+			if (ComponentsStore.GetIterFirst(out iter))
 			{
-				TotalCount += (int)row[(int)ComponentCol.count];
+				do {
+					Total += Decimal.Parse((String)ComponentsStore.GetValue(iter, (int)ComponentCol.price_total));
+				} while(ComponentsStore.IterNext (ref iter));
 			}
-
-			labelTotalCount.LabelProp = String.Format("Итого {0} единиц", TotalCount);
+			labelTotalCount.LabelProp = String.Format("Итого {0} единиц.", Total);
 		}
 
 		private void PrerareReport()
