@@ -286,17 +286,14 @@ namespace CupboardDesigner
 
 				// Запись компонент
 				TreeIter iter, childIter;
-				/*sql = "DELETE * FROM order_components WHERE order_id = @id";
-				cmd = new SqliteCommand(sql, (SqliteConnection)QSMain.ConnectionDB, trans);
-				cmd.Parameters.AddWithValue("@id", ItemId);*/
 				if(ComponentsStore.GetIterFirst(out iter))
 				{
-					do //Selecting parental iters
+					do
 					{
 						if (ComponentsStore.IterHasChild(iter))
 						{
 							ComponentsStore.IterChildren(out childIter, iter);
-							do //Selecting child iters
+							do
 							{
 								bool HasValue = (int) ComponentsStore.GetValue(childIter, (int)ComponentCol.count) > 0;
 								bool InDB = (long)ComponentsStore.GetValue(childIter, (int)ComponentCol.row_id) > 0;
@@ -817,7 +814,7 @@ namespace CupboardDesigner
 						"",
 						"",
 						DBWorks.GetDecimal(rdr, "price", 0).ToString(),
-						DBWorks.GetDecimal(rdr, "price", 0).ToString()
+						(DBWorks.GetDecimal(rdr, "price", 0) * DBWorks.GetInt(rdr, "count", 1)).ToString()
 					);
 				}
 				ComponentsStore.SetValue (BasisIter, (int)ComponentCol.price_total, Price.ToString ());
@@ -940,7 +937,7 @@ namespace CupboardDesigner
 		}
 
 		/// <summary>
-		/// Calculates the total price for items on order change and for whole order too.
+		/// Calculates/corrects the total price for items on order change and for whole order too.
 		/// </summary>
 		void CalculateTotalCount()
 		{
