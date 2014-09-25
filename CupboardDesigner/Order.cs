@@ -447,6 +447,20 @@ namespace CupboardDesigner
 		//TODO: Realize
 		void OnPriceEdited(object o,EditedArgs args) 
 		{
+			TreeIter iter;
+			Decimal NewValue;
+			if (!ComponentsStore.GetIterFromString (out iter, args.Path))
+				return;
+			if (ComponentsStore.IterHasChild (iter))
+				return;
+			if (args.NewText == null)
+				NewValue = 0;
+			else
+				NewValue = Decimal.Parse (args.NewText);
+			int count = (int)ComponentsStore.GetValue (iter, (int)ComponentCol.count);
+			ComponentsStore.SetValue(iter, (int)ComponentCol.price_total, (count * NewValue).ToString());
+			ComponentsStore.SetValue(iter, (int)ComponentCol.price, (NewValue).ToString());
+			CalculateTotalCount ();
 			return;
 		}
 
@@ -769,6 +783,10 @@ namespace CupboardDesigner
 			goForwardAction.Sensitive = notebook1.CurrentPage != 4;
 		}
 
+		/// <summary>
+		/// Updates the basis components.
+		/// </summary>
+		/// <param name="id">Identifier of basis.</param>
 		private void UpdateBasisComponents(int id)
 		{
 			ComponentsStore.Remove(ref BasisIter);
@@ -807,21 +825,39 @@ namespace CupboardDesigner
 			CalculateTotalCount();
 		}
 
+		/// <summary>
+		/// Updates the cube components. Adding one or removing if needed.
+		/// </summary>
 		private void UpdateCubeComponents()
 		{
 			TreeIter iter;
 			Dictionary<int, int> Counts = OrderCupboard.GetAmounts();
+
 			if (ComponentsStore.GetIterFirst(out iter))
 			{
-				do {
+				do
+				{
 					if ((Nomenclature.NomType)ComponentsStore.GetValue(iter, (int)ComponentCol.nomenclature_type) == Nomenclature.NomType.cube)
-						ComponentsStore.Remove(ref iter);
-				} while(ComponentsStore.IterNext (ref iter));
+					{
+						int NomId = (int)ComponentsStore.GetValue(iter, (int)ComponentCol.nomenclature_id);
+						if(Counts.ContainsKey(NomId))
+						{
+							ComponentsStore.SetValue(iter, (int)ComponentCol.count, Counts[NomId]);
+							Counts.Remove(NomId);
+							UpdateTable(iter);
+						}
+						else if((long)ComponentsStore.GetValue(iter, (int)ComponentCol.row_id) >= 0)
+							ComponentsStore.SetValue(iter, (int)ComponentCol.count, 0);
+						else
+							ComponentsStore.Remove(ref iter);
+					}
+				}
+				while(ComponentsStore.IterNext(ref iter));
 			}
 
 			foreach (KeyValuePair<int, int> pair in Counts) {
 				Cube cube = OrderCupboard.Cubes.Find (c => c.NomenclatureId == pair.Key);
-				TreeIter CubeIter = ComponentsStore.AppendValues ((long)-1, Enum.Parse (typeof(Nomenclature.NomType), "cube"), pair.Key, null, cube.Description, null, pair.Value, -1, "", -1, "", "");
+				TreeIter CubeIter = ComponentsStore.AppendValues ((long)-1, Enum.Parse (typeof(Nomenclature.NomType), "cube"), pair.Key, null, cube.Name, null, pair.Value, -1, "", -1, "", "");
 				string sql = "SELECT nomenclature.name as nomenclature, nomenclature.type, nomenclature.description, nomenclature.price, cubes_items.* FROM cubes_items " +
 					"LEFT JOIN nomenclature ON nomenclature.id = cubes_items.item_id " +
 					"WHERE cubes_id = @cubes_id";
@@ -851,8 +887,8 @@ namespace CupboardDesigner
 					}
 					ComponentsStore.SetValue (CubeIter, (int)ComponentCol.price_total, Price.ToString ());
 				}
-				CalculateTotalCount();
 			}
+			CalculateTotalCount();
 		}
 		private void UpdateArticles()
 		{
@@ -873,15 +909,56 @@ namespace CupboardDesigner
 			string half = text.Replace("{L}", String.Format("{0}", OrderCupboard.CubesH * 40));
 			return half.Replace("{H}", String.Format("{0}", OrderCupboard.CubesV * 40));
 		}
-			
+
+		/// <summary>
+		/// Updates the count and total price of cube component.
+		/// </summary>
+		/// <param name="iter">Iterator for parent, containing cube components.</param>
+		void UpdateTable(TreeIter iter) {
+			TreeIter childIter;
+			int parentCount, childNomenclatureId, parentId;
+			string SQL;
+
+			if (ComponentsStore.IterHasChild (iter)) {
+				parentId = (int)ComponentsStore.GetValue(iter, (int)ComponentCol.nomenclature_id);
+				parentCount = (int)ComponentsStore.GetValue(iter, (int)ComponentCol.count);
+				ComponentsStore.IterChildren (out childIter, iter);
+				do {
+					childNomenclatureId = (int)ComponentsStore.GetValue(childIter, (int)ComponentCol.nomenclature_id);
+					SQL = "SELECT count FROM cubes_items WHERE item_id = @item_id and cubes_id = @cubes_id";
+					SqliteCommand cmd = new SqliteCommand (SQL, (SqliteConnection)QSMain.ConnectionDB);
+					cmd.Parameters.AddWithValue ("@cubes_id", parentId.ToString());
+					cmd.Parameters.AddWithValue ("@item_id", childNomenclatureId.ToString());
+					using (SqliteDataReader rdr = cmd.ExecuteReader()) {
+						rdr.Read();
+						int newCount = DBWorks.GetInt(rdr, "count", 1) * parentCount;
+						ComponentsStore.SetValue(childIter, (int)ComponentCol.count, newCount);
+						ComponentsStore.SetValue(childIter, (int)ComponentCol.price_total, (newCount * Decimal.Parse((String)ComponentsStore.GetValue(childIter, (int)ComponentCol.price))).ToString());
+					}
+				} while(ComponentsStore.IterNext(ref childIter));
+			}
+		}
+
+		/// <summary>
+		/// Calculates the total price for items on order change and for whole order too.
+		/// </summary>
 		void CalculateTotalCount()
 		{
-			Decimal Total = 0;
-			TreeIter iter;
+			Decimal Total = 0, TempTotal;
+			TreeIter iter, childIter;
 			if (ComponentsStore.GetIterFirst(out iter))
 			{
 				do {
-					Total += Decimal.Parse((String)ComponentsStore.GetValue(iter, (int)ComponentCol.price_total));
+					if (ComponentsStore.IterHasChild(iter))
+					{
+						TempTotal = 0;
+						ComponentsStore.IterChildren(out childIter, iter);
+						do {
+							TempTotal += Decimal.Parse((String)ComponentsStore.GetValue(childIter, (int)ComponentCol.price_total));
+						} while (ComponentsStore.IterNext(ref childIter));
+						Total += TempTotal;
+						ComponentsStore.SetValue(iter, (int)ComponentCol.price_total, TempTotal.ToString());
+					}
 				} while(ComponentsStore.IterNext (ref iter));
 			}
 			labelTotalCount.LabelProp = String.Format("Итого {0} единиц.", Total);
