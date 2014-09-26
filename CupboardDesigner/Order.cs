@@ -447,7 +447,7 @@ namespace CupboardDesigner
 				return false;
 			}
 		}
-//TODO:FIX. Materials and facing are in DB but not loading at the moment.
+//TODO:FIX. Add fucking cubes.
 		public void Fill(int id, bool copy)
 		{
 			NewItem = copy;
@@ -514,8 +514,7 @@ namespace CupboardDesigner
 				cmd.Parameters.AddWithValue("@order_id", id);
 				cmd.Parameters.AddWithValue("@basis_id", basis.id);
 				using (SqliteDataReader rdr = cmd.ExecuteReader()) {
-					while(rdr.Read())
-					{
+					while(rdr.Read()) {
 						int count = DBWorks.GetInt(rdr, "count", -1);
 						decimal price = DBWorks.GetDecimal(rdr, "price", -1);
 						ComponentsStore.AppendValues(
@@ -533,9 +532,61 @@ namespace CupboardDesigner
 							"",
 							DBWorks.GetString(rdr, "comment", ""),
 							price.ToString(),
-							(price * count).ToString()
-						);
-
+							(price * count).ToString() );
+					}
+				}
+				//Loading cubes.
+				sql = "SELECT order_details.*, cubes.name FROM order_details " +
+					"LEFT JOIN cubes ON order_details.cube_id = cubes.id WHERE order_id = @order_id";
+				cmd = new SqliteCommand(sql, (SqliteConnection)QSMain.ConnectionDB);
+				cmd.Parameters.AddWithValue("@order_id", id);
+				using (SqliteDataReader rdr = cmd.ExecuteReader()) {
+					while (rdr.Read()) {
+						TreeIter CubeIter = ComponentsStore.AppendValues (
+							DBWorks.GetLong(rdr, "id", -1), 
+							Enum.Parse (typeof(Nomenclature.NomType), "cube"), 
+							DBWorks.GetInt(rdr, "cube_id", -1),
+							null, 
+							DBWorks.GetString(rdr, "name", ""), 
+							null, 
+							DBWorks.GetInt(rdr, "count", 1),
+							DBWorks.GetInt(rdr, "material_id", -1),
+							DBWorks.GetString(rdr, "material", ""),
+							DBWorks.GetInt(rdr, "facing_id", -1),
+							DBWorks.GetString(rdr, "facing", ""),
+							DBWorks.GetString(rdr, "comment", "") );
+						string contents_sql = "SELECT order_cubes_details.*, nomenclature.type AS type, nomenclature.name AS name, " +
+							"nomenclature.description AS description FROM order_cubes_details LEFT JOIN nomenclature ON " +
+							"order_cubes_details.nomenclature_id = nomenclature.id WHERE order_cubes_details.order_id = @order_id " +
+							"AND order_cubes_details.cube_id = @cube_id";
+						SqliteCommand contents_cmd = new SqliteCommand (contents_sql, (SqliteConnection)QSMain.ConnectionDB);
+						contents_cmd.Parameters.AddWithValue ("@cube_id", DBWorks.GetInt(rdr, "cube_id", -1));
+						contents_cmd.Parameters.AddWithValue ("@order_id", id);
+						decimal Price = 0;
+						using (SqliteDataReader contents_rdr = contents_cmd.ExecuteReader ()) {
+							while (contents_rdr.Read ()) {
+								Decimal NomenclaturePrice = DBWorks.GetDecimal (contents_rdr, "price", 0) * DBWorks.GetDecimal (contents_rdr, "count", 1);
+								Price += NomenclaturePrice;
+								ComponentsStore.AppendValues (
+									CubeIter,
+									DBWorks.GetLong(contents_rdr, "id", -1),
+									Enum.Parse (typeof(Nomenclature.NomType), contents_rdr ["type"].ToString ()),
+									DBWorks.GetInt (contents_rdr, "nomenclature_id", -1),
+									DBWorks.GetString (contents_rdr, "name", "нет"),
+									ReplaceArticle (DBWorks.GetString (contents_rdr, "name", "нет")),
+									DBWorks.GetString (contents_rdr, "description", ""),
+									DBWorks.GetInt (contents_rdr, "count", 1),
+									-1,
+									"",
+									-1,
+									"",
+									DBWorks.GetString(contents_rdr, "comment", ""),
+									(DBWorks.GetDecimal(contents_rdr, "price", 0)).ToString(),
+									NomenclaturePrice.ToString()
+								);
+							}
+							ComponentsStore.SetValue (CubeIter, (int)ComponentCol.price_total, Price.ToString ());
+						}
 					}
 				}
 				CalculateTotalCount();
