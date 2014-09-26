@@ -250,16 +250,18 @@ namespace CupboardDesigner
 			string sql;
 			if (NewItem)
 			{
-				sql = "INSERT INTO orders (customer, estimation, contract, address, phone1, phone2, " +
-					"exhibition_id, basis_id, arrval, deadline_s, deadline_e, comment, cupboard, total_price) " +
-					"VALUES (@customer, @estimation, @contract, @address, @phone1, @phone2, @exhibition_id, " +
-					"@basis_id, @arrval, @deadline_s, @deadline_e, @comment, @cupboard, @total_price)";
+				sql = "INSERT INTO orders (customer, estimation, contract, address, phone1, phone2, exhibition_id, basis_id, arrval, deadline_s, " +
+					"deadline_e, comment, cupboard, total_price, basis_facing_id, basis_facing, basis_material_id, basis_material, basis_comment) " +
+					"VALUES (@customer, @estimation, @contract, @address, @phone1, @phone2, @exhibition_id, @basis_id, @arrval, @deadline_s, @deadline_e, " +
+					"@comment, @cupboard, @total_price, @basis_facing_id, @basis_facing, @basis_material_id, @basis_material, @basis_comment)";
 			}
 			else
 			{
 				sql = "UPDATE orders SET customer = @customer, estimation = @estimation, contract = @contract, address = @address, phone1 = @phone1, " +
 					"phone2 = @phone2, exhibition_id = @exhibition_id, basis_id = @basis_id, arrval = @arrval, deadline_s = @deadline_s, " +
-					"deadline_e = @deadline_e, comment = @comment, cupboard = @cupboard, total_price = @total_price WHERE id = @id";
+					"deadline_e = @deadline_e, comment = @comment, cupboard = @cupboard, total_price = @total_price, basis_facing_id = @basis_facing_id, " +
+					"basis_facing = @basis_facing, basis_material_id = @basis_material_id, basis_material = @basis_material, basis_comment = @basis_comment " +
+					"WHERE id = @id";
 			}
 			SqliteTransaction trans = ((SqliteConnection)QSMain.ConnectionDB).BeginTransaction();
 			MainClass.StatusMessage("Запись заказа...");
@@ -284,6 +286,11 @@ namespace CupboardDesigner
 				cmd.Parameters.AddWithValue("@comment", DBWorks.ValueOrNull(textviewComments.Buffer.Text != "", textviewComments.Buffer.Text));
 				cmd.Parameters.AddWithValue("@cupboard", OrderCupboard.SaveToString());
 				cmd.Parameters.AddWithValue("@total_price", TotalPrice.ToString());
+				cmd.Parameters.AddWithValue("@basis_facing_id", "");
+				cmd.Parameters.AddWithValue("@basis_material_id", "");
+				cmd.Parameters.AddWithValue("@basis_facing", "");
+				cmd.Parameters.AddWithValue("@basis_material", "");
+				cmd.Parameters.AddWithValue("@basis_comment", "");
 
 				cmd.ExecuteNonQuery();
 
@@ -304,18 +311,20 @@ namespace CupboardDesigner
 							bool InDB = (long)ComponentsStore.GetValue(iter, (int)ComponentCol.row_id) > 0;
 							if(HasValue) {
 								if(!InDB)
-									sql = "INSERT INTO order_details (order_id, cube_id, count, facing_id, material_id, comment) " +
-										"VALUES (@order_id, @nomenclature_id, @count, @facing_id, @material_id, @comment)";
+									sql = "INSERT INTO order_details (order_id, cube_id, count, facing_id, facing, material_id, material, comment) " +
+										"VALUES (@order_id, @nomenclature_id, @count, @facing_id, @facing, @material_id, @material, @comment)";
 								else
-									sql = "UPDATE order_details SET count = @count, facing_id = @facing_id, " +
-										"material_id = @material_id, comment = @comment WHERE id = @id";
+									sql = "UPDATE order_details SET count = @count, facing_id = @facing_id, facing = @facing, " +
+										"material_id = @material_id, material = @material, comment = @comment WHERE id = @id";
 								cmd = new SqliteCommand(sql, (SqliteConnection)QSMain.ConnectionDB, trans);
 								cmd.Parameters.AddWithValue("@id", (long)ComponentsStore.GetValue(iter, (int)ComponentCol.row_id));
 								cmd.Parameters.AddWithValue("@order_id", ItemId);
 								cmd.Parameters.AddWithValue("@nomenclature_id", ComponentsStore.GetValue(iter,(int)ComponentCol.nomenclature_id));
 								cmd.Parameters.AddWithValue("@count", ComponentsStore.GetValue(iter,(int)ComponentCol.count));
-								cmd.Parameters.AddWithValue("@material_id", DBWorks.ValueOrNull((int) ComponentsStore.GetValue(iter,(int)ComponentCol.material_id) > 0, ComponentsStore.GetValue(iter, (int)ComponentCol.material_id)));
+								cmd.Parameters.AddWithValue("@material_id", DBWorks.ValueOrNull((int)ComponentsStore.GetValue(iter,(int)ComponentCol.material_id) > 0, ComponentsStore.GetValue(iter, (int)ComponentCol.material_id)));
 								cmd.Parameters.AddWithValue("@facing_id", DBWorks.ValueOrNull((int)ComponentsStore.GetValue(iter, (int)ComponentCol.facing_id) > 0, ComponentsStore.GetValue(iter, (int)ComponentCol.facing_id)));
+								cmd.Parameters.AddWithValue("@material", DBWorks.ValueOrNull((string)ComponentsStore.GetValue(iter,(int)ComponentCol.material) != "", ComponentsStore.GetValue(iter, (int)ComponentCol.material)));
+								cmd.Parameters.AddWithValue("@facing", DBWorks.ValueOrNull((string)ComponentsStore.GetValue(iter, (int)ComponentCol.facing) != "", ComponentsStore.GetValue(iter, (int)ComponentCol.facing)));
 								cmd.Parameters.AddWithValue("@comment", DBWorks.ValueOrNull((string)ComponentsStore.GetValue(iter, (int)ComponentCol.comment) != "", ComponentsStore.GetValue(iter, (int)ComponentCol.comment)));
 								cmd.ExecuteNonQuery();
 								if(!InDB)
@@ -373,6 +382,18 @@ namespace CupboardDesigner
 						}
 						else //Item is basis
 						{
+							sql = "UPDATE orders SET basis_facing_id = @basis_facing_id, basis_facing = @basis_facing, " +
+								"basis_material_id = @basis_material_id, basis_material = @basis_material, basis_comment = @basis_comment " +
+								"WHERE id = @id";
+							cmd = new SqliteCommand(sql, (SqliteConnection)QSMain.ConnectionDB, trans);
+							cmd.Parameters.AddWithValue("@id", ItemId);
+							cmd.Parameters.AddWithValue("@basis_facing_id", ComponentsStore.GetValue(iter, (int)ComponentCol.facing_id));
+							cmd.Parameters.AddWithValue("@basis_material_id", ComponentsStore.GetValue(iter, (int)ComponentCol.material_id));
+							cmd.Parameters.AddWithValue("@basis_facing", ComponentsStore.GetValue(iter, (int)ComponentCol.facing));
+							cmd.Parameters.AddWithValue("@basis_material", ComponentsStore.GetValue(iter, (int)ComponentCol.material));
+							cmd.Parameters.AddWithValue("@basis_comment", ComponentsStore.GetValue(iter, (int)ComponentCol.comment));
+							cmd.ExecuteNonQuery();
+
 							if(ComponentsStore.IterHasChild(iter)) {
 								ComponentsStore.IterChildren(out childIter, iter);
 								do { //Adding every nomenclature for basis
@@ -413,7 +434,6 @@ namespace CupboardDesigner
 						}
 					} while (ComponentsStore.IterNext(ref iter));
 				} 
-
 				trans.Commit();
 				MainClass.StatusMessage("Ok");
 				MainClass.MainWin.UpdateOrders();
@@ -427,8 +447,7 @@ namespace CupboardDesigner
 				return false;
 			}
 		}
-
-//TODO:FIX
+//TODO:FIX. Materials and facing are in DB but not loading at the moment.
 		public void Fill(int id, bool copy)
 		{
 			NewItem = copy;
@@ -440,16 +459,13 @@ namespace CupboardDesigner
 			try
 			{
 				SqliteCommand cmd = new SqliteCommand(sql, (SqliteConnection) QSMain.ConnectionDB);
-
 				cmd.Parameters.AddWithValue("@id", id);
 
 				CupboardListItem basis;
-				using(SqliteDataReader rdr = cmd.ExecuteReader())
-				{
-					rdr.Read();
 
-					if(!copy)
-					{
+				using(SqliteDataReader rdr = cmd.ExecuteReader()) {
+					rdr.Read();
+					if(!copy) {
 						this.Title = String.Format("Заказ №{0}", rdr["id"].ToString());
 						dateArrval.Date = DBWorks.GetDateTime(rdr, "arrval", new DateTime());
 					}
@@ -469,37 +485,60 @@ namespace CupboardDesigner
 					comboCubeH.Active = OrderCupboard.CubesH - 1;
 					comboCubeV.Active = OrderCupboard.CubesV - 1;
 					CalculateCubePxSize(drawCupboard.Allocation);
+					TotalPrice = DBWorks.GetDecimal(rdr, "total_price", 0);
+					labelTotalCount.LabelProp = String.Format("Итого {0} единиц.", TotalPrice);
+					ComponentsStore.Remove(ref BasisIter);
+					BasisIter = ComponentsStore.AppendValues (
+						(long)-1, 
+						Enum.Parse(typeof(Nomenclature.NomType), "construct"), 
+						basis.id, 
+						null, 
+						"Каркас", 
+						null, 
+						1, 
+						DBWorks.GetInt(rdr, "basis_material_id", -1),
+						DBWorks.GetString(rdr, "basis_material", ""),
+						DBWorks.GetInt(rdr, "basis_facing_id", -1),
+						DBWorks.GetString(rdr, "basis_facing", ""),
+						DBWorks.GetString(rdr, "basis_comment", ""),
+						"", ""
+					);
 				}
-				sql = "SELECT order_components.*, materials.name as material, facing.name as facing, " +
-					"nomenclature.name as nomenclature, nomenclature.description, nomenclature.type " +
-					"FROM order_components " +
-					"LEFT JOIN nomenclature ON nomenclature.id = order_components.nomenclature_id " +
-					"LEFT JOIN materials ON materials.id = order_components.material_id " +
-					"LEFT JOIN facing ON facing.id = order_components.facing_id" +
-					"WHERE order_components.order_id = @id";
+				//Loading basis and it's contents.
+
+				sql = "SELECT order_basis_details.*, nomenclature.type, nomenclature.name, nomenclature.description" +
+					" FROM order_basis_details " +
+					"LEFT JOIN nomenclature ON order_basis_details.nomenclature_id = nomenclature.id " +
+					"WHERE order_basis_details.order_id = @order_id and order_basis_details.basis_id = @basis_id";
 				cmd = new SqliteCommand(sql, (SqliteConnection)QSMain.ConnectionDB);
-				cmd.Parameters.AddWithValue("@id", id);
-				using(SqliteDataReader rdr = cmd.ExecuteReader())
-				{
+				cmd.Parameters.AddWithValue("@order_id", id);
+				cmd.Parameters.AddWithValue("@basis_id", basis.id);
+				using (SqliteDataReader rdr = cmd.ExecuteReader()) {
 					while(rdr.Read())
 					{
+						int count = DBWorks.GetInt(rdr, "count", -1);
+						decimal price = DBWorks.GetDecimal(rdr, "price", -1);
 						ComponentsStore.AppendValues(
 							BasisIter,
-							copy ? 0 : DBWorks.GetLong(rdr, "id", -1), // 0 Специальное значение поля, что бы компоненты не удалялись при копировании.
+							DBWorks.GetLong(rdr, "id", -1),
 							Enum.Parse(typeof(Nomenclature.NomType), rdr["type"].ToString()),
 							DBWorks.GetInt(rdr, "nomenclature_id", -1),
-							DBWorks.GetString(rdr, "nomenclature", "нет"),
-							ReplaceArticle(DBWorks.GetString(rdr, "nomenclature", "нет")),
+							DBWorks.GetString(rdr, "name", ""), 
+							ReplaceArticle(DBWorks.GetString(rdr, "name", "")),
 							DBWorks.GetString(rdr, "description", ""),
-							DBWorks.GetInt(rdr, "count", 0),
-							DBWorks.GetInt(rdr, "material_id", -1),
-							DBWorks.GetString(rdr, "material", "нет"),
-							DBWorks.GetInt(rdr, "facing_id", -1),
-							DBWorks.GetString(rdr, "facing", "нет"),
-							DBWorks.GetString(rdr, "comment", "")
+							count,
+							-1,
+							"",
+							-1,
+							"",
+							DBWorks.GetString(rdr, "comment", ""),
+							price.ToString(),
+							(price * count).ToString()
 						);
+
 					}
 				}
+				CalculateTotalCount();
 				basis.Button.Click();
 
 				MainClass.StatusMessage("Ok");
@@ -528,7 +567,7 @@ namespace CupboardDesigner
 				Price = Decimal.Parse((String)ComponentsStore.GetValue(iter, (int)ComponentCol.price));
 				ComponentsStore.SetValue(iter, (int)ComponentCol.count, NewValue);
 				ComponentsStore.SetValue(iter, (int)ComponentCol.price_total, (Price * NewValue).ToString());
-			} catch(Exception e) { return; }
+			} catch(Exception e) { logger.WarnException ("Error occured in OnCountEdited.", e);}
 		}
 
 		void OnPriceEdited(object o, EditedArgs args) 
@@ -547,7 +586,7 @@ namespace CupboardDesigner
 				ComponentsStore.SetValue(iter, (int)ComponentCol.price, (NewValue).ToString());
 				CalculateTotalCount ();
 				return;
-			} catch(Exception e) {return; }
+			} catch(Exception e) { logger.WarnException ("Error occured in OnPriceEdited", e);}
 		}
 
 		void OnMaterialComboEdited (object o, EditedArgs args)
@@ -840,11 +879,13 @@ namespace CupboardDesigner
 		/// <param name="id">Identifier of basis.</param>
 		private void UpdateBasisComponents(int id)
 		{
-			ComponentsStore.Remove(ref BasisIter);
-			BasisIter = ComponentsStore.AppendValues ((long)-1, Enum.Parse(typeof(Nomenclature.NomType), "construct"), id, null, "Каркас", null, 1, -1, "", -1, "", "");
-			string sql = "SELECT nomenclature.name as nomenclature, nomenclature.type, nomenclature.description, nomenclature.price, basis_items.* FROM basis_items " +
-				"LEFT JOIN nomenclature ON nomenclature.id = basis_items.item_id " +
-				"WHERE basis_id = @basis_id";
+			if ((int)ComponentsStore.GetValue (BasisIter, (int)ComponentCol.nomenclature_id) == id)
+				return; //False alarm. Nothing to change.
+			ComponentsStore.Remove (ref BasisIter); //Else setting up new basis tree component
+			BasisIter = ComponentsStore.AppendValues (
+				(long)-1, Enum.Parse(typeof(Nomenclature.NomType), "construct"), id, null, "Каркас", null, 1,	-1,	"",	-1,	"",	"",	"", "");
+			string sql = "SELECT nomenclature.name as nomenclature, nomenclature.type, nomenclature.description, nomenclature.price, basis_items.* " +
+				"FROM basis_items LEFT JOIN nomenclature ON nomenclature.id = basis_items.item_id WHERE basis_id = @basis_id";
 			SqliteCommand cmd = new SqliteCommand(sql, (SqliteConnection)QSMain.ConnectionDB);
 			cmd.Parameters.AddWithValue("@basis_id", id);
 			Decimal Price = 0;
