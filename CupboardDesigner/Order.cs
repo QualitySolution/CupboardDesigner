@@ -30,6 +30,7 @@ namespace CupboardDesigner
 		private DragInformation CurrentDrag;
 		private TreeIter BasisIter;
 		private Decimal TotalPrice;
+		private int PriceCorrection = 0;
 		private Gtk.TreeViewColumn ColumnPrice;
 		private Gtk.TreeViewColumn ColumnCount;
 		private Gtk.TreeViewColumn ColumnMaterial;
@@ -148,6 +149,10 @@ namespace CupboardDesigner
 			treeviewComponents.TooltipColumn = (int)ComponentCol.nomenclature_description;
 			treeviewComponents.ShowAll();
 
+			spinbutton1.Sensitive = false;
+			spinbutton1.Value = PriceCorrection;
+			checkbutton2.Active = false;
+
 			CurrentDrag = new DragInformation();
 			//Загрузка списка кубов
 			CubeList = new List<Cube>();
@@ -256,16 +261,16 @@ namespace CupboardDesigner
 			string sql;
 			if (NewItem) {
 				sql = "INSERT INTO orders (customer, estimation, contract, address, phone1, phone2, exhibition_id, basis_id, arrval, deadline_s, " +
-					"deadline_e, comment, cupboard, total_price, basis_facing_id, basis_facing, basis_material_id, basis_material, basis_comment) " +
+					"deadline_e, comment, cupboard, total_price, basis_facing_id, basis_facing, basis_material_id, basis_material, basis_comment, price_correction) " +
 					"VALUES (@customer, @estimation, @contract, @address, @phone1, @phone2, @exhibition_id, @basis_id, @arrval, @deadline_s, @deadline_e, " +
-					"@comment, @cupboard, @total_price, @basis_facing_id, @basis_facing, @basis_material_id, @basis_material, @basis_comment)";
+					"@comment, @cupboard, @total_price, @basis_facing_id, @basis_facing, @basis_material_id, @basis_material, @basis_comment, @price_correction)";
 			}
 			else {
 				sql = "UPDATE orders SET customer = @customer, estimation = @estimation, contract = @contract, address = @address, phone1 = @phone1, " +
 					"phone2 = @phone2, exhibition_id = @exhibition_id, basis_id = @basis_id, arrval = @arrval, deadline_s = @deadline_s, " +
 					"deadline_e = @deadline_e, comment = @comment, cupboard = @cupboard, total_price = @total_price, basis_facing_id = @basis_facing_id, " +
-					"basis_facing = @basis_facing, basis_material_id = @basis_material_id, basis_material = @basis_material, basis_comment = @basis_comment " +
-					"WHERE id = @id";
+					"basis_facing = @basis_facing, basis_material_id = @basis_material_id, basis_material = @basis_material, basis_comment = @basis_comment, " +
+					"price_correction = @price_correction WHERE id = @id";
 			}
 			SqliteTransaction trans = ((SqliteConnection)QSMain.ConnectionDB).BeginTransaction();
 			MainClass.StatusMessage("Запись заказа...");
@@ -294,6 +299,7 @@ namespace CupboardDesigner
 				cmd.Parameters.AddWithValue("@basis_facing", "");
 				cmd.Parameters.AddWithValue("@basis_material", "");
 				cmd.Parameters.AddWithValue("@basis_comment", "");
+				cmd.Parameters.AddWithValue("@price_correction", PriceCorrection.ToString());
 
 				cmd.ExecuteNonQuery();
 
@@ -351,7 +357,7 @@ namespace CupboardDesigner
 									InDB = (long)ComponentsStore.GetValue(childIter, (int)ComponentCol.row_id) > 0;
 									if(HasValue) {
 										if(!InDB)
-											sql = "INSERT INTO order_cubes_details (order_id, cube_id, nomenclature_id, count, price " +
+											sql = "INSERT INTO order_cubes_details (order_id, cube_id, nomenclature_id, count, price, " +
 												"comment) VALUES (@order_id, @cube_id, @nomenclature_id, @count, @price, @comment)";
 										else
 											sql = "UPDATE order_cubes_details SET count = @count, price = @price, comment = @comment WHERE id = @id";
@@ -492,8 +498,12 @@ namespace CupboardDesigner
 					comboCubeH.Active = OrderCupboard.CubesH - 1;
 					comboCubeV.Active = OrderCupboard.CubesV - 1;
 					CalculateCubePxSize(drawCupboard.Allocation);
+					PriceCorrection = DBWorks.GetInt(rdr, "price_correction", 0);
 					TotalPrice = DBWorks.GetDecimal(rdr, "total_price", 0);
-					labelTotalCount.LabelProp = String.Format("Итого {0} единиц.", TotalPrice);
+					spinbutton1.Value = PriceCorrection;
+					if (PriceCorrection != 0)
+						checkbutton1.Active = true;
+					labelTotalCount.LabelProp = String.Format("Итого {0} руб.", TotalPrice);
 					ComponentsStore.Remove(ref BasisIter);
 					BasisIter = ComponentsStore.AppendValues (
 						(long)-1, 
@@ -1098,10 +1108,10 @@ namespace CupboardDesigner
 		{
 			Decimal TempTotal;
 			TreeIter iter, childIter;
-			
-			TotalPrice = 0;
+
 			if (ComponentsStore.GetIterFirst(out iter))
 			{
+				TotalPrice = 0;
 				do {
 					if (ComponentsStore.IterHasChild(iter))
 					{
@@ -1115,8 +1125,9 @@ namespace CupboardDesigner
 					}
 				} while(ComponentsStore.IterNext (ref iter));
 			}
-			labelTotalCount.LabelProp = String.Format("Итого {0} единиц.", TotalPrice);
-		}
+		 	labelTotalCount.LabelProp = String.Format("Итого {0} руб.", Decimal.Round(TotalPrice + (TotalPrice / 100 * PriceCorrection), 2));
+		//labelTotalCount.LabelProp = String.Format("Итого {0} руб.", TotalPrice);
+	}
 
 		private void PrerareReport()
 		{
@@ -1244,6 +1255,24 @@ namespace CupboardDesigner
 			}
 		}
 
+		protected void OnCheckbutton1Toggled (object sender, EventArgs e)
+		{
+			if (spinbutton1.Sensitive == true) {
+				PriceCorrection = 0;
+				CalculateTotalCount ();
+				spinbutton1.Sensitive = false;
+			} else {
+				spinbutton1.Sensitive = true;
+				PriceCorrection = (int)spinbutton1.Value;
+				CalculateTotalCount ();
+			}
+		}
+
+		protected void OnSpinbutton1ValueChanged (object sender, EventArgs e) 
+		{
+			PriceCorrection = (int)spinbutton1.Value;
+			CalculateTotalCount ();
+		}
 	}
 }
 

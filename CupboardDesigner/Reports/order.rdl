@@ -13,15 +13,15 @@
   <BottomMargin>.25in</BottomMargin>
   <DataSets>
     <DataSet Name="Data">
-      <Query >
+      <Query>
         <DataSourceName>DS1</DataSourceName>
         <CommandText>select null as article, cubes.name as nomenclature, cubes.width * 400 as width, cubes.height * 400 as height, null as length, order_details.count as count, order_details.facing as facing, order_details.material as material, order_details.comment as comment from order_details
 left join cubes on order_details.cube_id = cubes.id
-where order_details.order_id = 2
+where order_details.order_id = @id
 union 
 select null as article, basis.name as nomenclature, null as width, null as height, null as length, 1 as count, orders.basis_facing as facing, orders.basis_material as material, orders.basis_comment as comment from orders
 left join basis on orders.basis_id = basis.id
-where orders.id = 2;</CommandText>
+where orders.id = @id;</CommandText>
         <QueryParameters>
           <QueryParameter Name="id">
             <Value>=Parameters!id</Value>
@@ -34,7 +34,7 @@ where orders.id = 2;</CommandText>
           </QueryParameter>
         </QueryParameters>
       </Query>
-      <Fields >
+      <Fields>
         <Field Name="article">
           <DataField>article</DataField>
           <rd:TypeName>System.String</rd:TypeName>
@@ -76,8 +76,8 @@ where orders.id = 2;</CommandText>
     <DataSet Name="Order">
       <Query >
         <DataSourceName>DS1</DataSourceName>
-        <CommandText>SELECT customer, orders.address as customaddress, phone1, orders.phone2, arrval, deadline_s, deadline_e, contract, exhibition.name as exhibition, exhibition.phone as exphone1, exhibition.phone2 as exphone2, total_price, exhibition.address, comment, basis.delta_h, basis.delta_l FROM orders
-LEFT JOIN exhibition ON exhibition_id = exhibition.id
+        <CommandText>SELECT customer, orders.address as customaddress, phone1, orders.phone2, arrval, deadline_s, deadline_e, contract, exhibition.name as exhibition, exhibition.phone as exphone1, exhibition.phone2 as exphone2, total_price, price_correction, exhibition.address, comment, basis.delta_h, basis.delta_l FROM orders
+ LEFT JOIN exhibition ON exhibition_id = exhibition.id
 LEFT JOIN basis ON basis.id = orders.basis_id
  WHERE orders.id = @id</CommandText>
         <QueryParameters>
@@ -150,6 +150,10 @@ LEFT JOIN basis ON basis.id = orders.basis_id
         <Field Name="total_price">
           <DataField>total_price</DataField>
           <TypeName>System.Decimal</TypeName>
+        </Field>
+        <Field Name="price_correction">
+          <DataField>price_correction</DataField>
+          <TypeName>System.Int32</TypeName>
         </Field>
       </Fields>
     </DataSet>
@@ -559,13 +563,13 @@ LEFT JOIN basis ON basis.id = orders.basis_id
             </Style>
             <CanGrow>true</CanGrow>
           </Textbox>
-          <Textbox Name="Textbox2" >
-            <Height>12pt</Height>
-            <Width>1in</Width>
-            <Value>="Итого: " + {total_price} + " руб."</Value>
+          <Textbox Name="Textbox2">
+            <Height>12.99pt</Height>
+            <Width>218.79pt</Width>
+            <Value>="Итого: " + Math.Round((total_price +  total_price / 100 * price_correction), 2)  + " руб."</Value>
             <ZIndex>1</ZIndex>
-            <Left>347.3pt</Left>
-            <Top>3.0pt</Top>
+            <Left>347.30pt</Left>
+            <Top>3.00pt</Top>
             <Style>
               <BorderStyle />
               <BorderColor />

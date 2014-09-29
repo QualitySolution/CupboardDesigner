@@ -116,6 +116,12 @@ namespace CupboardDesigner
 		
 		private global::Gtk.CheckButton checkbutton2;
 		
+		private global::Gtk.CheckButton checkbutton1;
+		
+		private global::Gtk.SpinButton spinbutton1;
+		
+		private global::Gtk.Label label18;
+		
 		private global::Gtk.Label labelTotalCount;
 		
 		private global::Gtk.Label label15;
@@ -171,7 +177,7 @@ namespace CupboardDesigner
 			this.notebook1 = new global::Gtk.Notebook ();
 			this.notebook1.CanFocus = true;
 			this.notebook1.Name = "notebook1";
-			this.notebook1.CurrentPage = 3;
+			this.notebook1.CurrentPage = 0;
 			// Container child notebook1.Gtk.Notebook+NotebookChild
 			this.hbox1 = new global::Gtk.HBox ();
 			this.hbox1.Name = "hbox1";
@@ -655,31 +661,64 @@ namespace CupboardDesigner
 			this.checkbutton2 = new global::Gtk.CheckButton ();
 			this.checkbutton2.CanFocus = true;
 			this.checkbutton2.Name = "checkbutton2";
-			this.checkbutton2.Label = global::Mono.Unix.Catalog.GetString ("Скрыть детальное отображение цены");
+			this.checkbutton2.Label = global::Mono.Unix.Catalog.GetString ("Скрыть цены");
 			this.checkbutton2.DrawIndicator = true;
 			this.checkbutton2.UseUnderline = true;
 			this.hbox6.Add (this.checkbutton2);
 			global::Gtk.Box.BoxChild w45 = ((global::Gtk.Box.BoxChild)(this.hbox6 [this.checkbutton2]));
 			w45.Position = 0;
 			// Container child hbox6.Gtk.Box+BoxChild
+			this.checkbutton1 = new global::Gtk.CheckButton ();
+			this.checkbutton1.CanFocus = true;
+			this.checkbutton1.Name = "checkbutton1";
+			this.checkbutton1.Label = global::Mono.Unix.Catalog.GetString ("Скидка / Наценка:");
+			this.checkbutton1.DrawIndicator = true;
+			this.checkbutton1.UseUnderline = true;
+			this.hbox6.Add (this.checkbutton1);
+			global::Gtk.Box.BoxChild w46 = ((global::Gtk.Box.BoxChild)(this.hbox6 [this.checkbutton1]));
+			w46.Position = 1;
+			w46.Expand = false;
+			// Container child hbox6.Gtk.Box+BoxChild
+			this.spinbutton1 = new global::Gtk.SpinButton (-100, 100, 1);
+			this.spinbutton1.CanDefault = true;
+			this.spinbutton1.CanFocus = true;
+			this.spinbutton1.Name = "spinbutton1";
+			this.spinbutton1.Adjustment.PageIncrement = 10;
+			this.spinbutton1.ClimbRate = 1;
+			this.spinbutton1.Numeric = true;
+			this.spinbutton1.UpdatePolicy = ((global::Gtk.SpinButtonUpdatePolicy)(1));
+			this.hbox6.Add (this.spinbutton1);
+			global::Gtk.Box.BoxChild w47 = ((global::Gtk.Box.BoxChild)(this.hbox6 [this.spinbutton1]));
+			w47.Position = 2;
+			w47.Expand = false;
+			w47.Fill = false;
+			// Container child hbox6.Gtk.Box+BoxChild
+			this.label18 = new global::Gtk.Label ();
+			this.label18.Name = "label18";
+			this.label18.LabelProp = global::Mono.Unix.Catalog.GetString ("%        ");
+			this.hbox6.Add (this.label18);
+			global::Gtk.Box.BoxChild w48 = ((global::Gtk.Box.BoxChild)(this.hbox6 [this.label18]));
+			w48.Position = 3;
+			w48.Expand = false;
+			w48.Fill = false;
+			// Container child hbox6.Gtk.Box+BoxChild
 			this.labelTotalCount = new global::Gtk.Label ();
-			this.labelTotalCount.WidthRequest = 300;
 			this.labelTotalCount.Name = "labelTotalCount";
 			this.labelTotalCount.Xalign = 1F;
 			this.labelTotalCount.LabelProp = global::Mono.Unix.Catalog.GetString ("label2");
 			this.hbox6.Add (this.labelTotalCount);
-			global::Gtk.Box.BoxChild w46 = ((global::Gtk.Box.BoxChild)(this.hbox6 [this.labelTotalCount]));
-			w46.Position = 1;
-			w46.Expand = false;
-			w46.Fill = false;
+			global::Gtk.Box.BoxChild w49 = ((global::Gtk.Box.BoxChild)(this.hbox6 [this.labelTotalCount]));
+			w49.Position = 4;
+			w49.Expand = false;
+			w49.Fill = false;
 			this.vbox5.Add (this.hbox6);
-			global::Gtk.Box.BoxChild w47 = ((global::Gtk.Box.BoxChild)(this.vbox5 [this.hbox6]));
-			w47.Position = 1;
-			w47.Expand = false;
-			w47.Fill = false;
+			global::Gtk.Box.BoxChild w50 = ((global::Gtk.Box.BoxChild)(this.vbox5 [this.hbox6]));
+			w50.Position = 1;
+			w50.Expand = false;
+			w50.Fill = false;
 			this.notebook1.Add (this.vbox5);
-			global::Gtk.Notebook.NotebookChild w48 = ((global::Gtk.Notebook.NotebookChild)(this.notebook1 [this.vbox5]));
-			w48.Position = 3;
+			global::Gtk.Notebook.NotebookChild w51 = ((global::Gtk.Notebook.NotebookChild)(this.notebook1 [this.vbox5]));
+			w51.Position = 3;
 			// Notebook tab
 			this.label15 = new global::Gtk.Label ();
 			this.label15.Name = "label15";
@@ -695,8 +734,8 @@ namespace CupboardDesigner
 			this.reportviewer1.ShowErrors = false;
 			this.reportviewer1.ShowParameters = false;
 			this.notebook1.Add (this.reportviewer1);
-			global::Gtk.Notebook.NotebookChild w49 = ((global::Gtk.Notebook.NotebookChild)(this.notebook1 [this.reportviewer1]));
-			w49.Position = 4;
+			global::Gtk.Notebook.NotebookChild w52 = ((global::Gtk.Notebook.NotebookChild)(this.notebook1 [this.reportviewer1]));
+			w52.Position = 4;
 			// Notebook tab
 			this.label16 = new global::Gtk.Label ();
 			this.label16.Name = "label16";
@@ -704,14 +743,14 @@ namespace CupboardDesigner
 			this.notebook1.SetTabLabel (this.reportviewer1, this.label16);
 			this.label16.ShowAll ();
 			this.vbox2.Add (this.notebook1);
-			global::Gtk.Box.BoxChild w50 = ((global::Gtk.Box.BoxChild)(this.vbox2 [this.notebook1]));
-			w50.Position = 1;
+			global::Gtk.Box.BoxChild w53 = ((global::Gtk.Box.BoxChild)(this.vbox2 [this.notebook1]));
+			w53.Position = 1;
 			this.Add (this.vbox2);
 			if ((this.Child != null)) {
 				this.Child.ShowAll ();
 			}
-			this.DefaultWidth = 921;
-			this.DefaultHeight = 602;
+			this.DefaultWidth = 831;
+			this.DefaultHeight = 558;
 			this.Show ();
 			this.revertToSavedAction.Activated += new global::System.EventHandler (this.OnRevertToSavedActionActivated);
 			this.goBackAction.Activated += new global::System.EventHandler (this.OnGoBackActionActivated);
@@ -719,6 +758,8 @@ namespace CupboardDesigner
 			this.saveAction.Activated += new global::System.EventHandler (this.OnSaveActionActivated);
 			this.printAction.Activated += new global::System.EventHandler (this.OnPrintActionActivated);
 			this.notebook1.SwitchPage += new global::Gtk.SwitchPageHandler (this.OnNotebook1SwitchPage);
+			this.dateDeadlineS.DateChanged += new global::System.EventHandler (this.OnDateDeadlineSDateChanged);
+			this.checkEstimation.Clicked += new global::System.EventHandler (this.OnCheckEstimationClicked);
 			this.comboCubeV.Changed += new global::System.EventHandler (this.OnComboCubeVChanged);
 			this.comboCubeH.Changed += new global::System.EventHandler (this.OnComboCubeHChanged);
 			this.drawCupboard.ExposeEvent += new global::Gtk.ExposeEventHandler (this.OnDrawCupboardExposeEvent);
@@ -729,6 +770,8 @@ namespace CupboardDesigner
 			this.drawCupboard.DragDataDelete += new global::Gtk.DragDataDeleteHandler (this.OnDrawCupboardDragDataDelete);
 			this.buttonCubeListOrientation.Clicked += new global::System.EventHandler (this.OnButtonCubeListOrientationClicked);
 			this.checkbutton2.Toggled += new global::System.EventHandler (this.OnCheckbutton2Toggled);
+			this.checkbutton1.Toggled += new global::System.EventHandler (this.OnCheckbutton1Toggled);
+			this.spinbutton1.ValueChanged += new global::System.EventHandler (this.OnSpinbutton1ValueChanged);
 		}
 	}
 }

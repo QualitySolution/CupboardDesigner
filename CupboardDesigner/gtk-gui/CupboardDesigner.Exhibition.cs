@@ -37,6 +37,7 @@ namespace CupboardDesigner
 			global::Stetic.Gui.Initialize (this);
 			// Widget CupboardDesigner.Exhibition
 			this.Name = "CupboardDesigner.Exhibition";
+			this.Title = global::Mono.Unix.Catalog.GetString ("Новая выставка");
 			this.WindowPosition = ((global::Gtk.WindowPosition)(4));
 			// Internal child CupboardDesigner.Exhibition.VBox
 			global::Gtk.VBox w1 = this.VBox;
