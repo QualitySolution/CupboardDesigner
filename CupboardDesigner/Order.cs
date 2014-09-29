@@ -30,6 +30,15 @@ namespace CupboardDesigner
 		private DragInformation CurrentDrag;
 		private TreeIter BasisIter;
 		private Decimal TotalPrice;
+		private Gtk.TreeViewColumn ColumnPrice;
+		private Gtk.TreeViewColumn ColumnCount;
+		private Gtk.TreeViewColumn ColumnMaterial;
+		private Gtk.TreeViewColumn ColumnFacing;
+		private Gtk.TreeViewColumn ColumnPriceTotal;
+		private Gtk.TreeViewColumn ColumnComment;
+		Gtk.TargetEntry[] TargetTable = new Gtk.TargetEntry[] {
+			new Gtk.TargetEntry ("application/cube", Gtk.TargetFlags.App, 0)
+		};
 
 		private enum ComponentCol{
 			row_id,
@@ -48,12 +57,7 @@ namespace CupboardDesigner
 			price_total
 		}
 
-		Gtk.TargetEntry[] TargetTable = new Gtk.TargetEntry[] {
-			new Gtk.TargetEntry ("application/cube", Gtk.TargetFlags.App, 0)
-		};
-
-		public Order() : 
-			base(Gtk.WindowType.Toplevel)
+		public Order() : base(Gtk.WindowType.Toplevel)
 		{
 			this.Build();
 			notebook1.CurrentPage = 0;
@@ -72,8 +76,9 @@ namespace CupboardDesigner
 			TempCombo.Destroy ();
 
 			ComponentsStore = new TreeStore(typeof(long), typeof(Nomenclature.NomType), typeof(int), typeof(string), typeof(string), typeof(string), typeof(int), typeof(int), typeof(string), typeof(int), typeof(string), typeof(string), typeof(string), typeof(string));
+			BasisIter = ComponentsStore.AppendValues ((long)-1, Enum.Parse(typeof(Nomenclature.NomType), "construct"), 1, null, "Каркас", null, 1, -1, "", -1, "", "", "", "");
 
-			Gtk.TreeViewColumn ColumnCount = new Gtk.TreeViewColumn ();
+			ColumnCount = new Gtk.TreeViewColumn ();
 			ColumnCount.Title = "Кол-во";
 			Gtk.CellRendererText CellCount = new CellRendererText ();
 			CellCount.Editable = true;
@@ -81,7 +86,7 @@ namespace CupboardDesigner
 			ColumnCount.PackStart (CellCount, true);
 			ColumnCount.AddAttribute(CellCount, "text", (int)ComponentCol.count);
 
-			Gtk.TreeViewColumn ColumnMaterial = new Gtk.TreeViewColumn ();
+			ColumnMaterial = new Gtk.TreeViewColumn ();
 			ColumnMaterial.Title = "Отделка кубов";
 			ColumnMaterial.MinWidth = 180;
 			Gtk.CellRendererCombo CellMaterial = new CellRendererCombo();
@@ -93,7 +98,7 @@ namespace CupboardDesigner
 			ColumnMaterial.PackStart (CellMaterial, true);
 			ColumnMaterial.AddAttribute(CellMaterial, "text", (int)ComponentCol.material);
 
-			Gtk.TreeViewColumn ColumnFacing = new Gtk.TreeViewColumn ();
+			ColumnFacing = new Gtk.TreeViewColumn ();
 			ColumnFacing.Title = "Отделка фасада";
 			ColumnFacing.MinWidth = 180;
 			Gtk.CellRendererCombo CellFacing = new CellRendererCombo();
@@ -105,7 +110,7 @@ namespace CupboardDesigner
 			ColumnFacing.PackStart (CellFacing, true);
 			ColumnFacing.AddAttribute(CellFacing, "text", (int)ComponentCol.facing);
 
-			Gtk.TreeViewColumn ColumnPrice = new Gtk.TreeViewColumn ();
+			ColumnPrice = new Gtk.TreeViewColumn ();
 			ColumnPrice.Title = "Цена";
 			Gtk.CellRendererText CellPrice = new CellRendererText ();
 			CellPrice.Editable = true;
@@ -113,7 +118,7 @@ namespace CupboardDesigner
 			ColumnPrice.PackStart (CellPrice, true);
 			ColumnPrice.AddAttribute(CellPrice, "text", (int)ComponentCol.price);
 
-			Gtk.TreeViewColumn ColumnPriceTotal = new Gtk.TreeViewColumn ();
+			ColumnPriceTotal = new Gtk.TreeViewColumn ();
 			ColumnPriceTotal.Title = "Сумма";
 			Gtk.CellRendererText CellPriceTotal = new CellRendererText ();
 			CellPriceTotal.Editable = false;
@@ -121,7 +126,7 @@ namespace CupboardDesigner
 			ColumnPriceTotal.AddAttribute(CellPriceTotal, "text", (int)ComponentCol.price_total);
 
 
-			Gtk.TreeViewColumn ColumnComment = new Gtk.TreeViewColumn ();
+			ColumnComment = new Gtk.TreeViewColumn ();
 			ColumnComment.Title = "Комментарий";
 			Gtk.CellRendererText CellComment = new Gtk.CellRendererText ();
 			CellComment.WrapMode = Pango.WrapMode.WordChar;
@@ -142,8 +147,6 @@ namespace CupboardDesigner
 			treeviewComponents.Model = ComponentsStore;
 			treeviewComponents.TooltipColumn = (int)ComponentCol.nomenclature_description;
 			treeviewComponents.ShowAll();
-
-			BasisIter = ComponentsStore.AppendValues ((long)-1, Enum.Parse(typeof(Nomenclature.NomType), "construct"), 1, null, "Каркас", null, 1, -1, "", -1, "", "");
 
 			CurrentDrag = new DragInformation();
 			//Загрузка списка кубов
@@ -245,18 +248,19 @@ namespace CupboardDesigner
 			hboxCubeList.DragDrop += OnCubeListDragDrop;
 		}
 
+		/// <summary>
+		/// Saving order information to DB.
+		/// </summary>
 		private bool Save()
 		{
 			string sql;
-			if (NewItem)
-			{
+			if (NewItem) {
 				sql = "INSERT INTO orders (customer, estimation, contract, address, phone1, phone2, exhibition_id, basis_id, arrval, deadline_s, " +
 					"deadline_e, comment, cupboard, total_price, basis_facing_id, basis_facing, basis_material_id, basis_material, basis_comment) " +
 					"VALUES (@customer, @estimation, @contract, @address, @phone1, @phone2, @exhibition_id, @basis_id, @arrval, @deadline_s, @deadline_e, " +
 					"@comment, @cupboard, @total_price, @basis_facing_id, @basis_facing, @basis_material_id, @basis_material, @basis_comment)";
 			}
-			else
-			{
+			else {
 				sql = "UPDATE orders SET customer = @customer, estimation = @estimation, contract = @contract, address = @address, phone1 = @phone1, " +
 					"phone2 = @phone2, exhibition_id = @exhibition_id, basis_id = @basis_id, arrval = @arrval, deadline_s = @deadline_s, " +
 					"deadline_e = @deadline_e, comment = @comment, cupboard = @cupboard, total_price = @total_price, basis_facing_id = @basis_facing_id, " +
@@ -265,11 +269,10 @@ namespace CupboardDesigner
 			}
 			SqliteTransaction trans = ((SqliteConnection)QSMain.ConnectionDB).BeginTransaction();
 			MainClass.StatusMessage("Запись заказа...");
-			try
-			{
+			try {
 				int contract;
-				SqliteCommand cmd = new SqliteCommand(sql, (SqliteConnection)QSMain.ConnectionDB, trans);
 
+				SqliteCommand cmd = new SqliteCommand(sql, (SqliteConnection)QSMain.ConnectionDB, trans);
 				cmd.Parameters.AddWithValue("@id", ItemId);
 				cmd.Parameters.AddWithValue("@customer", DBWorks.ValueOrNull(entryCustomer.Text != "", entryCustomer.Text));
 				cmd.Parameters.AddWithValue("@estimation", checkEstimation.Active);
@@ -294,8 +297,7 @@ namespace CupboardDesigner
 
 				cmd.ExecuteNonQuery();
 
-				if(NewItem)
-				{
+				if(NewItem) {
 					sql = @"select last_insert_rowid()";
 					cmd = new SqliteCommand(sql, (SqliteConnection)QSMain.ConnectionDB, trans);
 					ItemId = Convert.ToInt32(cmd.ExecuteScalar());
@@ -447,7 +449,12 @@ namespace CupboardDesigner
 				return false;
 			}
 		}
-//TODO:FIX. Add fucking cubes.
+
+		/// <summary>
+		/// Method for loading existing orders.
+		/// </summary>
+		/// <param name="id">Identifier - order id in database</param>
+		/// <param name="copy">If set to <c>true</c> copy.</param>
 		public void Fill(int id, bool copy)
 		{
 			NewItem = copy;
@@ -930,7 +937,7 @@ namespace CupboardDesigner
 		/// <param name="id">Identifier of basis.</param>
 		private void UpdateBasisComponents(int id)
 		{
-			if ((int)ComponentsStore.GetValue (BasisIter, (int)ComponentCol.nomenclature_id) == id)
+			if ((int)ComponentsStore.GetValue (BasisIter, (int)ComponentCol.nomenclature_id) == id && ComponentsStore.IterHasChild(BasisIter))
 				return; //False alarm. Nothing to change.
 			ComponentsStore.Remove (ref BasisIter); //Else setting up new basis tree component
 			BasisIter = ComponentsStore.AppendValues (
@@ -1203,6 +1210,38 @@ namespace CupboardDesigner
 			if (WeekE != WeekS)
 				dateDeadlineE.Date = dateDeadlineS.Date.AddDays((double)(5 - currentCulture.Calendar.GetDayOfWeek(dateDeadlineS.Date)));
 			OnOrderDatesChanged(sender, e);
+		}
+
+		protected void OnZoomInActionActivated (object sender, EventArgs e)
+		{
+			throw new NotImplementedException ();
+		}
+
+		protected void OnZoomOutActionActivated (object sender, EventArgs e)
+		{
+			throw new NotImplementedException ();
+		}
+
+		protected void OnPdfActionActivated (object sender, EventArgs e)
+		{
+			throw new NotImplementedException ();
+		}
+
+		protected void OnRefreshActionActivated (object sender, EventArgs e)
+		{
+			throw new NotImplementedException ();
+		}
+
+		protected void OnCheckbutton2Toggled (object sender, EventArgs e)
+		{
+			if (ColumnPrice.Visible && ColumnPriceTotal.Visible) {
+				ColumnPrice.Visible = false;
+				ColumnPriceTotal.Visible = false;
+			}
+			else {
+				ColumnPrice.Visible = true;
+				ColumnPriceTotal.Visible = true;
+			}
 		}
 
 	}

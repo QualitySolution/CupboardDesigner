@@ -112,6 +112,10 @@ namespace CupboardDesigner
 		
 		private global::Gtk.TreeView treeviewComponents;
 		
+		private global::Gtk.HBox hbox6;
+		
+		private global::Gtk.CheckButton checkbutton2;
+		
 		private global::Gtk.Label labelTotalCount;
 		
 		private global::Gtk.Label label15;
@@ -167,7 +171,7 @@ namespace CupboardDesigner
 			this.notebook1 = new global::Gtk.Notebook ();
 			this.notebook1.CanFocus = true;
 			this.notebook1.Name = "notebook1";
-			this.notebook1.CurrentPage = 1;
+			this.notebook1.CurrentPage = 3;
 			// Container child notebook1.Gtk.Notebook+NotebookChild
 			this.hbox1 = new global::Gtk.HBox ();
 			this.hbox1.Name = "hbox1";
@@ -644,18 +648,38 @@ namespace CupboardDesigner
 			global::Gtk.Box.BoxChild w44 = ((global::Gtk.Box.BoxChild)(this.vbox5 [this.GtkScrolledWindow1]));
 			w44.Position = 0;
 			// Container child vbox5.Gtk.Box+BoxChild
+			this.hbox6 = new global::Gtk.HBox ();
+			this.hbox6.Name = "hbox6";
+			this.hbox6.Spacing = 6;
+			// Container child hbox6.Gtk.Box+BoxChild
+			this.checkbutton2 = new global::Gtk.CheckButton ();
+			this.checkbutton2.CanFocus = true;
+			this.checkbutton2.Name = "checkbutton2";
+			this.checkbutton2.Label = global::Mono.Unix.Catalog.GetString ("Скрыть детальное отображение цены");
+			this.checkbutton2.DrawIndicator = true;
+			this.checkbutton2.UseUnderline = true;
+			this.hbox6.Add (this.checkbutton2);
+			global::Gtk.Box.BoxChild w45 = ((global::Gtk.Box.BoxChild)(this.hbox6 [this.checkbutton2]));
+			w45.Position = 0;
+			// Container child hbox6.Gtk.Box+BoxChild
 			this.labelTotalCount = new global::Gtk.Label ();
+			this.labelTotalCount.WidthRequest = 300;
 			this.labelTotalCount.Name = "labelTotalCount";
 			this.labelTotalCount.Xalign = 1F;
 			this.labelTotalCount.LabelProp = global::Mono.Unix.Catalog.GetString ("label2");
-			this.vbox5.Add (this.labelTotalCount);
-			global::Gtk.Box.BoxChild w45 = ((global::Gtk.Box.BoxChild)(this.vbox5 [this.labelTotalCount]));
-			w45.Position = 1;
-			w45.Expand = false;
-			w45.Fill = false;
+			this.hbox6.Add (this.labelTotalCount);
+			global::Gtk.Box.BoxChild w46 = ((global::Gtk.Box.BoxChild)(this.hbox6 [this.labelTotalCount]));
+			w46.Position = 1;
+			w46.Expand = false;
+			w46.Fill = false;
+			this.vbox5.Add (this.hbox6);
+			global::Gtk.Box.BoxChild w47 = ((global::Gtk.Box.BoxChild)(this.vbox5 [this.hbox6]));
+			w47.Position = 1;
+			w47.Expand = false;
+			w47.Fill = false;
 			this.notebook1.Add (this.vbox5);
-			global::Gtk.Notebook.NotebookChild w46 = ((global::Gtk.Notebook.NotebookChild)(this.notebook1 [this.vbox5]));
-			w46.Position = 3;
+			global::Gtk.Notebook.NotebookChild w48 = ((global::Gtk.Notebook.NotebookChild)(this.notebook1 [this.vbox5]));
+			w48.Position = 3;
 			// Notebook tab
 			this.label15 = new global::Gtk.Label ();
 			this.label15.Name = "label15";
@@ -671,8 +695,8 @@ namespace CupboardDesigner
 			this.reportviewer1.ShowErrors = false;
 			this.reportviewer1.ShowParameters = false;
 			this.notebook1.Add (this.reportviewer1);
-			global::Gtk.Notebook.NotebookChild w47 = ((global::Gtk.Notebook.NotebookChild)(this.notebook1 [this.reportviewer1]));
-			w47.Position = 4;
+			global::Gtk.Notebook.NotebookChild w49 = ((global::Gtk.Notebook.NotebookChild)(this.notebook1 [this.reportviewer1]));
+			w49.Position = 4;
 			// Notebook tab
 			this.label16 = new global::Gtk.Label ();
 			this.label16.Name = "label16";
@@ -680,8 +704,8 @@ namespace CupboardDesigner
 			this.notebook1.SetTabLabel (this.reportviewer1, this.label16);
 			this.label16.ShowAll ();
 			this.vbox2.Add (this.notebook1);
-			global::Gtk.Box.BoxChild w48 = ((global::Gtk.Box.BoxChild)(this.vbox2 [this.notebook1]));
-			w48.Position = 1;
+			global::Gtk.Box.BoxChild w50 = ((global::Gtk.Box.BoxChild)(this.vbox2 [this.notebook1]));
+			w50.Position = 1;
 			this.Add (this.vbox2);
 			if ((this.Child != null)) {
 				this.Child.ShowAll ();
@@ -704,6 +728,7 @@ namespace CupboardDesigner
 			this.drawCupboard.DragBegin += new global::Gtk.DragBeginHandler (this.OnDrawCupboardDragBegin);
 			this.drawCupboard.DragDataDelete += new global::Gtk.DragDataDeleteHandler (this.OnDrawCupboardDragDataDelete);
 			this.buttonCubeListOrientation.Clicked += new global::System.EventHandler (this.OnButtonCubeListOrientationClicked);
+			this.checkbutton2.Toggled += new global::System.EventHandler (this.OnCheckbutton2Toggled);
 		}
 	}
 }
