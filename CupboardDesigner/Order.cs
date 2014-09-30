@@ -709,7 +709,7 @@ namespace CupboardDesigner
 		{
 			bool Dateok = dateArrval.IsEmpty || dateDeadlineS.IsEmpty || dateArrval.Date <= dateDeadlineS.Date;
 
-			saveAction.Sensitive = printAction.Sensitive = Dateok;
+			saveAction.Sensitive = Dateok;
 		}
 
 
@@ -1154,11 +1154,6 @@ namespace CupboardDesigner
 
 			string ReportPath = System.IO.Path.Combine( Directory.GetCurrentDirectory(), "Reports", "order" + ".rdl");
 			reportviewer1.LoadReport(new Uri(ReportPath), param, QSMain.ConnectionString);
-		}
-
-		protected void OnPrintActionActivated(object sender, EventArgs e)
-		{
-			notebook1.CurrentPage = 4;
 		}
 
 		protected void OnOrderDatesChanged(object sender, EventArgs e)

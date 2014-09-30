@@ -9,7 +9,6 @@
     <widget-library name="../../../QSProjects/QSProjectsLib/bin/Debug/QSProjectsLib.dll" />
     <widget-library name="../../../QSProjects/QSSupportLib/bin/Debug/QSSupportLib.dll" />
     <widget-library name="../../../My-FyiReporting/RdlGtkViewer/RdlGtkViewer/bin/Debug/RdlGtkViewer.exe" />
-    <widget-library name="../../../QSProjects/QSWidgetLib/bin/Debug/QSWidgetLib.dll" />
     <widget-library name="../bin/Debug/CupboardDesigner.exe" internal="true" />
   </import>
   <widget class="Gtk.Window" id="MainWindow" design-size="725 465">
@@ -1756,7 +1755,7 @@
       </widget>
     </child>
   </widget>
-  <widget class="Gtk.Window" id="CupboardDesigner.Order" design-size="831 558">
+  <widget class="Gtk.Window" id="CupboardDesigner.Order" design-size="901 602">
     <action-group name="Default">
       <action id="revertToSavedAction">
         <property name="Type">Action</property>
@@ -1790,14 +1789,6 @@
         <property name="StockId">gtk-save</property>
         <property name="Tooltip" translatable="yes">Сохранить изменения</property>
         <signal name="Activated" handler="OnSaveActionActivated" />
-      </action>
-      <action id="printAction">
-        <property name="Type">Action</property>
-        <property name="Label" translatable="yes">Печать</property>
-        <property name="ShortLabel" translatable="yes">Печать</property>
-        <property name="StockId">gtk-print</property>
-        <property name="Tooltip" translatable="yes">Напечатать заказ</property>
-        <signal name="Activated" handler="OnPrintActionActivated" />
       </action>
     </action-group>
     <property name="MemberName" />

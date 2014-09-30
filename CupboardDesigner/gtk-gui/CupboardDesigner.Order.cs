@@ -14,8 +14,6 @@ namespace CupboardDesigner
 		
 		private global::Gtk.Action saveAction;
 		
-		private global::Gtk.Action printAction;
-		
 		private global::Gtk.VBox vbox2;
 		
 		private global::Gtk.Toolbar toolbar1;
@@ -149,9 +147,6 @@ namespace CupboardDesigner
 			this.saveAction = new global::Gtk.Action ("saveAction", global::Mono.Unix.Catalog.GetString ("Сохранить"), global::Mono.Unix.Catalog.GetString ("Сохранить изменения"), "gtk-save");
 			this.saveAction.ShortLabel = global::Mono.Unix.Catalog.GetString ("Сохранить");
 			w1.Add (this.saveAction, null);
-			this.printAction = new global::Gtk.Action ("printAction", global::Mono.Unix.Catalog.GetString ("Печать"), global::Mono.Unix.Catalog.GetString ("Напечатать заказ"), "gtk-print");
-			this.printAction.ShortLabel = global::Mono.Unix.Catalog.GetString ("Печать");
-			w1.Add (this.printAction, null);
 			this.UIManager.InsertActionGroup (w1, 0);
 			this.AddAccelGroup (this.UIManager.AccelGroup);
 			this.Name = "CupboardDesigner.Order";
@@ -749,14 +744,13 @@ namespace CupboardDesigner
 			if ((this.Child != null)) {
 				this.Child.ShowAll ();
 			}
-			this.DefaultWidth = 831;
-			this.DefaultHeight = 558;
+			this.DefaultWidth = 901;
+			this.DefaultHeight = 602;
 			this.Show ();
 			this.revertToSavedAction.Activated += new global::System.EventHandler (this.OnRevertToSavedActionActivated);
 			this.goBackAction.Activated += new global::System.EventHandler (this.OnGoBackActionActivated);
 			this.goForwardAction.Activated += new global::System.EventHandler (this.OnGoForwardActionActivated);
 			this.saveAction.Activated += new global::System.EventHandler (this.OnSaveActionActivated);
-			this.printAction.Activated += new global::System.EventHandler (this.OnPrintActionActivated);
 			this.notebook1.SwitchPage += new global::Gtk.SwitchPageHandler (this.OnNotebook1SwitchPage);
 			this.dateDeadlineS.DateChanged += new global::System.EventHandler (this.OnDateDeadlineSDateChanged);
 			this.checkEstimation.Clicked += new global::System.EventHandler (this.OnCheckEstimationClicked);
