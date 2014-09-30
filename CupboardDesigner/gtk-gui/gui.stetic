@@ -2652,10 +2652,11 @@
                     <property name="MemberName" />
                     <property name="Spacing">6</property>
                     <child>
-                      <widget class="Gtk.CheckButton" id="checkbutton2">
+                      <widget class="Gtk.CheckButton" id="checkbuttonShowPrice">
                         <property name="MemberName" />
                         <property name="CanFocus">True</property>
-                        <property name="Label" translatable="yes">Скрыть цены</property>
+                        <property name="Label" translatable="yes">Показать расчет стоимости</property>
+                        <property name="Active">True</property>
                         <property name="DrawIndicator">True</property>
                         <property name="HasLabel">True</property>
                         <property name="UseUnderline">True</property>
@@ -2667,10 +2668,10 @@
                       </packing>
                     </child>
                     <child>
-                      <widget class="Gtk.CheckButton" id="checkbutton1">
+                      <widget class="Gtk.CheckButton" id="checkbuttonDiscount">
                         <property name="MemberName" />
                         <property name="CanFocus">True</property>
-                        <property name="Label" translatable="yes">Скидка / Наценка:</property>
+                        <property name="Label" translatable="yes">Скидка:</property>
                         <property name="DrawIndicator">True</property>
                         <property name="HasLabel">True</property>
                         <property name="UseUnderline">True</property>

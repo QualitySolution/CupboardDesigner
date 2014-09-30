@@ -112,9 +112,9 @@ namespace CupboardDesigner
 		
 		private global::Gtk.HBox hbox6;
 		
-		private global::Gtk.CheckButton checkbutton2;
+		private global::Gtk.CheckButton checkbuttonShowPrice;
 		
-		private global::Gtk.CheckButton checkbutton1;
+		private global::Gtk.CheckButton checkbuttonDiscount;
 		
 		private global::Gtk.SpinButton spinbutton1;
 		
@@ -653,24 +653,25 @@ namespace CupboardDesigner
 			this.hbox6.Name = "hbox6";
 			this.hbox6.Spacing = 6;
 			// Container child hbox6.Gtk.Box+BoxChild
-			this.checkbutton2 = new global::Gtk.CheckButton ();
-			this.checkbutton2.CanFocus = true;
-			this.checkbutton2.Name = "checkbutton2";
-			this.checkbutton2.Label = global::Mono.Unix.Catalog.GetString ("Скрыть цены");
-			this.checkbutton2.DrawIndicator = true;
-			this.checkbutton2.UseUnderline = true;
-			this.hbox6.Add (this.checkbutton2);
-			global::Gtk.Box.BoxChild w45 = ((global::Gtk.Box.BoxChild)(this.hbox6 [this.checkbutton2]));
+			this.checkbuttonShowPrice = new global::Gtk.CheckButton ();
+			this.checkbuttonShowPrice.CanFocus = true;
+			this.checkbuttonShowPrice.Name = "checkbuttonShowPrice";
+			this.checkbuttonShowPrice.Label = global::Mono.Unix.Catalog.GetString ("Показать расчет стоимости");
+			this.checkbuttonShowPrice.Active = true;
+			this.checkbuttonShowPrice.DrawIndicator = true;
+			this.checkbuttonShowPrice.UseUnderline = true;
+			this.hbox6.Add (this.checkbuttonShowPrice);
+			global::Gtk.Box.BoxChild w45 = ((global::Gtk.Box.BoxChild)(this.hbox6 [this.checkbuttonShowPrice]));
 			w45.Position = 0;
 			// Container child hbox6.Gtk.Box+BoxChild
-			this.checkbutton1 = new global::Gtk.CheckButton ();
-			this.checkbutton1.CanFocus = true;
-			this.checkbutton1.Name = "checkbutton1";
-			this.checkbutton1.Label = global::Mono.Unix.Catalog.GetString ("Скидка / Наценка:");
-			this.checkbutton1.DrawIndicator = true;
-			this.checkbutton1.UseUnderline = true;
-			this.hbox6.Add (this.checkbutton1);
-			global::Gtk.Box.BoxChild w46 = ((global::Gtk.Box.BoxChild)(this.hbox6 [this.checkbutton1]));
+			this.checkbuttonDiscount = new global::Gtk.CheckButton ();
+			this.checkbuttonDiscount.CanFocus = true;
+			this.checkbuttonDiscount.Name = "checkbuttonDiscount";
+			this.checkbuttonDiscount.Label = global::Mono.Unix.Catalog.GetString ("Скидка:");
+			this.checkbuttonDiscount.DrawIndicator = true;
+			this.checkbuttonDiscount.UseUnderline = true;
+			this.hbox6.Add (this.checkbuttonDiscount);
+			global::Gtk.Box.BoxChild w46 = ((global::Gtk.Box.BoxChild)(this.hbox6 [this.checkbuttonDiscount]));
 			w46.Position = 1;
 			w46.Expand = false;
 			// Container child hbox6.Gtk.Box+BoxChild
@@ -763,8 +764,8 @@ namespace CupboardDesigner
 			this.drawCupboard.DragBegin += new global::Gtk.DragBeginHandler (this.OnDrawCupboardDragBegin);
 			this.drawCupboard.DragDataDelete += new global::Gtk.DragDataDeleteHandler (this.OnDrawCupboardDragDataDelete);
 			this.buttonCubeListOrientation.Clicked += new global::System.EventHandler (this.OnButtonCubeListOrientationClicked);
-			this.checkbutton2.Toggled += new global::System.EventHandler (this.OnCheckbutton2Toggled);
-			this.checkbutton1.Toggled += new global::System.EventHandler (this.OnCheckbutton1Toggled);
+			this.checkbuttonShowPrice.Toggled += new global::System.EventHandler (this.OnCheckbutton2Toggled);
+			this.checkbuttonDiscount.Toggled += new global::System.EventHandler (this.OnCheckbutton1Toggled);
 			this.spinbutton1.ValueChanged += new global::System.EventHandler (this.OnSpinbutton1ValueChanged);
 		}
 	}

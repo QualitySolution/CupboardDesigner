@@ -113,6 +113,7 @@ namespace CupboardDesigner
 
 			ColumnPrice = new Gtk.TreeViewColumn ();
 			ColumnPrice.Title = "Цена";
+			ColumnPrice.Visible = false;
 			Gtk.CellRendererText CellPrice = new CellRendererText ();
 			CellPrice.Editable = true;
 			CellPrice.Edited += OnPriceEdited;
@@ -121,6 +122,7 @@ namespace CupboardDesigner
 
 			ColumnPriceTotal = new Gtk.TreeViewColumn ();
 			ColumnPriceTotal.Title = "Сумма";
+			ColumnPriceTotal.Visible = false;
 			Gtk.CellRendererText CellPriceTotal = new CellRendererText ();
 			CellPriceTotal.Editable = false;
 			ColumnPriceTotal.PackStart (CellPriceTotal, true);
@@ -151,7 +153,7 @@ namespace CupboardDesigner
 
 			spinbutton1.Sensitive = false;
 			spinbutton1.Value = PriceCorrection;
-			checkbutton2.Active = false;
+			checkbuttonShowPrice.Active = false;
 
 			CurrentDrag = new DragInformation();
 			//Загрузка списка кубов
@@ -502,7 +504,7 @@ namespace CupboardDesigner
 					TotalPrice = DBWorks.GetDecimal(rdr, "total_price", 0);
 					spinbutton1.Value = PriceCorrection;
 					if (PriceCorrection != 0)
-						checkbutton1.Active = true;
+						checkbuttonDiscount.Active = true;
 					labelTotalCount.LabelProp = String.Format("Итого {0} руб.", TotalPrice);
 					ComponentsStore.Remove(ref BasisIter);
 					BasisIter = ComponentsStore.AppendValues (
@@ -1125,9 +1127,8 @@ namespace CupboardDesigner
 					}
 				} while(ComponentsStore.IterNext (ref iter));
 			}
-		 	labelTotalCount.LabelProp = String.Format("Итого {0} руб.", Decimal.Round(TotalPrice + (TotalPrice / 100 * PriceCorrection), 2));
-		//labelTotalCount.LabelProp = String.Format("Итого {0} руб.", TotalPrice);
-	}
+			labelTotalCount.LabelProp = String.Format("Итого: {0:C} ", Decimal.Round(TotalPrice + (TotalPrice / 100 * PriceCorrection), 2));
+		}
 
 		private void PrerareReport()
 		{
@@ -1240,14 +1241,7 @@ namespace CupboardDesigner
 
 		protected void OnCheckbutton2Toggled (object sender, EventArgs e)
 		{
-			if (ColumnPrice.Visible && ColumnPriceTotal.Visible) {
-				ColumnPrice.Visible = false;
-				ColumnPriceTotal.Visible = false;
-			}
-			else {
-				ColumnPrice.Visible = true;
-				ColumnPriceTotal.Visible = true;
-			}
+			ColumnPrice.Visible = ColumnPriceTotal.Visible = checkbuttonShowPrice.Active;
 		}
 
 		protected void OnCheckbutton1Toggled (object sender, EventArgs e)
@@ -1265,8 +1259,12 @@ namespace CupboardDesigner
 
 		protected void OnSpinbutton1ValueChanged (object sender, EventArgs e) 
 		{
-			PriceCorrection = (int)spinbutton1.Value;
+			PriceCorrection = spinbutton1.ValueAsInt;
 			CalculateTotalCount ();
+			if (spinbutton1.ValueAsInt > 0)
+				checkbuttonDiscount.Label = "Наценка:";
+			else
+				checkbuttonDiscount.Label = "Скидка:";
 		}
 	}
 }
