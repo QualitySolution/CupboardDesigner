@@ -566,7 +566,7 @@ LEFT JOIN basis ON basis.id = orders.basis_id
           <Textbox Name="Textbox2">
             <Height>12.99pt</Height>
             <Width>218.79pt</Width>
-            <Value>="Итого: " + Math.Round((total_price +  total_price / 100 * price_correction), 2)  + " руб."</Value>
+            <Value>="Итого: " + Convert.ToString(Math.Round(Fields!total_price.Value * (Fields!price_correction.Value + 100) / 100, 2)) + " руб."</Value>
             <ZIndex>1</ZIndex>
             <Left>347.30pt</Left>
             <Top>3.00pt</Top>
