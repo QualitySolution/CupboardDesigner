@@ -13,8 +13,6 @@ namespace CupboardDesigner
 		private static Logger logger = LogManager.GetCurrentClassLogger();
 		public bool NewItem;
 		private int ItemId;
-		private byte[] ImageFile;
-		private bool ImageChanged = false;
 
 		internal enum NomType {cube, construct};
 
@@ -23,12 +21,10 @@ namespace CupboardDesigner
 			this.Build();
 
 			OnComboTypeChanged(comboType, EventArgs.Empty);
-			drawCube.SetSizeRequest(200, 200);
 		}
 
 		protected void OnComboTypeChanged(object sender, EventArgs e)
 		{
-			buttonLoadImage.Sensitive = comboType.Active == 0;
 			int SizeStep = (comboType.Active == 0) ? 400 : 1;
 			spinH.Adjustment.StepIncrement = spinL.Adjustment.StepIncrement = spinW.Adjustment.StepIncrement = SizeStep;
 			checkPlusH.Visible = checkPlusL.Visible = comboType.Active == 1;
@@ -64,14 +60,7 @@ namespace CupboardDesigner
 						checkPlusH.Active = DBWorks.GetBoolean(rdr, "plush", false);
 						checkPlusL.Active = DBWorks.GetBoolean(rdr, "plusl", false);
 					}
-
-					if(rdr["image"] != DBNull.Value)
-					{
-						int size = DBWorks.GetInt(rdr, "image_size", 0);
-						ImageFile = new byte[size];
-						rdr.GetBytes(rdr.GetOrdinal("image"), 0, ImageFile, 0, size);
-						drawCube.QueueDraw();
-					}
+					spinPrice.Value = DBWorks.GetDouble(rdr, "price", 0);
 				}
 
 				MainClass.StatusMessage("Ok");
@@ -97,13 +86,13 @@ namespace CupboardDesigner
 			string sql;
 			if(NewItem)
 			{
-				sql = "INSERT INTO nomenclature (type, article, name, description, widht, lenght, height, plusl, plush) " +
-					"VALUES (@type, @article, @name, @description, @widht, @lenght, @height, @plusl, @plush)";
+				sql = "INSERT INTO nomenclature (type, article, name, description, widht, lenght, height, plusl, plush, price) " +
+					"VALUES (@type, @article, @name, @description, @widht, @lenght, @height, @plusl, @plush, @price)";
 			}
 			else
 			{
 				sql = "UPDATE nomenclature SET type = @type, article = @article, name = @name, description = @description, " +
-					"widht = @widht, lenght = @lenght, height = @height, plusl = @plusl, plush = @plush WHERE id = @id";
+					"widht = @widht, lenght = @lenght, height = @height, plusl = @plusl, plush = @plush, price = @price WHERE id = @id";
 			}
 			MainClass.StatusMessage("Запись номенклатуры...");
 			SqliteTransaction trans = (SqliteTransaction)QSMain.ConnectionDB.BeginTransaction();
@@ -121,6 +110,7 @@ namespace CupboardDesigner
 				cmd.Parameters.AddWithValue("@height", DBWorks.ValueOrNull(spinH.ValueAsInt > 0, spinH.ValueAsInt));
 				cmd.Parameters.AddWithValue("@plush", DBWorks.ValueOrNull(comboType.Active == (int)NomType.construct , checkPlusH.Active));
 				cmd.Parameters.AddWithValue("@plusl", DBWorks.ValueOrNull(comboType.Active == (int)NomType.construct, checkPlusL.Active));
+				cmd.Parameters.AddWithValue("@price", DBWorks.ValueOrNull(spinPrice.ValueAsInt > 0, spinPrice.ValueAsInt));
 
 				cmd.ExecuteNonQuery();
 
@@ -133,16 +123,6 @@ namespace CupboardDesigner
 					sql = "UPDATE nomenclature SET ordinal = @id WHERE id = @id";
 					cmd = new SqliteCommand(sql, (SqliteConnection)QSMain.ConnectionDB, trans);
 					cmd.Parameters.AddWithValue("@id", ItemId);
-					cmd.ExecuteNonQuery();
-				}
-
-				if(ImageChanged)
-				{
-					sql = "UPDATE nomenclature SET image_size = @image_size, image = @image WHERE id = @id";
-					cmd = new SqliteCommand(sql, (SqliteConnection)QSMain.ConnectionDB, trans);
-					cmd.Parameters.AddWithValue("@id", ItemId);
-					cmd.Parameters.AddWithValue("@image_size", ImageFile.Length);
-					cmd.Parameters.AddWithValue("@image", ImageFile);
 					cmd.ExecuteNonQuery();
 				}
 
@@ -159,69 +139,6 @@ namespace CupboardDesigner
 			}
 
 		}
-
-		protected void OnButtonLoadImageClicked(object sender, EventArgs e)
-		{
-			FileChooserDialog Chooser = new FileChooserDialog("Выберите svg для загрузки...", 
-				this,
-				FileChooserAction.Open,
-				"Отмена", ResponseType.Cancel,
-				"Загрузить", ResponseType.Accept );
-
-			FileFilter Filter = new FileFilter();
-			Filter.Name = "SVG изображение";
-			Filter.AddMimeType("image/svg+xml");
-			Filter.AddPattern("*.svg");
-			Chooser.AddFilter(Filter);
-
-			Filter = new FileFilter();
-			Filter.Name = "Все файлы";
-			Filter.AddPattern("*.*");
-			Chooser.AddFilter(Filter);
-
-			if((ResponseType) Chooser.Run () == ResponseType.Accept)
-			{
-				Chooser.Hide();
-				MainClass.StatusMessage("Загрузка изображения куба...");
-				if(entryName.Text == "")
-				{
-					entryName.Text = System.IO.Path.GetFileNameWithoutExtension(Chooser.Filename);
-				}
-				using (FileStream fs = new FileStream(Chooser.Filename, FileMode.Open, FileAccess.Read))
-				{
-					using (MemoryStream ms = new MemoryStream())
-					{
-						fs.CopyTo(ms);
-						ImageFile = ms.ToArray();
-					}
-				}
-				ImageChanged = true;
-				drawCube.QueueDraw();
-				MainClass.StatusMessage("Ok");
-			}
-			Chooser.Destroy ();
-		}
-
-		protected void OnDrawCubeExposeEvent(object o, ExposeEventArgs args)
-		{
-			if (ImageFile == null)
-				return;
-			logger.Debug("Render Cairo");
-			using (Context cr = Gdk.CairoHelper.Create (args.Event.Window)) 
-			{
-				int MaxWidth = args.Event.Area.Width;
-				int MaxHeight = args.Event.Area.Height;
-				logger.Debug("Image widget size W: {0} H: {1}", MaxWidth, MaxHeight);
-
-				Rsvg.Handle svg = new Rsvg.Handle(ImageFile);
-				double vratio = (double) MaxHeight / svg.Dimensions.Height;
-				double hratio = (double) MaxWidth / svg.Dimensions.Width;
-				double ratio = Math.Min(vratio, hratio);
-				cr.Scale(ratio, ratio);
-				svg.RenderCairo(cr);
-			}
-		}
-
 	}
 }
 

@@ -204,7 +204,7 @@ namespace CupboardDesigner
 			this.label6 = new global::Gtk.Label ();
 			this.label6.Name = "label6";
 			this.label6.Xalign = 1F;
-			this.label6.LabelProp = global::Mono.Unix.Catalog.GetString ("Ширина (W)");
+			this.label6.LabelProp = global::Mono.Unix.Catalog.GetString ("Ширина (W):");
 			this.table1.Add (this.label6);
 			global::Gtk.Table.TableChild w13 = ((global::Gtk.Table.TableChild)(this.table1 [this.label6]));
 			w13.TopAttach = ((uint)(3));
@@ -318,7 +318,7 @@ namespace CupboardDesigner
 			if ((this.Child != null)) {
 				this.Child.ShowAll ();
 			}
-			this.DefaultWidth = 565;
+			this.DefaultWidth = 575;
 			this.DefaultHeight = 300;
 			this.Show ();
 			this.drawCube.ExposeEvent += new global::Gtk.ExposeEventHandler (this.OnDrawCubeExposeEvent);

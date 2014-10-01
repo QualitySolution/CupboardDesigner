@@ -162,8 +162,9 @@ public partial class MainWindow: Gtk.Window
 	protected void OnAction9Activated(object sender, EventArgs e)
 	{
 		Reference winref = new Reference();
-		winref.SqlSelect = "SELECT id, name FROM @tablename ORDER BY ordinal";
+		winref.SqlSelect = "SELECT id, name, price FROM @tablename ORDER BY ordinal";
 		winref.OrdinalField = "ordinal";
+		winref.Columns.Add(new Reference.ColumnInfo("Цена", "{2:C}", false));
 		winref.SetMode(false,false,true,true,true);
 		winref.FillList("nomenclature", "номенклатура", "Номенклатура");
 		winref.Show();
