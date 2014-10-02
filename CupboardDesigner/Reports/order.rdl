@@ -74,9 +74,9 @@ where orders.id = @id;</CommandText>
       </Fields>
     </DataSet>
     <DataSet Name="Order">
-      <Query >
+      <Query>
         <DataSourceName>DS1</DataSourceName>
-        <CommandText>SELECT customer, orders.address as customaddress, phone1, orders.phone2, arrval, deadline_s, deadline_e, contract, exhibition.name as exhibition, exhibition.phone as exphone1, exhibition.phone2 as exphone2, total_price, price_correction, exhibition.address, comment, basis.delta_h, basis.delta_l FROM orders
+        <CommandText>SELECT customer, orders.address as customaddress, phone1, orders.phone2, arrval, deadline_s, deadline_e, contract, exhibition.name as exhibition, exhibition.phone as exphone1, exhibition.phone2 as exphone2, total_price, price_correction, exhibition.address, comment, basis.delta_h, basis.delta_l, orders.cutting_base FROM orders
  LEFT JOIN exhibition ON exhibition_id = exhibition.id
 LEFT JOIN basis ON basis.id = orders.basis_id
  WHERE orders.id = @id</CommandText>
@@ -86,7 +86,7 @@ LEFT JOIN basis ON basis.id = orders.basis_id
           </QueryParameter>
         </QueryParameters>
       </Query>
-      <Fields >
+      <Fields>
         <Field Name="customer">
           <DataField>customer</DataField>
           <TypeName>System.String</TypeName>
@@ -153,6 +153,10 @@ LEFT JOIN basis ON basis.id = orders.basis_id
         </Field>
         <Field Name="price_correction">
           <DataField>price_correction</DataField>
+          <TypeName>System.Int32</TypeName>
+        </Field>
+        <Field Name="cutting_base">
+          <DataField>cutting_base</DataField>
           <TypeName>System.Int32</TypeName>
         </Field>
       </Fields>
@@ -611,11 +615,11 @@ LEFT JOIN basis ON basis.id = orders.basis_id
       </Textbox>
       <Textbox Name="Textbox33">
         <Height>13.50pt</Height>
-        <Width>124.89pt</Width>
-        <Value>="Высота (H) " + Convert.ToString(First(Fields!delta_h.Value, "Order") + {?baseh} * 400) + " мм"</Value>
+        <Width>188.71pt</Width>
+        <Value>="Высота (H) " + Convert.ToString(First(Fields!delta_h.Value, "Order") + {?baseh} * 400 - First(Fields!cutting_base.Value, "Order") * 50) + " мм" + Iif(First(Fields!cutting_base.Value, "Order") = 1, " (урез.)", "")</Value>
         <ZIndex>1</ZIndex>
-        <Left>10.0pt</Left>
-        <Top>202.3pt</Top>
+        <Left>10.00pt</Left>
+        <Top>202.30pt</Top>
         <Style>
           <BorderStyle />
           <BorderColor />
@@ -627,8 +631,8 @@ LEFT JOIN basis ON basis.id = orders.basis_id
         <Width>118.90pt</Width>
         <Value>="Длина (L) " + Convert.ToString(First(Fields!delta_l.Value, "Order") + {?basel} * 400) + " мм"</Value>
         <ZIndex>1</ZIndex>
-        <Left>10.0pt</Left>
-        <Top>173.2pt</Top>
+        <Left>10.00pt</Left>
+        <Top>173.20pt</Top>
         <Style>
           <BorderStyle />
           <BorderColor />
