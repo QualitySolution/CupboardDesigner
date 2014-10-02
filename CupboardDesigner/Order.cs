@@ -16,6 +16,7 @@ namespace CupboardDesigner
 		private static Logger logger = LogManager.GetCurrentClassLogger();
 		private bool NewItem = true;
 		private int ItemId;
+		private bool FillInProgress = false;
 		private TreeStore ComponentsStore;
 		private TreeModel MaterialNameList, FacingNameList;
 		private List<Cube> CubeList;
@@ -417,6 +418,7 @@ namespace CupboardDesigner
 							if(ComponentsStore.IterHasChild(iter)) {
 								ComponentsStore.IterChildren(out childIter, iter);
 								do { //Adding every nomenclature for basis
+
 									bool HasValue = (int) ComponentsStore.GetValue(childIter, (int)ComponentCol.count) > 0;
 									bool InDB = (long)ComponentsStore.GetValue(childIter, (int)ComponentCol.row_id) > 0;
 									if(HasValue) {
@@ -475,6 +477,7 @@ namespace CupboardDesigner
 		/// <param name="copy">If set to <c>true</c> copy.</param>
 		public void Fill(int id, bool copy)
 		{
+			FillInProgress = true;
 			NewItem = copy;
 			if(!copy)
 				ItemId = id;
@@ -642,7 +645,7 @@ namespace CupboardDesigner
 				}
 				CalculateTotalCount();
 				basis.Button.Click();
-
+				FillInProgress = false;
 				MainClass.StatusMessage("Ok");
 			}
 			catch (Exception ex)
@@ -977,48 +980,61 @@ namespace CupboardDesigner
 		/// <param name="id">Identifier of basis.</param>
 		private void UpdateBasisComponents(int id)
 		{
-			if ((int)ComponentsStore.GetValue (BasisIter, (int)ComponentCol.nomenclature_id) == id && ComponentsStore.IterHasChild(BasisIter))
-				return; //False alarm. Nothing to change.
-			ComponentsStore.Remove (ref BasisIter); //Else setting up new basis tree component
-			BasisIter = ComponentsStore.AppendValues (
-				(long)-1, Enum.Parse(typeof(Nomenclature.NomType), "construct"), id, null, "Каркас", null, 1,	-1,	"",	-1,	"",	"",	"", "", false, false, true, true);
+			if (FillInProgress)
+				return;
+			Dictionary<int, TreeIter> pairs= new Dictionary<int, TreeIter> ();
+			TreeIter iter;
+			//Making all components inside basis NULL.
+			if (ComponentsStore.IterHasChild (BasisIter)) {
+				ComponentsStore.IterChildren (out iter, BasisIter);
+				do {
+					ComponentsStore.SetValue (iter, (int)ComponentCol.count, 0);
+					ComponentsStore.SetValue (iter, (int)ComponentCol.price_total, "0");
+					pairs.Add((int)ComponentsStore.GetValue(iter, (int)ComponentCol.nomenclature_id), iter);
+				} while (ComponentsStore.IterNext (ref iter));
+			}
+
 			string sql = "SELECT nomenclature.name as nomenclature, nomenclature.type, nomenclature.description, nomenclature.price, basis_items.* " +
 				"FROM basis_items LEFT JOIN nomenclature ON nomenclature.id = basis_items.item_id WHERE basis_id = @basis_id";
 			SqliteCommand cmd = new SqliteCommand(sql, (SqliteConnection)QSMain.ConnectionDB);
 			cmd.Parameters.AddWithValue("@basis_id", id);
-			Decimal Price = 0;
 			using (SqliteDataReader rdr = cmd.ExecuteReader())
 			{
 				while (rdr.Read())
 				{
-					Price += DBWorks.GetDecimal (rdr, "price", 0);
-					ComponentsStore.AppendValues(
-						BasisIter,
-						(long)-1,
-						Enum.Parse(typeof(Nomenclature.NomType), rdr["type"].ToString()),
-						DBWorks.GetInt(rdr, "item_id", -1),
-						DBWorks.GetString(rdr, "nomenclature", "нет"),
-						ReplaceArticle(DBWorks.GetString(rdr, "nomenclature", "нет")),
-						DBWorks.GetString(rdr, "description", ""),
-						DBWorks.GetInt(rdr, "count", 1),
-						-1,
-						"",
-						-1,
-						"",
-						"",
-						DBWorks.GetDecimal(rdr, "price", 0).ToString(),
-						(DBWorks.GetDecimal(rdr, "price", 0) * DBWorks.GetInt(rdr, "count", 1)).ToString(),
-						true,
-						true,
-						false,
-						false
-					);
+					if (pairs.TryGetValue (DBWorks.GetInt (rdr, "item_id", -1), out iter)) {
+						int count = DBWorks.GetInt (rdr, "count", 1);
+						Decimal price = count * Decimal.Parse(ComponentsStore.GetValue (iter, (int)ComponentCol.price).ToString());
+						ComponentsStore.SetValue (iter, (int)ComponentCol.count, count);
+						ComponentsStore.SetValue (iter, (int)ComponentCol.price_total, price.ToString());
+					} else {
+						ComponentsStore.AppendValues (
+							BasisIter,
+							(long)-1,
+							Enum.Parse (typeof(Nomenclature.NomType), rdr ["type"].ToString ()),
+							DBWorks.GetInt (rdr, "item_id", -1),
+							DBWorks.GetString (rdr, "nomenclature", "нет"),
+							ReplaceArticle (DBWorks.GetString (rdr, "nomenclature", "нет")),
+							DBWorks.GetString (rdr, "description", ""),
+							DBWorks.GetInt (rdr, "count", 1),
+							-1,
+							"",
+							-1,
+							"",
+							"",
+							DBWorks.GetDecimal (rdr, "price", 0).ToString (),
+							(DBWorks.GetDecimal (rdr, "price", 0) * DBWorks.GetInt (rdr, "count", 0)).ToString (),
+							true,
+							true,
+							false,
+							false
+						);
+					}
 				}
-				ComponentsStore.SetValue (BasisIter, (int)ComponentCol.price_total, Price.ToString ());
 			}
 			CalculateTotalCount();
 		}
-
+			
 		/// <summary>
 		/// Updates the cube components. Adding one or removing if needed.
 		/// </summary>
