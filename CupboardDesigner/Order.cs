@@ -60,7 +60,8 @@ namespace CupboardDesigner
 			editable_count,
 			editable_price,
 			editable_material,
-			editable_facing
+			editable_facing,
+			editable_comment
 		}
 
 		public Order() : base(Gtk.WindowType.Toplevel)
@@ -81,8 +82,8 @@ namespace CupboardDesigner
 			FacingNameList = TempCombo.Model;
 			TempCombo.Destroy ();
 
-			ComponentsStore = new TreeStore(typeof(long), typeof(Nomenclature.NomType), typeof(int), typeof(string), typeof(string), typeof(string), typeof(int), typeof(int), typeof(string), typeof(int), typeof(string), typeof(string), typeof(string), typeof(string), typeof(bool), typeof(bool), typeof(bool), typeof(bool));
-			BasisIter = ComponentsStore.AppendValues ((long)-1, Enum.Parse(typeof(Nomenclature.NomType), "construct"), 1, null, "Каркас", null, 1, -1, "", -1, "", "", "", "");
+			ComponentsStore = new TreeStore(typeof(long), typeof(Nomenclature.NomType), typeof(int), typeof(string), typeof(string), typeof(string), typeof(int), typeof(int), typeof(string), typeof(int), typeof(string), typeof(string), typeof(string), typeof(string), typeof(bool), typeof(bool), typeof(bool), typeof(bool), typeof(bool));
+			BasisIter = ComponentsStore.AppendValues ((long)-1, Enum.Parse(typeof(Nomenclature.NomType), "construct"), 1, null, "Каркас", null, 1, -1, "", -1, "", "", "", "", false, false, false, false, false);
 
 			ColumnCount = new Gtk.TreeViewColumn ();
 			ColumnCount.Title = "Кол-во";
@@ -149,6 +150,7 @@ namespace CupboardDesigner
 			ColumnComment.MaxWidth = 500;
 			ColumnComment.PackStart (CellComment, true);
 			ColumnComment.AddAttribute(CellComment, "text", (int)ComponentCol.comment);
+			ColumnComment.AddAttribute(CellComment, "editable", (int)ComponentCol.editable_comment);
 
 			treeviewComponents.AppendColumn("Название", new Gtk.CellRendererText (), "text", (int)ComponentCol.nomenclature_title);
 			treeviewComponents.AppendColumn(ColumnCount);
@@ -272,17 +274,16 @@ namespace CupboardDesigner
 		{
 			string sql;
 			if (NewItem) {
-				sql = "INSERT INTO orders (customer, estimation, contract, address, phone1, phone2, exhibition_id, basis_id, arrval, deadline_s, " +
-					"deadline_e, comment, cupboard, total_price, basis_facing_id, basis_facing, basis_material_id, basis_material, basis_comment, price_correction, cutting_base) " +
-					"VALUES (@customer, @estimation, @contract, @address, @phone1, @phone2, @exhibition_id, @basis_id, @arrval, @deadline_s, @deadline_e, " +
-					"@comment, @cupboard, @total_price, @basis_facing_id, @basis_facing, @basis_material_id, @basis_material, @basis_comment, @price_correction, @cutting_base)";
+				sql = "INSERT INTO orders (customer, estimation, contract, address, phone1, phone2, exhibition_id, basis_id, " +
+					"arrval, deadline_s, deadline_e, comment, cupboard, total_price, price_correction, cutting_base) " +
+					"VALUES (@customer, @estimation, @contract, @address, @phone1, @phone2, @exhibition_id, @basis_id, @arrval, " +
+					"@deadline_s, @deadline_e, @comment, @cupboard, @total_price, @price_correction, @cutting_base)";
 			}
 			else {
-				sql = "UPDATE orders SET customer = @customer, estimation = @estimation, contract = @contract, address = @address, phone1 = @phone1, " +
-					"phone2 = @phone2, exhibition_id = @exhibition_id, basis_id = @basis_id, arrval = @arrval, deadline_s = @deadline_s, " +
-					"deadline_e = @deadline_e, comment = @comment, cupboard = @cupboard, total_price = @total_price, basis_facing_id = @basis_facing_id, " +
-					"basis_facing = @basis_facing, basis_material_id = @basis_material_id, basis_material = @basis_material, basis_comment = @basis_comment, " +
-					"price_correction = @price_correction, cutting_base = @cutting_base WHERE id = @id";
+				sql = "UPDATE orders SET customer = @customer, estimation = @estimation, contract = @contract, address = @address, " +
+					"phone1 = @phone1, phone2 = @phone2, exhibition_id = @exhibition_id, basis_id = @basis_id, arrval = @arrval, " +
+					"deadline_s = @deadline_s, deadline_e = @deadline_e, comment = @comment, cupboard = @cupboard, " +
+					"total_price = @total_price, price_correction = @price_correction, cutting_base = @cutting_base WHERE id = @id";
 			}
 			SqliteTransaction trans = ((SqliteConnection)QSMain.ConnectionDB).BeginTransaction();
 			MainClass.StatusMessage("Запись заказа...");
@@ -306,11 +307,6 @@ namespace CupboardDesigner
 				cmd.Parameters.AddWithValue("@comment", DBWorks.ValueOrNull(textviewComments.Buffer.Text != "", textviewComments.Buffer.Text));
 				cmd.Parameters.AddWithValue("@cupboard", OrderCupboard.SaveToString());
 				cmd.Parameters.AddWithValue("@total_price", TotalPrice.ToString());
-				cmd.Parameters.AddWithValue("@basis_facing_id", "");
-				cmd.Parameters.AddWithValue("@basis_material_id", "");
-				cmd.Parameters.AddWithValue("@basis_facing", "");
-				cmd.Parameters.AddWithValue("@basis_material", "");
-				cmd.Parameters.AddWithValue("@basis_comment", "");
 				cmd.Parameters.AddWithValue("@price_correction", PriceCorrection);
 				cmd.Parameters.AddWithValue("@cutting_base", checkCuttingBase.Active);
 
@@ -403,18 +399,6 @@ namespace CupboardDesigner
 						}
 						else //Item is basis
 						{
-							sql = "UPDATE orders SET basis_facing_id = @basis_facing_id, basis_facing = @basis_facing, " +
-								"basis_material_id = @basis_material_id, basis_material = @basis_material, basis_comment = @basis_comment " +
-								"WHERE id = @id";
-							cmd = new SqliteCommand(sql, (SqliteConnection)QSMain.ConnectionDB, trans);
-							cmd.Parameters.AddWithValue("@id", ItemId);
-							cmd.Parameters.AddWithValue("@basis_facing_id", ComponentsStore.GetValue(iter, (int)ComponentCol.facing_id));
-							cmd.Parameters.AddWithValue("@basis_material_id", ComponentsStore.GetValue(iter, (int)ComponentCol.material_id));
-							cmd.Parameters.AddWithValue("@basis_facing", ComponentsStore.GetValue(iter, (int)ComponentCol.facing));
-							cmd.Parameters.AddWithValue("@basis_material", ComponentsStore.GetValue(iter, (int)ComponentCol.material));
-							cmd.Parameters.AddWithValue("@basis_comment", ComponentsStore.GetValue(iter, (int)ComponentCol.comment));
-							cmd.ExecuteNonQuery();
-
 							if(ComponentsStore.IterHasChild(iter)) {
 								ComponentsStore.IterChildren(out childIter, iter);
 								do { //Adding every nomenclature for basis
@@ -529,17 +513,18 @@ namespace CupboardDesigner
 						"Каркас", 
 						null, 
 						1, 
-						DBWorks.GetInt(rdr, "basis_material_id", -1),
-						DBWorks.GetString(rdr, "basis_material", ""),
-						DBWorks.GetInt(rdr, "basis_facing_id", -1),
-						DBWorks.GetString(rdr, "basis_facing", ""),
-						DBWorks.GetString(rdr, "basis_comment", ""),
+						-1,
+						"",
+						-1,
+						"",
+						"",
 						"", 
 						"",
 						false,
 						false,
-						true,
-						true
+						false,
+						false,
+						false
 					);
 				}
 				//Loading basis and it's contents.
@@ -574,7 +559,8 @@ namespace CupboardDesigner
 							true,
 							true,
 							false,
-							false
+							false,
+							true
 						);
 					}
 				}
@@ -602,6 +588,7 @@ namespace CupboardDesigner
 							"", 
 							false,
 							false,
+							true,
 							true,
 							true
 						);
@@ -636,7 +623,8 @@ namespace CupboardDesigner
 									true,
 									true,
 									false,
-									false
+									false,
+									true
 								);
 							}
 							ComponentsStore.SetValue (CubeIter, (int)ComponentCol.price_total, Price.ToString ());
@@ -1027,7 +1015,8 @@ namespace CupboardDesigner
 							true,
 							true,
 							false,
-							false
+							false,
+							true
 						);
 					}
 				}
@@ -1067,7 +1056,7 @@ namespace CupboardDesigner
 
 			foreach (KeyValuePair<int, int> pair in Counts) {
 				Cube cube = OrderCupboard.Cubes.Find (c => c.NomenclatureId == pair.Key);
-				TreeIter CubeIter = ComponentsStore.AppendValues ((long)-1, Enum.Parse (typeof(Nomenclature.NomType), "cube"), pair.Key, null, cube.Name, null, pair.Value, -1, "", -1, "", "", "", "",false, false, true, true);
+				TreeIter CubeIter = ComponentsStore.AppendValues ((long)-1, Enum.Parse (typeof(Nomenclature.NomType), "cube"), pair.Key, null, cube.Name, null, pair.Value, -1, "", -1, "", "", "", "",false, false, true, true, true);
 				string sql = "SELECT nomenclature.name as nomenclature, nomenclature.type, nomenclature.description, nomenclature.price, cubes_items.* FROM cubes_items " +
 					"LEFT JOIN nomenclature ON nomenclature.id = cubes_items.item_id " +
 					"WHERE cubes_id = @cubes_id";
@@ -1096,7 +1085,8 @@ namespace CupboardDesigner
 							true,
 							true,
 							false,
-							false
+							false,
+							true
 						);
 					}
 					ComponentsStore.SetValue (CubeIter, (int)ComponentCol.price_total, Price.ToString ());

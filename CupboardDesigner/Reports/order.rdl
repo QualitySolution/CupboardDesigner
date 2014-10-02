@@ -13,15 +13,15 @@
   <BottomMargin>.25in</BottomMargin>
   <DataSets>
     <DataSet Name="Data">
-      <Query>
+      <Query >
         <DataSourceName>DS1</DataSourceName>
         <CommandText>select null as article, cubes.name as nomenclature, cubes.width * 400 as width, cubes.height * 400 as height, null as length, order_details.count as count, order_details.facing as facing, order_details.material as material, order_details.comment as comment from order_details
 left join cubes on order_details.cube_id = cubes.id
 where order_details.order_id = @id
 union 
-select null as article, basis.name as nomenclature, null as width, null as height, null as length, 1 as count, orders.basis_facing as facing, orders.basis_material as material, orders.basis_comment as comment from orders
-left join basis on orders.basis_id = basis.id
-where orders.id = @id;</CommandText>
+select null as article, nomenclature.name as nomenclature, nomenclature.widht as width, nomenclature.height as height, nomenclature.lenght as length, order_basis_details.count as count, null as facing, null as material, order_basis_details.comment as comment from order_basis_details 
+left join nomenclature on order_basis_details.nomenclature_id = nomenclature.id 
+where order_basis_details.order_id = @id;</CommandText>
         <QueryParameters>
           <QueryParameter Name="id">
             <Value>=Parameters!id</Value>
@@ -34,7 +34,7 @@ where orders.id = @id;</CommandText>
           </QueryParameter>
         </QueryParameters>
       </Query>
-      <Fields>
+      <Fields >
         <Field Name="article">
           <DataField>article</DataField>
           <rd:TypeName>System.String</rd:TypeName>
