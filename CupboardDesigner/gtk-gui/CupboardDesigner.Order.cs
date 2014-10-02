@@ -78,6 +78,8 @@ namespace CupboardDesigner
 		
 		private global::Gtk.Table table1;
 		
+		private global::Gtk.CheckButton checkCuttingBase;
+		
 		private global::Gtk.ComboBox comboCubeH;
 		
 		private global::Gtk.ComboBox comboCubeV;
@@ -172,7 +174,7 @@ namespace CupboardDesigner
 			this.notebook1 = new global::Gtk.Notebook ();
 			this.notebook1.CanFocus = true;
 			this.notebook1.Name = "notebook1";
-			this.notebook1.CurrentPage = 0;
+			this.notebook1.CurrentPage = 1;
 			// Container child notebook1.Gtk.Notebook+NotebookChild
 			this.hbox1 = new global::Gtk.HBox ();
 			this.hbox1.Name = "hbox1";
@@ -474,6 +476,20 @@ namespace CupboardDesigner
 			this.table1.RowSpacing = ((uint)(6));
 			this.table1.ColumnSpacing = ((uint)(6));
 			// Container child table1.Gtk.Table+TableChild
+			this.checkCuttingBase = new global::Gtk.CheckButton ();
+			this.checkCuttingBase.CanFocus = true;
+			this.checkCuttingBase.Name = "checkCuttingBase";
+			this.checkCuttingBase.Label = global::Mono.Unix.Catalog.GetString ("Урезанное основание");
+			this.checkCuttingBase.DrawIndicator = true;
+			this.checkCuttingBase.UseUnderline = true;
+			this.table1.Add (this.checkCuttingBase);
+			global::Gtk.Table.TableChild w29 = ((global::Gtk.Table.TableChild)(this.table1 [this.checkCuttingBase]));
+			w29.TopAttach = ((uint)(1));
+			w29.BottomAttach = ((uint)(2));
+			w29.LeftAttach = ((uint)(2));
+			w29.RightAttach = ((uint)(3));
+			w29.YOptions = ((global::Gtk.AttachOptions)(4));
+			// Container child table1.Gtk.Table+TableChild
 			this.comboCubeH = global::Gtk.ComboBox.NewText ();
 			this.comboCubeH.AppendText (global::Mono.Unix.Catalog.GetString ("1"));
 			this.comboCubeH.AppendText (global::Mono.Unix.Catalog.GetString ("2"));
@@ -493,11 +509,11 @@ namespace CupboardDesigner
 			this.comboCubeH.Name = "comboCubeH";
 			this.comboCubeH.Active = 0;
 			this.table1.Add (this.comboCubeH);
-			global::Gtk.Table.TableChild w29 = ((global::Gtk.Table.TableChild)(this.table1 [this.comboCubeH]));
-			w29.LeftAttach = ((uint)(1));
-			w29.RightAttach = ((uint)(2));
-			w29.XOptions = ((global::Gtk.AttachOptions)(4));
-			w29.YOptions = ((global::Gtk.AttachOptions)(4));
+			global::Gtk.Table.TableChild w30 = ((global::Gtk.Table.TableChild)(this.table1 [this.comboCubeH]));
+			w30.LeftAttach = ((uint)(1));
+			w30.RightAttach = ((uint)(2));
+			w30.XOptions = ((global::Gtk.AttachOptions)(4));
+			w30.YOptions = ((global::Gtk.AttachOptions)(4));
 			// Container child table1.Gtk.Table+TableChild
 			this.comboCubeV = global::Gtk.ComboBox.NewText ();
 			this.comboCubeV.AppendText (global::Mono.Unix.Catalog.GetString ("1"));
@@ -513,13 +529,13 @@ namespace CupboardDesigner
 			this.comboCubeV.Name = "comboCubeV";
 			this.comboCubeV.Active = 0;
 			this.table1.Add (this.comboCubeV);
-			global::Gtk.Table.TableChild w30 = ((global::Gtk.Table.TableChild)(this.table1 [this.comboCubeV]));
-			w30.TopAttach = ((uint)(1));
-			w30.BottomAttach = ((uint)(2));
-			w30.LeftAttach = ((uint)(1));
-			w30.RightAttach = ((uint)(2));
-			w30.XOptions = ((global::Gtk.AttachOptions)(4));
-			w30.YOptions = ((global::Gtk.AttachOptions)(4));
+			global::Gtk.Table.TableChild w31 = ((global::Gtk.Table.TableChild)(this.table1 [this.comboCubeV]));
+			w31.TopAttach = ((uint)(1));
+			w31.BottomAttach = ((uint)(2));
+			w31.LeftAttach = ((uint)(1));
+			w31.RightAttach = ((uint)(2));
+			w31.XOptions = ((global::Gtk.AttachOptions)(4));
+			w31.YOptions = ((global::Gtk.AttachOptions)(4));
 			// Container child table1.Gtk.Table+TableChild
 			this.label2 = new global::Gtk.Label ();
 			this.label2.Name = "label2";
@@ -527,11 +543,11 @@ namespace CupboardDesigner
 			this.label2.LabelProp = global::Mono.Unix.Catalog.GetString ("Кубов по вертикали:");
 			this.label2.UseMarkup = true;
 			this.table1.Add (this.label2);
-			global::Gtk.Table.TableChild w31 = ((global::Gtk.Table.TableChild)(this.table1 [this.label2]));
-			w31.TopAttach = ((uint)(1));
-			w31.BottomAttach = ((uint)(2));
-			w31.XOptions = ((global::Gtk.AttachOptions)(4));
-			w31.YOptions = ((global::Gtk.AttachOptions)(4));
+			global::Gtk.Table.TableChild w32 = ((global::Gtk.Table.TableChild)(this.table1 [this.label2]));
+			w32.TopAttach = ((uint)(1));
+			w32.BottomAttach = ((uint)(2));
+			w32.XOptions = ((global::Gtk.AttachOptions)(4));
+			w32.YOptions = ((global::Gtk.AttachOptions)(4));
 			// Container child table1.Gtk.Table+TableChild
 			this.label3 = new global::Gtk.Label ();
 			this.label3.Name = "label3";
@@ -539,14 +555,14 @@ namespace CupboardDesigner
 			this.label3.LabelProp = global::Mono.Unix.Catalog.GetString ("Кубов по горизонтали:");
 			this.label3.UseMarkup = true;
 			this.table1.Add (this.label3);
-			global::Gtk.Table.TableChild w32 = ((global::Gtk.Table.TableChild)(this.table1 [this.label3]));
-			w32.XOptions = ((global::Gtk.AttachOptions)(4));
-			w32.YOptions = ((global::Gtk.AttachOptions)(4));
+			global::Gtk.Table.TableChild w33 = ((global::Gtk.Table.TableChild)(this.table1 [this.label3]));
+			w33.XOptions = ((global::Gtk.AttachOptions)(4));
+			w33.YOptions = ((global::Gtk.AttachOptions)(4));
 			this.vbox7.Add (this.table1);
-			global::Gtk.Box.BoxChild w33 = ((global::Gtk.Box.BoxChild)(this.vbox7 [this.table1]));
-			w33.Position = 0;
-			w33.Expand = false;
-			w33.Fill = false;
+			global::Gtk.Box.BoxChild w34 = ((global::Gtk.Box.BoxChild)(this.vbox7 [this.table1]));
+			w34.Position = 0;
+			w34.Expand = false;
+			w34.Fill = false;
 			// Container child vbox7.Gtk.Box+BoxChild
 			this.scrolledTypesH = new global::Gtk.ScrolledWindow ();
 			this.scrolledTypesH.CanFocus = true;
@@ -554,11 +570,11 @@ namespace CupboardDesigner
 			this.scrolledTypesH.VscrollbarPolicy = ((global::Gtk.PolicyType)(2));
 			this.scrolledTypesH.ShadowType = ((global::Gtk.ShadowType)(1));
 			this.vbox7.Add (this.scrolledTypesH);
-			global::Gtk.Box.BoxChild w34 = ((global::Gtk.Box.BoxChild)(this.vbox7 [this.scrolledTypesH]));
-			w34.Position = 1;
-			this.notebook1.Add (this.vbox7);
-			global::Gtk.Notebook.NotebookChild w35 = ((global::Gtk.Notebook.NotebookChild)(this.notebook1 [this.vbox7]));
+			global::Gtk.Box.BoxChild w35 = ((global::Gtk.Box.BoxChild)(this.vbox7 [this.scrolledTypesH]));
 			w35.Position = 1;
+			this.notebook1.Add (this.vbox7);
+			global::Gtk.Notebook.NotebookChild w36 = ((global::Gtk.Notebook.NotebookChild)(this.notebook1 [this.vbox7]));
+			w36.Position = 1;
 			// Notebook tab
 			this.label5 = new global::Gtk.Label ();
 			this.label5.Name = "label5";
@@ -581,17 +597,17 @@ namespace CupboardDesigner
 			this.buttonCubeListOrientation.Name = "buttonCubeListOrientation";
 			this.buttonCubeListOrientation.UseUnderline = true;
 			this.buttonCubeListOrientation.Relief = ((global::Gtk.ReliefStyle)(2));
-			global::Gtk.Image w36 = new global::Gtk.Image ();
-			w36.Pixbuf = global::Gdk.Pixbuf.LoadFromResource ("CupboardDesigner.icons.emblem-synchronizing.png");
-			this.buttonCubeListOrientation.Image = w36;
+			global::Gtk.Image w37 = new global::Gtk.Image ();
+			w37.Pixbuf = global::Gdk.Pixbuf.LoadFromResource ("CupboardDesigner.icons.emblem-synchronizing.png");
+			this.buttonCubeListOrientation.Image = w37;
 			this.tableConstructor.Add (this.buttonCubeListOrientation);
-			global::Gtk.Table.TableChild w37 = ((global::Gtk.Table.TableChild)(this.tableConstructor [this.buttonCubeListOrientation]));
-			w37.TopAttach = ((uint)(1));
-			w37.BottomAttach = ((uint)(2));
-			w37.LeftAttach = ((uint)(1));
-			w37.RightAttach = ((uint)(2));
-			w37.XOptions = ((global::Gtk.AttachOptions)(4));
-			w37.YOptions = ((global::Gtk.AttachOptions)(4));
+			global::Gtk.Table.TableChild w38 = ((global::Gtk.Table.TableChild)(this.tableConstructor [this.buttonCubeListOrientation]));
+			w38.TopAttach = ((uint)(1));
+			w38.BottomAttach = ((uint)(2));
+			w38.LeftAttach = ((uint)(1));
+			w38.RightAttach = ((uint)(2));
+			w38.XOptions = ((global::Gtk.AttachOptions)(4));
+			w38.YOptions = ((global::Gtk.AttachOptions)(4));
 			// Container child tableConstructor.Gtk.Table+TableChild
 			this.drawCupboard = new global::Gtk.DrawingArea ();
 			this.drawCupboard.Name = "drawCupboard";
@@ -603,10 +619,10 @@ namespace CupboardDesigner
 			this.scrolledCubeListH.VscrollbarPolicy = ((global::Gtk.PolicyType)(2));
 			this.scrolledCubeListH.ShadowType = ((global::Gtk.ShadowType)(1));
 			this.tableConstructor.Add (this.scrolledCubeListH);
-			global::Gtk.Table.TableChild w39 = ((global::Gtk.Table.TableChild)(this.tableConstructor [this.scrolledCubeListH]));
-			w39.TopAttach = ((uint)(1));
-			w39.BottomAttach = ((uint)(2));
-			w39.YOptions = ((global::Gtk.AttachOptions)(6));
+			global::Gtk.Table.TableChild w40 = ((global::Gtk.Table.TableChild)(this.tableConstructor [this.scrolledCubeListH]));
+			w40.TopAttach = ((uint)(1));
+			w40.BottomAttach = ((uint)(2));
+			w40.YOptions = ((global::Gtk.AttachOptions)(6));
 			// Container child tableConstructor.Gtk.Table+TableChild
 			this.scrolledCubeListV = new global::Gtk.ScrolledWindow ();
 			this.scrolledCubeListV.CanFocus = true;
@@ -615,17 +631,17 @@ namespace CupboardDesigner
 			this.scrolledCubeListV.HscrollbarPolicy = ((global::Gtk.PolicyType)(2));
 			this.scrolledCubeListV.ShadowType = ((global::Gtk.ShadowType)(1));
 			this.tableConstructor.Add (this.scrolledCubeListV);
-			global::Gtk.Table.TableChild w40 = ((global::Gtk.Table.TableChild)(this.tableConstructor [this.scrolledCubeListV]));
-			w40.LeftAttach = ((uint)(1));
-			w40.RightAttach = ((uint)(2));
-			w40.XOptions = ((global::Gtk.AttachOptions)(4));
+			global::Gtk.Table.TableChild w41 = ((global::Gtk.Table.TableChild)(this.tableConstructor [this.scrolledCubeListV]));
+			w41.LeftAttach = ((uint)(1));
+			w41.RightAttach = ((uint)(2));
+			w41.XOptions = ((global::Gtk.AttachOptions)(4));
 			this.vbox3.Add (this.tableConstructor);
-			global::Gtk.Box.BoxChild w41 = ((global::Gtk.Box.BoxChild)(this.vbox3 [this.tableConstructor]));
-			w41.PackType = ((global::Gtk.PackType)(1));
-			w41.Position = 0;
+			global::Gtk.Box.BoxChild w42 = ((global::Gtk.Box.BoxChild)(this.vbox3 [this.tableConstructor]));
+			w42.PackType = ((global::Gtk.PackType)(1));
+			w42.Position = 0;
 			this.notebook1.Add (this.vbox3);
-			global::Gtk.Notebook.NotebookChild w42 = ((global::Gtk.Notebook.NotebookChild)(this.notebook1 [this.vbox3]));
-			w42.Position = 2;
+			global::Gtk.Notebook.NotebookChild w43 = ((global::Gtk.Notebook.NotebookChild)(this.notebook1 [this.vbox3]));
+			w43.Position = 2;
 			// Notebook tab
 			this.label8 = new global::Gtk.Label ();
 			this.label8.Name = "label8";
@@ -646,8 +662,8 @@ namespace CupboardDesigner
 			this.treeviewComponents.Name = "treeviewComponents";
 			this.GtkScrolledWindow1.Add (this.treeviewComponents);
 			this.vbox5.Add (this.GtkScrolledWindow1);
-			global::Gtk.Box.BoxChild w44 = ((global::Gtk.Box.BoxChild)(this.vbox5 [this.GtkScrolledWindow1]));
-			w44.Position = 0;
+			global::Gtk.Box.BoxChild w45 = ((global::Gtk.Box.BoxChild)(this.vbox5 [this.GtkScrolledWindow1]));
+			w45.Position = 0;
 			// Container child vbox5.Gtk.Box+BoxChild
 			this.hbox6 = new global::Gtk.HBox ();
 			this.hbox6.Name = "hbox6";
@@ -661,8 +677,8 @@ namespace CupboardDesigner
 			this.checkbuttonShowPrice.DrawIndicator = true;
 			this.checkbuttonShowPrice.UseUnderline = true;
 			this.hbox6.Add (this.checkbuttonShowPrice);
-			global::Gtk.Box.BoxChild w45 = ((global::Gtk.Box.BoxChild)(this.hbox6 [this.checkbuttonShowPrice]));
-			w45.Position = 0;
+			global::Gtk.Box.BoxChild w46 = ((global::Gtk.Box.BoxChild)(this.hbox6 [this.checkbuttonShowPrice]));
+			w46.Position = 0;
 			// Container child hbox6.Gtk.Box+BoxChild
 			this.checkbuttonDiscount = new global::Gtk.CheckButton ();
 			this.checkbuttonDiscount.CanFocus = true;
@@ -671,9 +687,9 @@ namespace CupboardDesigner
 			this.checkbuttonDiscount.DrawIndicator = true;
 			this.checkbuttonDiscount.UseUnderline = true;
 			this.hbox6.Add (this.checkbuttonDiscount);
-			global::Gtk.Box.BoxChild w46 = ((global::Gtk.Box.BoxChild)(this.hbox6 [this.checkbuttonDiscount]));
-			w46.Position = 1;
-			w46.Expand = false;
+			global::Gtk.Box.BoxChild w47 = ((global::Gtk.Box.BoxChild)(this.hbox6 [this.checkbuttonDiscount]));
+			w47.Position = 1;
+			w47.Expand = false;
 			// Container child hbox6.Gtk.Box+BoxChild
 			this.spinbutton1 = new global::Gtk.SpinButton (-100, 100, 1);
 			this.spinbutton1.CanDefault = true;
@@ -684,37 +700,37 @@ namespace CupboardDesigner
 			this.spinbutton1.Numeric = true;
 			this.spinbutton1.UpdatePolicy = ((global::Gtk.SpinButtonUpdatePolicy)(1));
 			this.hbox6.Add (this.spinbutton1);
-			global::Gtk.Box.BoxChild w47 = ((global::Gtk.Box.BoxChild)(this.hbox6 [this.spinbutton1]));
-			w47.Position = 2;
-			w47.Expand = false;
-			w47.Fill = false;
+			global::Gtk.Box.BoxChild w48 = ((global::Gtk.Box.BoxChild)(this.hbox6 [this.spinbutton1]));
+			w48.Position = 2;
+			w48.Expand = false;
+			w48.Fill = false;
 			// Container child hbox6.Gtk.Box+BoxChild
 			this.label18 = new global::Gtk.Label ();
 			this.label18.Name = "label18";
 			this.label18.LabelProp = global::Mono.Unix.Catalog.GetString ("%        ");
 			this.hbox6.Add (this.label18);
-			global::Gtk.Box.BoxChild w48 = ((global::Gtk.Box.BoxChild)(this.hbox6 [this.label18]));
-			w48.Position = 3;
-			w48.Expand = false;
-			w48.Fill = false;
+			global::Gtk.Box.BoxChild w49 = ((global::Gtk.Box.BoxChild)(this.hbox6 [this.label18]));
+			w49.Position = 3;
+			w49.Expand = false;
+			w49.Fill = false;
 			// Container child hbox6.Gtk.Box+BoxChild
 			this.labelTotalCount = new global::Gtk.Label ();
 			this.labelTotalCount.Name = "labelTotalCount";
 			this.labelTotalCount.Xalign = 1F;
 			this.labelTotalCount.LabelProp = global::Mono.Unix.Catalog.GetString ("label2");
 			this.hbox6.Add (this.labelTotalCount);
-			global::Gtk.Box.BoxChild w49 = ((global::Gtk.Box.BoxChild)(this.hbox6 [this.labelTotalCount]));
-			w49.Position = 4;
-			w49.Expand = false;
-			w49.Fill = false;
-			this.vbox5.Add (this.hbox6);
-			global::Gtk.Box.BoxChild w50 = ((global::Gtk.Box.BoxChild)(this.vbox5 [this.hbox6]));
-			w50.Position = 1;
+			global::Gtk.Box.BoxChild w50 = ((global::Gtk.Box.BoxChild)(this.hbox6 [this.labelTotalCount]));
+			w50.Position = 4;
 			w50.Expand = false;
 			w50.Fill = false;
+			this.vbox5.Add (this.hbox6);
+			global::Gtk.Box.BoxChild w51 = ((global::Gtk.Box.BoxChild)(this.vbox5 [this.hbox6]));
+			w51.Position = 1;
+			w51.Expand = false;
+			w51.Fill = false;
 			this.notebook1.Add (this.vbox5);
-			global::Gtk.Notebook.NotebookChild w51 = ((global::Gtk.Notebook.NotebookChild)(this.notebook1 [this.vbox5]));
-			w51.Position = 3;
+			global::Gtk.Notebook.NotebookChild w52 = ((global::Gtk.Notebook.NotebookChild)(this.notebook1 [this.vbox5]));
+			w52.Position = 3;
 			// Notebook tab
 			this.label15 = new global::Gtk.Label ();
 			this.label15.Name = "label15";
@@ -730,8 +746,8 @@ namespace CupboardDesigner
 			this.reportviewer1.ShowErrors = false;
 			this.reportviewer1.ShowParameters = false;
 			this.notebook1.Add (this.reportviewer1);
-			global::Gtk.Notebook.NotebookChild w52 = ((global::Gtk.Notebook.NotebookChild)(this.notebook1 [this.reportviewer1]));
-			w52.Position = 4;
+			global::Gtk.Notebook.NotebookChild w53 = ((global::Gtk.Notebook.NotebookChild)(this.notebook1 [this.reportviewer1]));
+			w53.Position = 4;
 			// Notebook tab
 			this.label16 = new global::Gtk.Label ();
 			this.label16.Name = "label16";
@@ -739,8 +755,8 @@ namespace CupboardDesigner
 			this.notebook1.SetTabLabel (this.reportviewer1, this.label16);
 			this.label16.ShowAll ();
 			this.vbox2.Add (this.notebook1);
-			global::Gtk.Box.BoxChild w53 = ((global::Gtk.Box.BoxChild)(this.vbox2 [this.notebook1]));
-			w53.Position = 1;
+			global::Gtk.Box.BoxChild w54 = ((global::Gtk.Box.BoxChild)(this.vbox2 [this.notebook1]));
+			w54.Position = 1;
 			this.Add (this.vbox2);
 			if ((this.Child != null)) {
 				this.Child.ShowAll ();

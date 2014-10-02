@@ -263,16 +263,16 @@ namespace CupboardDesigner
 			string sql;
 			if (NewItem) {
 				sql = "INSERT INTO orders (customer, estimation, contract, address, phone1, phone2, exhibition_id, basis_id, arrval, deadline_s, " +
-					"deadline_e, comment, cupboard, total_price, basis_facing_id, basis_facing, basis_material_id, basis_material, basis_comment, price_correction) " +
+					"deadline_e, comment, cupboard, total_price, basis_facing_id, basis_facing, basis_material_id, basis_material, basis_comment, price_correction, cutting_base) " +
 					"VALUES (@customer, @estimation, @contract, @address, @phone1, @phone2, @exhibition_id, @basis_id, @arrval, @deadline_s, @deadline_e, " +
-					"@comment, @cupboard, @total_price, @basis_facing_id, @basis_facing, @basis_material_id, @basis_material, @basis_comment, @price_correction)";
+					"@comment, @cupboard, @total_price, @basis_facing_id, @basis_facing, @basis_material_id, @basis_material, @basis_comment, @price_correction, @cutting_base)";
 			}
 			else {
 				sql = "UPDATE orders SET customer = @customer, estimation = @estimation, contract = @contract, address = @address, phone1 = @phone1, " +
 					"phone2 = @phone2, exhibition_id = @exhibition_id, basis_id = @basis_id, arrval = @arrval, deadline_s = @deadline_s, " +
 					"deadline_e = @deadline_e, comment = @comment, cupboard = @cupboard, total_price = @total_price, basis_facing_id = @basis_facing_id, " +
 					"basis_facing = @basis_facing, basis_material_id = @basis_material_id, basis_material = @basis_material, basis_comment = @basis_comment, " +
-					"price_correction = @price_correction WHERE id = @id";
+					"price_correction = @price_correction, cutting_base = @cutting_base WHERE id = @id";
 			}
 			SqliteTransaction trans = ((SqliteConnection)QSMain.ConnectionDB).BeginTransaction();
 			MainClass.StatusMessage("Запись заказа...");
@@ -301,7 +301,8 @@ namespace CupboardDesigner
 				cmd.Parameters.AddWithValue("@basis_facing", "");
 				cmd.Parameters.AddWithValue("@basis_material", "");
 				cmd.Parameters.AddWithValue("@basis_comment", "");
-				cmd.Parameters.AddWithValue("@price_correction", PriceCorrection.ToString());
+				cmd.Parameters.AddWithValue("@price_correction", PriceCorrection);
+				cmd.Parameters.AddWithValue("@cutting_base", checkCuttingBase.Active);
 
 				cmd.ExecuteNonQuery();
 
@@ -499,6 +500,7 @@ namespace CupboardDesigner
 					OrderCupboard = Cupboard.Load(rdr["cupboard"].ToString(), CubeList);
 					comboCubeH.Active = OrderCupboard.CubesH - 1;
 					comboCubeV.Active = OrderCupboard.CubesV - 1;
+					checkCuttingBase.Active = DBWorks.GetBoolean(rdr, "cutting_base", false);
 					CalculateCubePxSize(drawCupboard.Allocation);
 					PriceCorrection = DBWorks.GetInt(rdr, "price_correction", 0);
 					TotalPrice = DBWorks.GetDecimal(rdr, "total_price", 0);
