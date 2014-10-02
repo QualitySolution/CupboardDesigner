@@ -135,28 +135,7 @@ public partial class MainWindow: Gtk.Window
 
 	protected void OnAboutActionActivated(object sender, EventArgs e)
 	{
-		AboutDialog dialog = new AboutDialog ();
-		System.Reflection.AssemblyProductAttribute Product = (System.Reflection.AssemblyProductAttribute)
-			System.Reflection.Assembly.GetExecutingAssembly().GetCustomAttributes(typeof(System.Reflection.AssemblyProductAttribute), false)[0];
-		dialog.ProgramName = Product.Product;
-
-		Version version = System.Reflection.Assembly.GetExecutingAssembly().GetName().Version;
-		dialog.Version = version.ToString (version.Revision == 0 ? 3 : 4);
-
-		dialog.Logo = Gdk.Pixbuf.LoadFromResource ("CupboardDesigner.icons.logo.png");
-
-		dialog.Comments = "Программа позволяет создавать спецификации шкафов." +
-			"\nРазработана на MonoDevelop с использованием открытых технологий Mono, GTK#, MySQL." +
-			"\nТелефон тех. поддержки +7(812)575-79-44";
-
-		dialog.Copyright = "Quality Solution 2014";
-
-		dialog.Authors = new string [] {"Ганьков Андрей <gav@qsolution.ru>"};
-
-		dialog.Website = "http://www.qsolution.ru/";
-
-		dialog.Run ();
-		dialog.Destroy();
+		QSMain.RunAboutDialog();
 	}
 
 	protected void OnAction9Activated(object sender, EventArgs e)
