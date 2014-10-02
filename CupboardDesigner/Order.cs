@@ -1163,7 +1163,7 @@ namespace CupboardDesigner
 					}
 				} while(ComponentsStore.IterNext (ref iter));
 			}
-			labelTotalCount.LabelProp = String.Format("Итого: {0:C} ", Decimal.Round(TotalPrice + (TotalPrice / 100 * PriceCorrection), 2));
+			labelTotalCount.LabelProp = String.Format("Итого: {0:C} ", Decimal.Round(TotalPrice + (TotalPrice / 100 * PriceCorrection), 0));
 		}
 
 		private void PrerareReport()
