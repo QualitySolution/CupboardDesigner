@@ -303,15 +303,15 @@ namespace CupboardDesigner
 			string sql;
 			if (NewItem) {
 				sql = "INSERT INTO orders (customer, estimation, contract, address, phone1, phone2, exhibition_id, basis_id, " +
-					"arrval, deadline_s, deadline_e, comment, cupboard, total_price, price_correction, cutting_base) " +
+					"arrval, deadline_s, deadline_e, comment, cupboard, total_price, price_correction, cutting_base, basis_price) " +
 					"VALUES (@customer, @estimation, @contract, @address, @phone1, @phone2, @exhibition_id, @basis_id, @arrval, " +
-					"@deadline_s, @deadline_e, @comment, @cupboard, @total_price, @price_correction, @cutting_base)";
+					"@deadline_s, @deadline_e, @comment, @cupboard, @total_price, @price_correction, @cutting_base, @basis_price)";
 			}
 			else {
 				sql = "UPDATE orders SET customer = @customer, estimation = @estimation, contract = @contract, address = @address, " +
 					"phone1 = @phone1, phone2 = @phone2, exhibition_id = @exhibition_id, basis_id = @basis_id, arrval = @arrval, " +
 					"deadline_s = @deadline_s, deadline_e = @deadline_e, comment = @comment, cupboard = @cupboard, " +
-					"total_price = @total_price, price_correction = @price_correction, cutting_base = @cutting_base WHERE id = @id";
+					"total_price = @total_price, price_correction = @price_correction, cutting_base = @cutting_base, basis_price = @basis_price WHERE id = @id";
 			}
 			SqliteTransaction trans = ((SqliteConnection)QSMain.ConnectionDB).BeginTransaction();
 			MainClass.StatusMessage("Запись заказа...");
@@ -331,6 +331,7 @@ namespace CupboardDesigner
 				cmd.Parameters.AddWithValue("@deadline_e", DBWorks.ValueOrNull(!dateDeadlineE.IsEmpty, dateDeadlineE.Date));
 				CupboardListItem basis = TypeWidgetList.Find(w => w.Button.Active);
 				cmd.Parameters.AddWithValue("basis_id", DBWorks.ValueOrNull(basis != null, basis.id));
+				cmd.Parameters.AddWithValue("basis_price", ComponentsStore.GetValue(BasisIter, (int)ComponentCol.price_total));
 				cmd.Parameters.AddWithValue("exhibition_id", ComboWorks.GetActiveIdOrNull(comboExhibition));
 				cmd.Parameters.AddWithValue("@comment", DBWorks.ValueOrNull(textviewComments.Buffer.Text != "", textviewComments.Buffer.Text));
 				cmd.Parameters.AddWithValue("@cupboard", OrderCupboard.SaveToString());
@@ -388,11 +389,11 @@ namespace CupboardDesigner
 							bool InDB = (long)ComponentsStore.GetValue(iter, (int)ComponentCol.row_id) > 0;
 							if(HasValue) {
 								if(!InDB)
-									sql = "INSERT INTO order_details (order_id, cube_id, count, facing_id, facing, material_id, material, comment) " +
-										"VALUES (@order_id, @nomenclature_id, @count, @facing_id, @facing, @material_id, @material, @comment)";
+									sql = "INSERT INTO order_details (order_id, cube_id, count, facing_id, facing, material_id, material, comment, price) " +
+										"VALUES (@order_id, @nomenclature_id, @count, @facing_id, @facing, @material_id, @material, @comment, @price)";
 								else
 									sql = "UPDATE order_details SET count = @count, facing_id = @facing_id, facing = @facing, " +
-										"material_id = @material_id, material = @material, comment = @comment WHERE id = @id";
+										"material_id = @material_id, material = @material, comment = @comment, price = @price WHERE id = @id";
 								cmd = new SqliteCommand(sql, (SqliteConnection)QSMain.ConnectionDB, trans);
 								cmd.Parameters.AddWithValue("@id", (long)ComponentsStore.GetValue(iter, (int)ComponentCol.row_id));
 								cmd.Parameters.AddWithValue("@order_id", ItemId);
@@ -403,6 +404,7 @@ namespace CupboardDesigner
 								cmd.Parameters.AddWithValue("@material", DBWorks.ValueOrNull((string)ComponentsStore.GetValue(iter,(int)ComponentCol.material) != "", ComponentsStore.GetValue(iter, (int)ComponentCol.material)));
 								cmd.Parameters.AddWithValue("@facing", DBWorks.ValueOrNull((string)ComponentsStore.GetValue(iter, (int)ComponentCol.facing) != "", ComponentsStore.GetValue(iter, (int)ComponentCol.facing)));
 								cmd.Parameters.AddWithValue("@comment", DBWorks.ValueOrNull((string)ComponentsStore.GetValue(iter, (int)ComponentCol.comment) != "", ComponentsStore.GetValue(iter, (int)ComponentCol.comment)));
+								cmd.Parameters.AddWithValue("@price", ComponentsStore.GetValue(iter, (int)ComponentCol.price_total));
 								cmd.ExecuteNonQuery();
 								if(!InDB)
 								{
@@ -1096,14 +1098,12 @@ namespace CupboardDesigner
 		protected void OnNotebook1SwitchPage(object o, SwitchPageArgs args)
 		{
 			if (notebook1.CurrentPage == 2)
-			{
 				if (OrderCupboard.Clean())
 					UpdateCubeComponents();
-			}
 			if (notebook1.CurrentPage == 4)
-			{
-				PrerareReport();
-			}
+				PrerareReport(true);
+			if (notebook1.CurrentPage == 5)
+				PrerareReport (false);
 		
 			goBackAction.Sensitive = notebook1.CurrentPage != 0;
 			goForwardAction.Sensitive = notebook1.CurrentPage != 4;
@@ -1328,7 +1328,7 @@ namespace CupboardDesigner
 			labelTotalCount.LabelProp = String.Format("Итого: {0:C} ", Decimal.Round(TotalPrice + (TotalPrice / 100 * PriceCorrection), 0));
 		}
 
-		private void PrerareReport()
+		private void PrerareReport(bool Client)
 		{
 			if (!Save())
 				return;
@@ -1350,9 +1350,15 @@ namespace CupboardDesigner
 				"&image=" + TempImagePath +
 				"&basel=" + OrderCupboard.CubesH.ToString() + 
 				"&baseh=" + OrderCupboard.CubesV.ToString();
+			string ReportPath;
+			if (Client) {
+				ReportPath = System.IO.Path.Combine (Directory.GetCurrentDirectory (), "Reports", "order" + ".rdl");
+				reportviewer1.LoadReport (new Uri (ReportPath), param, QSMain.ConnectionString);
+			} else {
+				ReportPath = System.IO.Path.Combine (Directory.GetCurrentDirectory (), "Reports", "order_factory" + ".rdl");
+				reportviewer2.LoadReport(new Uri(ReportPath), param, QSMain.ConnectionString);
+			}
 
-			string ReportPath = System.IO.Path.Combine( Directory.GetCurrentDirectory(), "Reports", "order" + ".rdl");
-			reportviewer1.LoadReport(new Uri(ReportPath), param, QSMain.ConnectionString);
 		}
 
 		protected void OnOrderDatesChanged(object sender, EventArgs e)
@@ -1528,6 +1534,12 @@ namespace CupboardDesigner
 			}
 			CalculateTotalCount ();
 		}
+
+		protected void OnPrintActionActivated (object sender, EventArgs e)
+		{
+			throw new NotImplementedException ();
+		}
+
 	}
 }
 

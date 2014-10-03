@@ -1,0 +1,1150 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Report xmlns="http://schemas.microsoft.com/sqlserver/reporting/2005/01/reportdefinition" xmlns:rd="http://schemas.microsoft.com/SQLServer/reporting/reportdesigner">
+  <Description>
+  </Description>
+  <Author>
+  </Author>
+  <PageHeight>11in</PageHeight>
+  <PageWidth>8.5in</PageWidth>
+  <Width>7.5in</Width>
+  <TopMargin>.25in</TopMargin>
+  <LeftMargin>.25in</LeftMargin>
+  <RightMargin>.25in</RightMargin>
+  <BottomMargin>.25in</BottomMargin>
+  <DataSets>
+    <DataSet Name="Data">
+      <Query>
+        <DataSourceName>DS1</DataSourceName>
+        <CommandText>select * from
+(select order_details.cube_id as cube_id, null as owner, null as article, cubes.name as nomenclature, cubes.width * 400 as width, cubes.height * 400 as height, null as length, 
+order_details.count as count, order_details.facing as facing, order_details.material as material, order_details.comment as comment from order_details
+left join cubes on order_details.cube_id = cubes.id
+where order_details.order_id = @id
+union 
+select null as cube_id, order_cubes_details.cube_id as owner, null as article, nomenclature.name as nomenclature, nomenclature.widht * 400 as width, nomenclature.height  * 400 as height, 
+null as length, order_cubes_details.count as count, null as facing, null as material, order_cubes_details.comment as comment from order_cubes_details
+left join nomenclature on order_cubes_details.nomenclature_id = nomenclature.id
+where order_cubes_details.order_id = @id ) 
+
+union 
+select null as cube_id, null as owner, null as article, nomenclature.name as nomenclature, nomenclature.widht as width, nomenclature.height as height, nomenclature.lenght as length, 
+order_basis_details.count as count, null as facing, null as material, order_basis_details.comment as comment from order_basis_details 
+left join nomenclature on order_basis_details.nomenclature_id = nomenclature.id 
+where order_basis_details.order_id = @id</CommandText>
+        <QueryParameters>
+          <QueryParameter Name="id">
+            <Value>=Parameters!id</Value>
+          </QueryParameter>
+          <QueryParameter Name="basel">
+            <Value>=Parameters!basel</Value>
+          </QueryParameter>
+          <QueryParameter Name="baseh">
+            <Value>=Parameters!baseh</Value>
+          </QueryParameter>
+        </QueryParameters>
+      </Query>
+      <Fields>
+        <Field Name="article">
+          <DataField>article</DataField>
+          <rd:TypeName>System.String</rd:TypeName>
+        </Field>
+        <Field Name="nomenclature">
+          <DataField>nomenclature</DataField>
+          <rd:TypeName>System.String</rd:TypeName>
+        </Field>
+        <Field Name="lenght">
+          <DataField>length</DataField>
+          <rd:TypeName>System.Int64</rd:TypeName>
+        </Field>
+        <Field Name="widht">
+          <DataField>width</DataField>
+          <rd:TypeName>System.Int64</rd:TypeName>
+        </Field>
+        <Field Name="height">
+          <DataField>height</DataField>
+          <rd:TypeName>System.Int64</rd:TypeName>
+        </Field>
+        <Field Name="material">
+          <DataField>material</DataField>
+          <rd:TypeName>System.String</rd:TypeName>
+        </Field>
+        <Field Name="facing">
+          <DataField>facing</DataField>
+          <rd:TypeName>System.String</rd:TypeName>
+        </Field>
+        <Field Name="count">
+          <DataField>count</DataField>
+          <rd:TypeName>System.Int64</rd:TypeName>
+        </Field>
+        <Field Name="comment">
+          <DataField>comment</DataField>
+          <rd:TypeName>System.String</rd:TypeName>
+        </Field>
+        <Field Name="cube_id">
+          <DataField>cube_id</DataField>
+          <rd:TypeName>System.Int32</rd:TypeName>
+        </Field>
+        <Field Name="owner">
+          <DataField>owner</DataField>
+          <rd:TypeName>System.Int32</rd:TypeName>
+        </Field>
+      </Fields>
+    </DataSet>
+    <DataSet Name="Order">
+      <Query>
+        <DataSourceName>DS1</DataSourceName>
+        <CommandText>SELECT customer, orders.address as customaddress, phone1, orders.phone2, arrval, deadline_s, deadline_e, contract, exhibition.name as exhibition, exhibition.phone as exphone1, exhibition.phone2 as exphone2, total_price, price_correction, exhibition.address, comment, basis.delta_h, basis.delta_l, orders.cutting_base FROM orders
+ LEFT JOIN exhibition ON exhibition_id = exhibition.id
+LEFT JOIN basis ON basis.id = orders.basis_id
+ WHERE orders.id = @id</CommandText>
+        <QueryParameters>
+          <QueryParameter Name="id">
+            <Value>=Parameters!id</Value>
+          </QueryParameter>
+        </QueryParameters>
+      </Query>
+      <Fields>
+        <Field Name="customer">
+          <DataField>customer</DataField>
+          <TypeName>System.String</TypeName>
+        </Field>
+        <Field Name="customaddress">
+          <DataField>customaddress</DataField>
+          <TypeName>System.String</TypeName>
+        </Field>
+        <Field Name="phone1">
+          <DataField>phone1</DataField>
+          <TypeName>System.String</TypeName>
+        </Field>
+        <Field Name="phone2">
+          <DataField>phone2</DataField>
+          <TypeName>System.String</TypeName>
+        </Field>
+        <Field Name="arrval">
+          <DataField>arrval</DataField>
+          <TypeName>System.DateTime</TypeName>
+        </Field>
+        <Field Name="deadline_s">
+          <DataField>deadline_s</DataField>
+          <TypeName>System.DateTime</TypeName>
+        </Field>
+        <Field Name="exhibition">
+          <DataField>exhibition</DataField>
+          <TypeName>System.String</TypeName>
+        </Field>
+        <Field Name="exphone1">
+          <DataField>exphone1</DataField>
+          <TypeName>System.String</TypeName>
+        </Field>
+        <Field Name="address">
+          <DataField>address</DataField>
+          <TypeName>System.String</TypeName>
+        </Field>
+        <Field Name="comment">
+          <DataField>comment</DataField>
+          <TypeName>System.String</TypeName>
+        </Field>
+        <Field Name="delta_h">
+          <DataField>delta_h</DataField>
+          <TypeName>System.Int64</TypeName>
+        </Field>
+        <Field Name="delta_l">
+          <DataField>delta_l</DataField>
+          <TypeName>System.Int64</TypeName>
+        </Field>
+        <Field Name="exphone2">
+          <DataField>exphone2</DataField>
+          <TypeName>System.String</TypeName>
+        </Field>
+        <Field Name="deadline_e">
+          <DataField>deadline_e</DataField>
+          <TypeName>System.DateTime</TypeName>
+        </Field>
+        <Field Name="contract">
+          <DataField>contract</DataField>
+          <TypeName>System.Int32</TypeName>
+        </Field>
+        <Field Name="total_price">
+          <DataField>total_price</DataField>
+          <TypeName>System.Decimal</TypeName>
+        </Field>
+        <Field Name="price_correction">
+          <DataField>price_correction</DataField>
+          <TypeName>System.Int32</TypeName>
+        </Field>
+        <Field Name="cutting_base">
+          <DataField>cutting_base</DataField>
+          <TypeName>System.Int32</TypeName>
+        </Field>
+      </Fields>
+    </DataSet>
+    <DataSet Name="Services">
+      <Query>
+        <DataSourceName>DS1</DataSourceName>
+        <CommandText>select name, price + price / 100 * discount as price, comment from order_services where order_id = 2;</CommandText>
+        <QueryParameters>
+          <QueryParameter Name="id">
+            <Value>=Parameters!id</Value>
+          </QueryParameter>
+        </QueryParameters>
+      </Query>
+      <Fields>
+        <Field Name="name">
+          <DataField>name</DataField>
+          <TypeName>System.String</TypeName>
+        </Field>
+        <Field Name="price">
+          <DataField>price</DataField>
+          <TypeName>System.Decimal</TypeName>
+        </Field>
+        <Field Name="comment">
+          <DataField>comment</DataField>
+          <TypeName>System.String</TypeName>
+        </Field>
+      </Fields>
+    </DataSet>
+    <DataSet Name="Cubes">
+      <Query>
+        <DataSourceName>DS1</DataSourceName>
+        <CommandText>select order_details.cube_id as cube_id, cubes.name as nomenclature, nomenclature.name as name, order_cubes_details.count as count, order_cubes_details.price as price ,cubes.width * 400 as width, cubes.height * 400 as height, 
+order_details.count as cube_count, order_details.facing as facing, order_details.material as material, order_details.comment as cube_comment, order_cubes_details.comment as comment, order_details.price as total_price from order_details
+left join cubes on order_details.cube_id = cubes.id
+left join order_cubes_details on order_cubes_details.cube_id = cubes.id
+left join nomenclature on nomenclature.id = order_cubes_details.nomenclature_id
+where order_details.order_id = @id and order_cubes_details.order_id = @id
+union
+select orders.basis_id as cube_id, basis.name as nomenclature, nomenclature.name as name, order_basis_details.count as count, order_basis_details.price as price , null as width, null as height, "1" as cube_count, null as facing, null as material, null as cube_comment, order_basis_details.comment as comment, orders.basis_price as total_price from orders
+left join basis on orders.basis_id = basis.id
+left join order_basis_details on order_basis_details.basis_id = basis.id
+left join nomenclature on nomenclature.id = order_basis_details.nomenclature_id
+where orders.id = @id and order_basis_details.order_id = @id;</CommandText>
+        <QueryParameters>
+          <QueryParameter Name="id">
+            <Value>=Parameters!id</Value>
+          </QueryParameter>
+        </QueryParameters>
+      </Query>
+      <Fields>
+        <Field Name="cube_id">
+          <DataField>cube_id</DataField>
+          <TypeName>System.Int32</TypeName>
+        </Field>
+        <Field Name="nomenclature">
+          <DataField>nomenclature</DataField>
+          <TypeName>System.String</TypeName>
+        </Field>
+        <Field Name="name">
+          <DataField>name</DataField>
+          <TypeName>System.String</TypeName>
+        </Field>
+        <Field Name="count">
+          <DataField>count</DataField>
+          <TypeName>System.Int32</TypeName>
+        </Field>
+        <Field Name="price">
+          <DataField>price</DataField>
+          <TypeName>System.Decimal</TypeName>
+        </Field>
+        <Field Name="width">
+          <DataField>width</DataField>
+          <TypeName>System.Int32</TypeName>
+        </Field>
+        <Field Name="height">
+          <DataField>height</DataField>
+          <TypeName>System.Int32</TypeName>
+        </Field>
+        <Field Name="cube_count">
+          <DataField>cube_count</DataField>
+          <TypeName>System.Int32</TypeName>
+        </Field>
+        <Field Name="facing">
+          <DataField>facing</DataField>
+          <TypeName>System.String</TypeName>
+        </Field>
+        <Field Name="material">
+          <DataField>material</DataField>
+          <TypeName>System.String</TypeName>
+        </Field>
+        <Field Name="cube_comment">
+          <DataField>cube_comment</DataField>
+          <TypeName>System.String</TypeName>
+        </Field>
+        <Field Name="comment">
+          <DataField>comment</DataField>
+          <TypeName>System.String</TypeName>
+        </Field>
+        <Field Name="total_price">
+          <DataField>total_price</DataField>
+          <TypeName>System.Decimal</TypeName>
+        </Field>
+      </Fields>
+    </DataSet>
+  </DataSets>
+  <PageHeader>
+    <Height>0.0pt</Height>
+    <PrintOnFirstPage>true</PrintOnFirstPage>
+    <PrintOnLastPage>true</PrintOnLastPage>
+  </PageHeader>
+  <Body>
+    <ReportItems>
+      <Table Name="Table2">
+        <DataSetName>Cubes</DataSetName>
+        <NoRows>В заказе нет позиций.</NoRows>
+        <Style>
+          <BorderStyle>
+            <Default>Solid</Default>
+          </BorderStyle>
+          <BorderColor />
+          <BorderWidth />
+        </Style>
+        <TableColumns>
+          <TableColumn>
+            <Width>188.9pt</Width>
+          </TableColumn>
+          <TableColumn>
+            <Width>27.4pt</Width>
+          </TableColumn>
+          <TableColumn>
+            <Width>27.4pt</Width>
+          </TableColumn>
+          <TableColumn>
+            <Width>75.4pt</Width>
+          </TableColumn>
+          <TableColumn>
+            <Width>79.4pt</Width>
+          </TableColumn>
+          <TableColumn>
+            <Width>176.9pt</Width>
+          </TableColumn>
+        </TableColumns>
+        <Header>
+          <TableRows>
+            <TableRow>
+              <Height>13.0pt</Height>
+              <TableCells>
+                <TableCell>
+                  <ReportItems>
+                    <Textbox Name="Textbox10">
+                      <Value>Наименование</Value>
+                      <Style>
+                        <TextAlign>Center</TextAlign>
+                        <BorderStyle>
+                          <Default>Solid</Default>
+                        </BorderStyle>
+                        <FontWeight>Bold</FontWeight>
+                        <BorderColor />
+                        <BorderWidth />
+                        <FontSize>9pt</FontSize>
+                      </Style>
+                    </Textbox>
+                  </ReportItems>
+                </TableCell>
+                <TableCell>
+                  <ReportItems>
+                    <Textbox Name="Textbox11">
+                      <Value>Кол.</Value>
+                      <Style>
+                        <TextAlign>Center</TextAlign>
+                        <BorderStyle>
+                          <Default>Solid</Default>
+                        </BorderStyle>
+                        <FontWeight>Bold</FontWeight>
+                        <BorderColor />
+                        <BorderWidth />
+                        <FontSize>9pt</FontSize>
+                      </Style>
+                    </Textbox>
+                  </ReportItems>
+                </TableCell>
+                <TableCell>
+                  <ReportItems>
+                    <Textbox Name="Textbox21">
+                      <Value>Цена</Value>
+                      <Style xmlns="http://schemas.microsoft.com/sqlserver/reporting/2005/01/reportdefinition">
+                        <TextAlign>Center</TextAlign>
+                        <BorderStyle>
+                          <Default>Solid</Default>
+                        </BorderStyle>
+                        <FontWeight>Bold</FontWeight>
+                        <BorderColor />
+                        <BorderWidth />
+                        <FontSize>9pt</FontSize>
+                      </Style>
+                    </Textbox>
+                  </ReportItems>
+                </TableCell>
+                <TableCell>
+                  <ReportItems>
+                    <Textbox Name="Textbox15">
+                      <Value>Отделка куба</Value>
+                      <Style>
+                        <TextAlign>Center</TextAlign>
+                        <BorderStyle>
+                          <Default>Solid</Default>
+                        </BorderStyle>
+                        <FontWeight>Bold</FontWeight>
+                        <BorderColor />
+                        <BorderWidth />
+                        <FontSize>9pt</FontSize>
+                      </Style>
+                    </Textbox>
+                  </ReportItems>
+                </TableCell>
+                <TableCell>
+                  <ReportItems>
+                    <Textbox Name="Textbox16">
+                      <Value>Отделка фасада</Value>
+                      <Style>
+                        <TextAlign>Center</TextAlign>
+                        <BorderStyle>
+                          <Default>Solid</Default>
+                        </BorderStyle>
+                        <FontWeight>Bold</FontWeight>
+                        <BorderColor />
+                        <BorderWidth />
+                        <FontSize>9pt</FontSize>
+                      </Style>
+                    </Textbox>
+                  </ReportItems>
+                </TableCell>
+                <TableCell>
+                  <ReportItems>
+                    <Textbox Name="Textbox17">
+                      <Value>Примечание</Value>
+                      <Style>
+                        <TextAlign>Center</TextAlign>
+                        <BorderStyle>
+                          <Default>Solid</Default>
+                        </BorderStyle>
+                        <FontWeight>Bold</FontWeight>
+                        <BorderColor />
+                        <BorderWidth />
+                        <FontSize>9pt</FontSize>
+                      </Style>
+                    </Textbox>
+                  </ReportItems>
+                </TableCell>
+              </TableCells>
+            </TableRow>
+          </TableRows>
+          <RepeatOnNewPage>true</RepeatOnNewPage>
+        </Header>
+        <Details>
+          <TableRows>
+            <TableRow>
+              <Height>8.0pt</Height>
+              <TableCells>
+                <TableCell>
+                  <ReportItems>
+                    <Textbox Name="Textbox19">
+                      <Value>=" - " +  Fields!name.Value</Value>
+                      <CanGrow>true</CanGrow>
+                      <Style>
+                        <BorderStyle>
+                          <Default>Solid</Default>
+                        </BorderStyle>
+                        <FontSize>9pt</FontSize>
+                        <BorderColor />
+                        <BorderWidth />
+                      </Style>
+                    </Textbox>
+                  </ReportItems>
+                </TableCell>
+                <TableCell>
+                  <ReportItems>
+                    <Textbox Name="Textbox20">
+                      <Value>=Fields!count.Value</Value>
+                      <CanGrow>true</CanGrow>
+                      <Style>
+                        <BorderStyle>
+                          <Default>Solid</Default>
+                        </BorderStyle>
+                        <BorderColor />
+                        <BorderWidth />
+                        <TextAlign>General</TextAlign>
+                        <FontSize>9pt</FontSize>
+                      </Style>
+                    </Textbox>
+                  </ReportItems>
+                </TableCell>
+                <TableCell>
+                  <ReportItems>
+                    <Textbox Name="Textbox22">
+                      <Value>=Fields!price.Value</Value>
+                      <Style xmlns="http://schemas.microsoft.com/sqlserver/reporting/2005/01/reportdefinition">
+                        <BorderStyle>
+                          <Default>Solid</Default>
+                        </BorderStyle>
+                        <BorderColor />
+                        <BorderWidth />
+                        <TextAlign>General</TextAlign>
+                        <FontSize>9pt</FontSize>
+                      </Style>
+                    </Textbox>
+                  </ReportItems>
+                </TableCell>
+                <TableCell>
+                  <ReportItems>
+                    <Textbox Name="Textbox24">
+                      <Value>
+                      </Value>
+                      <CanGrow>true</CanGrow>
+                      <Style>
+                        <BorderStyle>
+                          <Default>Solid</Default>
+                        </BorderStyle>
+                        <FontSize>9pt</FontSize>
+                        <BorderColor />
+                        <BorderWidth />
+                      </Style>
+                    </Textbox>
+                  </ReportItems>
+                </TableCell>
+                <TableCell>
+                  <ReportItems>
+                    <Textbox Name="Textbox25">
+                      <Value>
+                      </Value>
+                      <CanGrow>true</CanGrow>
+                      <Style>
+                        <BorderStyle>
+                          <Default>Solid</Default>
+                        </BorderStyle>
+                        <FontSize>9pt</FontSize>
+                        <BorderColor />
+                        <BorderWidth />
+                      </Style>
+                    </Textbox>
+                  </ReportItems>
+                </TableCell>
+                <TableCell>
+                  <ReportItems>
+                    <Textbox Name="Textbox26">
+                      <Value>=Fields!comment.Value</Value>
+                      <CanGrow>true</CanGrow>
+                      <Style>
+                        <BorderStyle>
+                          <Default>Solid</Default>
+                        </BorderStyle>
+                        <FontSize>9pt</FontSize>
+                        <BorderColor />
+                        <BorderWidth />
+                      </Style>
+                    </Textbox>
+                  </ReportItems>
+                </TableCell>
+              </TableCells>
+            </TableRow>
+          </TableRows>
+        </Details>
+        <Left>16.7pt</Left>
+        <Top>412.8pt</Top>
+        <TableGroups>
+          <TableGroup>
+            <Grouping Name="Cube">
+              <PageBreakAtStart>false</PageBreakAtStart>
+              <PageBreakAtEnd>false</PageBreakAtEnd>
+              <GroupExpressions>
+                <GroupExpression>=Fields!cube_id</GroupExpression>
+              </GroupExpressions>
+            </Grouping>
+            <Header>
+              <RepeatOnNewPage>false</RepeatOnNewPage>
+              <TableRows>
+                <TableRow>
+                  <Height>.2in</Height>
+                  <TableCells>
+                    <TableCell>
+                      <ReportItems>
+                        <Textbox Name="Textbox41">
+                          <Style>
+                            <BorderStyle>
+                              <Default>Solid</Default>
+                            </BorderStyle>
+                            <BorderColor />
+                            <BorderWidth />
+                          </Style>
+                          <Value>=Replace(Convert.ToString(Replace(Convert.ToString(Fields!nomenclature.Value), "{H}", Convert.ToString({?baseh} * 40))), "{L}", Convert.ToString({?basel} * 40))</Value>
+                        </Textbox>
+                      </ReportItems>
+                    </TableCell>
+                    <TableCell>
+                      <ReportItems>
+                        <Textbox Name="Textbox42">
+                          <Style>
+                            <BorderStyle>
+                              <Default>Solid</Default>
+                            </BorderStyle>
+                            <BorderColor />
+                            <BorderWidth />
+                          </Style>
+                          <Value>=Fields!cube_count.Value</Value>
+                        </Textbox>
+                      </ReportItems>
+                    </TableCell>
+                    <TableCell>
+                      <ReportItems>
+                        <Textbox Name="Textbox43">
+                          <Style>
+                            <BorderStyle>
+                              <Default>Solid</Default>
+                            </BorderStyle>
+                            <BorderColor />
+                            <BorderWidth />
+                          </Style>
+                          <Value>=Fields!total_price.Value</Value>
+                        </Textbox>
+                      </ReportItems>
+                    </TableCell>
+                    <TableCell>
+                      <ReportItems>
+                        <Textbox Name="Textbox44">
+                          <Style>
+                            <BorderStyle>
+                              <Default>Solid</Default>
+                            </BorderStyle>
+                            <BorderColor />
+                            <BorderWidth />
+                          </Style>
+                          <Value>=Fields!material.Value</Value>
+                        </Textbox>
+                      </ReportItems>
+                    </TableCell>
+                    <TableCell>
+                      <ReportItems>
+                        <Textbox Name="Textbox45">
+                          <Style>
+                            <BorderStyle>
+                              <Default>Solid</Default>
+                            </BorderStyle>
+                            <BorderColor />
+                            <BorderWidth />
+                          </Style>
+                          <Value>=Fields!facing.Value</Value>
+                        </Textbox>
+                      </ReportItems>
+                    </TableCell>
+                    <TableCell>
+                      <ReportItems>
+                        <Textbox Name="Textbox46">
+                          <Style>
+                            <BorderStyle>
+                              <Default>Solid</Default>
+                            </BorderStyle>
+                            <BorderColor />
+                            <BorderWidth />
+                          </Style>
+                          <Value>=Fields!cube_comment.Value</Value>
+                        </Textbox>
+                      </ReportItems>
+                    </TableCell>
+                  </TableCells>
+                </TableRow>
+              </TableRows>
+            </Header>
+          </TableGroup>
+        </TableGroups>
+      </Table>
+      <List Name="List1">
+        <Height>127.21pt</Height>
+        <Width>565.30pt</Width>
+        <Left>7.50pt</Left>
+        <Top>10.30pt</Top>
+        <ReportItems>
+          <Textbox Name="Textbox6">
+            <Height>14.26pt</Height>
+            <Width>303.92pt</Width>
+            <Value>="Ф.И.О. Заказчика: " + {customer}</Value>
+            <ZIndex>1</ZIndex>
+            <Left>6pt</Left>
+            <Top>45.0pt</Top>
+            <Style>
+              <BorderStyle />
+              <BorderColor />
+              <BorderWidth />
+            </Style>
+          </Textbox>
+          <Textbox Name="Textbox7">
+            <Height>12.00pt</Height>
+            <Width>338.31pt</Width>
+            <Value>="Договор № "+ Iif(Fields.contract.IsMissing, "____", Fields!contract.Value) + " от " + Iif(Fields.arrval.IsMissing, "------//-----", Format(Fields!arrval.Value, "d"))</Value>
+            <ZIndex>1</ZIndex>
+            <Left>6.0pt</Left>
+            <Top>90.3pt</Top>
+            <Style>
+              <BorderStyle />
+              <BorderColor />
+              <BorderWidth />
+              <Format>None</Format>
+            </Style>
+          </Textbox>
+          <Textbox Name="Textbox27">
+            <Height>15.75pt</Height>
+            <Width>336.22pt</Width>
+            <Value>={exhibition}</Value>
+            <ZIndex>1</ZIndex>
+            <Left>227.15pt</Left>
+            <Top>4.80pt</Top>
+            <Style>
+              <BorderStyle />
+              <BorderColor />
+              <BorderWidth />
+              <TextAlign>Right</TextAlign>
+              <FontWeight>Bold</FontWeight>
+              <TextDecoration>None</TextDecoration>
+            </Style>
+          </Textbox>
+          <Textbox Name="Textbox30">
+            <Height>12.76pt</Height>
+            <Width>344.58pt</Width>
+            <Value>={exphone1}</Value>
+            <ZIndex>1</ZIndex>
+            <Left>219.13pt</Left>
+            <Top>19.40pt</Top>
+            <Style>
+              <BorderStyle />
+              <BorderColor />
+              <BorderWidth />
+              <TextAlign>Right</TextAlign>
+            </Style>
+          </Textbox>
+          <Textbox Name="Textbox31">
+            <Height>26.27pt</Height>
+            <Width>348.60pt</Width>
+            <Value>={address}</Value>
+            <ZIndex>1</ZIndex>
+            <Left>214.62pt</Left>
+            <Top>48.60pt</Top>
+            <Style>
+              <BorderStyle />
+              <BorderColor />
+              <BorderWidth />
+              <TextAlign>Right</TextAlign>
+            </Style>
+            <CanGrow>true</CanGrow>
+          </Textbox>
+          <Textbox Name="Textbox3">
+            <Height>14.25pt</Height>
+            <Width>447.97pt</Width>
+            <Value>="Телефоны: " + Iif(Fields.phone1.IsMissing, "", "(осн.) " + Fields.phone1) + Iif(Fields.phone2.IsMissing, "", " (доп.) " + Fields.phone2)</Value>
+            <ZIndex>1</ZIndex>
+            <Left>6.0pt</Left>
+            <Top>75.1pt</Top>
+            <Style>
+              <BorderStyle />
+              <BorderColor />
+              <BorderWidth />
+            </Style>
+            <CanGrow>true</CanGrow>
+          </Textbox>
+          <Textbox Name="Textbox35">
+            <Height>15.78pt</Height>
+            <Width>558.61pt</Width>
+            <Value>= "Адрес доставки: " +{customaddress}</Value>
+            <ZIndex>1</ZIndex>
+            <Left>6.00pt</Left>
+            <Top>59.70pt</Top>
+            <Style>
+              <BorderStyle />
+              <BorderColor />
+              <BorderWidth />
+            </Style>
+            <CanGrow>true</CanGrow>
+          </Textbox>
+          <Textbox Name="Textbox4">
+            <Height>14.26pt</Height>
+            <Width>417.03pt</Width>
+            <Value>="Срок сдачи: " &amp; Iif(Fields.deadline_s.IsMissing, "XX", Format(Fields!deadline_s.Value, "d")) &amp; " - " &amp; Iif(Fields.deadline_e.IsMissing, "XX", Format(Fields!deadline_e.Value, "d"))</Value>
+            <ZIndex>1</ZIndex>
+            <Left>6.00pt</Left>
+            <Top>107.70pt</Top>
+            <Style>
+              <BorderStyle />
+              <BorderColor />
+              <BorderWidth />
+            </Style>
+          </Textbox>
+          <Textbox Name="Textbox5">
+            <Height>15.00pt</Height>
+            <Width>343.15pt</Width>
+            <Value>={exphone2}</Value>
+            <ZIndex>1</ZIndex>
+            <Left>220.05pt</Left>
+            <Top>34.10pt</Top>
+            <Style>
+              <BorderStyle />
+              <BorderColor />
+              <BorderWidth />
+              <TextAlign>Right</TextAlign>
+            </Style>
+          </Textbox>
+        </ReportItems>
+        <DataSetName>Order</DataSetName>
+      </List>
+      <List Name="List2">
+        <Height>58.51pt</Height>
+        <Width>567.03pt</Width>
+        <Left>8.10pt</Left>
+        <Top>485.60pt</Top>
+        <Style>
+          <BorderStyle />
+          <BorderColor />
+          <BorderWidth />
+        </Style>
+        <DataSetName>Order</DataSetName>
+        <ReportItems>
+          <Textbox Name="Textbox28">
+            <Height>12.00pt</Height>
+            <Width>72.27pt</Width>
+            <Value>Примечания:</Value>
+            <ZIndex>1</ZIndex>
+            <Left>7.8pt</Left>
+            <Top>18.6pt</Top>
+            <Style>
+              <BorderStyle />
+              <BorderColor />
+              <BorderWidth />
+              <TextAlign>Right</TextAlign>
+            </Style>
+          </Textbox>
+          <Textbox Name="Textbox29">
+            <Height>32.25pt</Height>
+            <Width>486.35pt</Width>
+            <Value>={comment}</Value>
+            <ZIndex>1</ZIndex>
+            <Left>80.20pt</Left>
+            <Top>18.30pt</Top>
+            <Style>
+              <BorderStyle>
+                <Default>Solid</Default>
+                <Left>Solid</Left>
+                <Right>Solid</Right>
+                <Top>Solid</Top>
+                <Bottom>Solid</Bottom>
+              </BorderStyle>
+              <BorderColor />
+              <BorderWidth />
+              <FontStyle>Italic</FontStyle>
+            </Style>
+            <CanGrow>true</CanGrow>
+          </Textbox>
+          <Textbox Name="Textbox2">
+            <Height>12.99pt</Height>
+            <Width>218.79pt</Width>
+            <Value>="Итого: " + Convert.ToString(Math.Round(Fields!total_price.Value * (Fields!price_correction.Value + 100) / 100, 0)) + " руб."</Value>
+            <ZIndex>1</ZIndex>
+            <Left>347.30pt</Left>
+            <Top>3.00pt</Top>
+            <Style>
+              <BorderStyle />
+              <BorderColor />
+              <BorderWidth />
+            </Style>
+          </Textbox>
+        </ReportItems>
+      </List>
+      <Image Name="Image1">
+        <Height>265.08pt</Height>
+        <Width>559.20pt</Width>
+        <Left>16.00pt</Left>
+        <Top>145.00pt</Top>
+        <Style>
+          <BorderStyle>
+            <Top>Dashed</Top>
+          </BorderStyle>
+          <BorderColor />
+          <BorderWidth />
+          <BackgroundColor>
+          </BackgroundColor>
+        </Style>
+        <Source>External</Source>
+        <Value>={?image}</Value>
+        <Sizing>FitProportional</Sizing>
+      </Image>
+      <Textbox Name="Textbox32">
+        <Height>12.75pt</Height>
+        <Width>123.43pt</Width>
+        <Value>="Ширина (W) " + Convert.ToString(Max(Fields!widht.Value, "Data")) + " мм"</Value>
+        <ZIndex>1</ZIndex>
+        <Left>10.0pt</Left>
+        <Top>187.4pt</Top>
+        <Style>
+          <BorderStyle />
+          <BorderColor />
+          <BorderWidth />
+        </Style>
+      </Textbox>
+      <Textbox Name="Textbox33">
+        <Height>13.50pt</Height>
+        <Width>188.71pt</Width>
+        <Value>="Высота (H) " + Convert.ToString(First(Fields!delta_h.Value, "Order") + {?baseh} * 400 - First(Fields!cutting_base.Value, "Order") * 50) + " мм" + Iif(First(Fields!cutting_base.Value, "Order") = 1, " (урез.)", "")</Value>
+        <ZIndex>1</ZIndex>
+        <Left>10.00pt</Left>
+        <Top>202.30pt</Top>
+        <Style>
+          <BorderStyle />
+          <BorderColor />
+          <BorderWidth />
+        </Style>
+      </Textbox>
+      <Textbox Name="Textbox34">
+        <Height>12.00pt</Height>
+        <Width>118.90pt</Width>
+        <Value>="Длина (L) " + Convert.ToString(First(Fields!delta_l.Value, "Order") + {?basel} * 400) + " мм"</Value>
+        <ZIndex>1</ZIndex>
+        <Left>10.00pt</Left>
+        <Top>173.20pt</Top>
+        <Style>
+          <BorderStyle />
+          <BorderColor />
+          <BorderWidth />
+        </Style>
+      </Textbox>
+      <Image Name="Image2">
+        <Height>42.41pt</Height>
+        <Width>205.91pt</Width>
+        <Left>10.20pt</Left>
+        <Top>8.50pt</Top>
+        <Style>
+          <BorderStyle />
+          <BorderColor />
+          <BorderWidth />
+        </Style>
+        <Source>Embedded</Source>
+        <Value>logo_H</Value>
+        <Sizing>FitProportional</Sizing>
+      </Image>
+      <Table Name="Table1">
+        <DataSetName>Services</DataSetName>
+        <NoRows>Query returned no rows!</NoRows>
+        <Style>
+          <BorderStyle>
+            <Default>Solid</Default>
+          </BorderStyle>
+        </Style>
+        <TableColumns>
+          <TableColumn>
+            <Width>215.6pt</Width>
+          </TableColumn>
+          <TableColumn>
+            <Width>76.3pt</Width>
+          </TableColumn>
+          <TableColumn>
+            <Width>283.4pt</Width>
+          </TableColumn>
+        </TableColumns>
+        <Header>
+          <TableRows>
+            <TableRow>
+              <Height>12.0pt</Height>
+              <TableCells>
+                <TableCell>
+                  <ReportItems>
+                    <Textbox Name="Textbox8">
+                      <Value>Услуга</Value>
+                      <Style>
+                        <TextAlign>Center</TextAlign>
+                        <BorderStyle>
+                          <Default>Solid</Default>
+                        </BorderStyle>
+                        <FontWeight>Bold</FontWeight>
+                        <BorderColor />
+                        <BorderWidth />
+                        <FontSize>9pt</FontSize>
+                      </Style>
+                    </Textbox>
+                  </ReportItems>
+                </TableCell>
+                <TableCell>
+                  <ReportItems>
+                    <Textbox Name="Textbox9">
+                      <Value>Цена</Value>
+                      <Style>
+                        <TextAlign>Center</TextAlign>
+                        <BorderStyle>
+                          <Default>Solid</Default>
+                        </BorderStyle>
+                        <FontWeight>Bold</FontWeight>
+                        <BorderColor />
+                        <BorderWidth />
+                        <FontSize>9pt</FontSize>
+                      </Style>
+                    </Textbox>
+                  </ReportItems>
+                </TableCell>
+                <TableCell>
+                  <ReportItems>
+                    <Textbox Name="Textbox12">
+                      <Value>Примечание</Value>
+                      <Style>
+                        <TextAlign>Center</TextAlign>
+                        <BorderStyle>
+                          <Default>Solid</Default>
+                        </BorderStyle>
+                        <FontWeight>Bold</FontWeight>
+                        <BorderColor />
+                        <BorderWidth />
+                        <FontSize>9pt</FontSize>
+                      </Style>
+                    </Textbox>
+                  </ReportItems>
+                </TableCell>
+              </TableCells>
+            </TableRow>
+          </TableRows>
+          <RepeatOnNewPage>true</RepeatOnNewPage>
+        </Header>
+        <Details>
+          <TableRows>
+            <TableRow>
+              <Height>12.0pt</Height>
+              <TableCells>
+                <TableCell>
+                  <ReportItems>
+                    <Textbox Name="Textbox13">
+                      <Value>=Fields!name.Value</Value>
+                      <CanGrow>true</CanGrow>
+                      <Style>
+                        <BorderStyle>
+                          <Default>Solid</Default>
+                        </BorderStyle>
+                        <FontSize>9pt</FontSize>
+                        <BorderColor />
+                        <BorderWidth />
+                      </Style>
+                    </Textbox>
+                  </ReportItems>
+                </TableCell>
+                <TableCell>
+                  <ReportItems>
+                    <Textbox Name="Textbox14">
+                      <Value>=Fields!price.Value</Value>
+                      <CanGrow>true</CanGrow>
+                      <Style>
+                        <BorderStyle>
+                          <Default>Solid</Default>
+                        </BorderStyle>
+                        <FontSize>9pt</FontSize>
+                        <BorderColor />
+                        <BorderWidth />
+                      </Style>
+                    </Textbox>
+                  </ReportItems>
+                </TableCell>
+                <TableCell>
+                  <ReportItems>
+                    <Textbox Name="Textbox18">
+                      <Value>=Fields!comment.Value</Value>
+                      <CanGrow>true</CanGrow>
+                      <Style>
+                        <BorderStyle>
+                          <Default>Solid</Default>
+                        </BorderStyle>
+                        <BorderColor />
+                        <BorderWidth />
+                        <FontSize>9pt</FontSize>
+                      </Style>
+                    </Textbox>
+                  </ReportItems>
+                </TableCell>
+              </TableCells>
+            </TableRow>
+          </TableRows>
+        </Details>
+        <Left>17.1pt</Left>
+        <Top>459.3pt</Top>
+      </Table>
+    </ReportItems>
+    <Height>554.3pt</Height>
+  </Body>
+  <PageFooter>
+    <Height>32.8pt</Height>
+    <PrintOnFirstPage>true</PrintOnFirstPage>
+    <PrintOnLastPage>true</PrintOnLastPage>
+    <ReportItems>
+      <Textbox Name="Textbox1">
+        <Height>16.50pt</Height>
+        <Width>297.30pt</Width>
+        <Value>Подпись Заказчика: ________________________</Value>
+        <ZIndex>1</ZIndex>
+        <Left>269.80pt</Left>
+        <Top>3.40pt</Top>
+        <Style>
+          <BorderStyle />
+          <BorderColor />
+          <BorderWidth />
+          <FontSize>12pt</FontSize>
+        </Style>
+      </Textbox>
+    </ReportItems>
+  </PageFooter>
+  <DataSources>
+    <DataSource Name="DS1">
+      <ConnectionProperties>
+        <DataProvider>SQLite</DataProvider>
+        <ConnectString>Data Source=/home/andrew/Projects/CupboardDesigner/Base/Cupboard.db3;Version=3;</ConnectString>
+        <IntegratedSecurity>false</IntegratedSecurity>
+      </ConnectionProperties>
+    </DataSource>
+  </DataSources>
+  <ReportParameters>
+    <ReportParameter Name="id">
+      <DataType>Integer</DataType>
+      <DefaultValue>
+        <Values>
+          <Value>5</Value>
+        </Values>
+      </DefaultValue>
+      <Nullable>false</Nullable>
+      <AllowBlank>false</AllowBlank>
+      <MultiValue>false</MultiValue>
+      <Prompt>
+      </Prompt>
+    </ReportParameter>
+    <ReportParameter Name="image">
+      <DataType>String</DataType>
+      <DefaultValue>
+        <Values>
+          <Value>C:\Users\виртуал\AppData\Local\Temp\Cupboard5.png</Value>
+        </Values>
+      </DefaultValue>
+      <Nullable>false</Nullable>
+      <AllowBlank>false</AllowBlank>
+      <MultiValue>false</MultiValue>
+      <Prompt>
+      </Prompt>
+    </ReportParameter>
+    <ReportParameter Name="basel">
+      <DataType>Integer</DataType>
+      <DefaultValue>
+        <Values>
+          <Value>5</Value>
+        </Values>
+      </DefaultValue>
+      <Nullable>false</Nullable>
+      <AllowBlank>false</AllowBlank>
+      <MultiValue>false</MultiValue>
+      <Prompt>
+      </Prompt>
+    </ReportParameter>
+    <ReportParameter Name="baseh">
+      <DataType>Integer</DataType>
+      <DefaultValue>
+        <Values>
+          <Value>1</Value>
+        </Values>
+      </DefaultValue>
+      <Nullable>false</Nullable>
+      <AllowBlank>false</AllowBlank>
+      <MultiValue>false</MultiValue>
+      <Prompt>
+      </Prompt>
+    </ReportParameter>
+  </ReportParameters>
+  <EmbeddedImages>
+    <EmbeddedImage Name="logo_H">
+      <MIMEType>image/png</MIMEType>
+      <ImageData>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</ImageData>
+    </EmbeddedImage>
+  </EmbeddedImages>
+</Report>

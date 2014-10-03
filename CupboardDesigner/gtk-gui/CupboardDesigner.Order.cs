@@ -129,6 +129,10 @@ namespace CupboardDesigner
 		private global::fyiReporting.RdlGtkViewer.ReportViewer reportviewer1;
 		
 		private global::Gtk.Label label16;
+		
+		private global::fyiReporting.RdlGtkViewer.ReportViewer reportviewer2;
+		
+		private global::Gtk.Label label19;
 
 		protected virtual void Build ()
 		{
@@ -174,7 +178,7 @@ namespace CupboardDesigner
 			this.notebook1 = new global::Gtk.Notebook ();
 			this.notebook1.CanFocus = true;
 			this.notebook1.Name = "notebook1";
-			this.notebook1.CurrentPage = 3;
+			this.notebook1.CurrentPage = 4;
 			// Container child notebook1.Gtk.Notebook+NotebookChild
 			this.hbox1 = new global::Gtk.HBox ();
 			this.hbox1.Name = "hbox1";
@@ -751,17 +755,34 @@ namespace CupboardDesigner
 			// Notebook tab
 			this.label16 = new global::Gtk.Label ();
 			this.label16.Name = "label16";
-			this.label16.LabelProp = global::Mono.Unix.Catalog.GetString ("ШАГ-4 (предварительный просмотр)");
+			this.label16.LabelProp = global::Mono.Unix.Catalog.GetString ("ШАГ-4 (печать заказа)");
 			this.notebook1.SetTabLabel (this.reportviewer1, this.label16);
 			this.label16.ShowAll ();
+			// Container child notebook1.Gtk.Notebook+NotebookChild
+			this.reportviewer2 = new global::fyiReporting.RdlGtkViewer.ReportViewer ();
+			this.reportviewer2.WidthRequest = 0;
+			this.reportviewer2.HeightRequest = 0;
+			this.reportviewer2.Events = ((global::Gdk.EventMask)(256));
+			this.reportviewer2.Name = "reportviewer2";
+			this.reportviewer2.ShowErrors = false;
+			this.reportviewer2.ShowParameters = false;
+			this.notebook1.Add (this.reportviewer2);
+			global::Gtk.Notebook.NotebookChild w54 = ((global::Gtk.Notebook.NotebookChild)(this.notebook1 [this.reportviewer2]));
+			w54.Position = 5;
+			// Notebook tab
+			this.label19 = new global::Gtk.Label ();
+			this.label19.Name = "label19";
+			this.label19.LabelProp = global::Mono.Unix.Catalog.GetString ("ШАГ-5 (печать для производства)");
+			this.notebook1.SetTabLabel (this.reportviewer2, this.label19);
+			this.label19.ShowAll ();
 			this.vbox2.Add (this.notebook1);
-			global::Gtk.Box.BoxChild w54 = ((global::Gtk.Box.BoxChild)(this.vbox2 [this.notebook1]));
-			w54.Position = 1;
+			global::Gtk.Box.BoxChild w55 = ((global::Gtk.Box.BoxChild)(this.vbox2 [this.notebook1]));
+			w55.Position = 1;
 			this.Add (this.vbox2);
 			if ((this.Child != null)) {
 				this.Child.ShowAll ();
 			}
-			this.DefaultWidth = 901;
+			this.DefaultWidth = 913;
 			this.DefaultHeight = 602;
 			this.Show ();
 			this.revertToSavedAction.Activated += new global::System.EventHandler (this.OnRevertToSavedActionActivated);

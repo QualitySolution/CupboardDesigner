@@ -1769,7 +1769,7 @@
       </widget>
     </child>
   </widget>
-  <widget class="Gtk.Window" id="CupboardDesigner.Order" design-size="901 602">
+  <widget class="Gtk.Window" id="CupboardDesigner.Order" design-size="913 602">
     <action-group name="Default">
       <action id="revertToSavedAction">
         <property name="Type">Action</property>
@@ -1836,7 +1836,7 @@
           <widget class="Gtk.Notebook" id="notebook1">
             <property name="MemberName" />
             <property name="CanFocus">True</property>
-            <property name="CurrentPage">3</property>
+            <property name="CurrentPage">4</property>
             <signal name="SwitchPage" handler="OnNotebook1SwitchPage" />
             <child>
               <widget class="Gtk.HBox" id="hbox1">
@@ -2803,7 +2803,29 @@
             <child>
               <widget class="Gtk.Label" id="label16">
                 <property name="MemberName" />
-                <property name="LabelProp" translatable="yes">ШАГ-4 (предварительный просмотр)</property>
+                <property name="LabelProp" translatable="yes">ШАГ-4 (печать заказа)</property>
+              </widget>
+              <packing>
+                <property name="type">tab</property>
+              </packing>
+            </child>
+            <child>
+              <widget class="fyiReporting.RdlGtkViewer.ReportViewer" id="reportviewer2">
+                <property name="MemberName" />
+                <property name="WidthRequest">0</property>
+                <property name="HeightRequest">0</property>
+                <property name="Events">ButtonPressMask</property>
+                <property name="ShowErrors">False</property>
+                <property name="ShowParameters">False</property>
+              </widget>
+              <packing>
+                <property name="Position">5</property>
+              </packing>
+            </child>
+            <child>
+              <widget class="Gtk.Label" id="label19">
+                <property name="MemberName" />
+                <property name="LabelProp" translatable="yes">ШАГ-5 (печать для производства)</property>
               </widget>
               <packing>
                 <property name="type">tab</property>
