@@ -38,6 +38,8 @@ namespace CupboardDesigner
 		private Gtk.TreeViewColumn ColumnFacing;
 		private Gtk.TreeViewColumn ColumnPriceTotal;
 		private Gtk.TreeViewColumn ColumnComment;
+		private Gtk.TreeViewColumn ColumnDiscount;
+
 		Gtk.TargetEntry[] TargetTable = new Gtk.TargetEntry[] {
 			new Gtk.TargetEntry ("application/cube", Gtk.TargetFlags.App, 0)
 		};
@@ -61,7 +63,9 @@ namespace CupboardDesigner
 			editable_price,
 			editable_material,
 			editable_facing,
-			editable_comment
+			editable_comment,
+			editable_discount,
+			discount
 		}
 
 		public Order() : base(Gtk.WindowType.Toplevel)
@@ -82,8 +86,8 @@ namespace CupboardDesigner
 			FacingNameList = TempCombo.Model;
 			TempCombo.Destroy ();
 
-			ComponentsStore = new TreeStore(typeof(long), typeof(Nomenclature.NomType), typeof(int), typeof(string), typeof(string), typeof(string), typeof(int), typeof(int), typeof(string), typeof(int), typeof(string), typeof(string), typeof(string), typeof(string), typeof(bool), typeof(bool), typeof(bool), typeof(bool), typeof(bool));
-			BasisIter = ComponentsStore.AppendValues ((long)-1, Enum.Parse(typeof(Nomenclature.NomType), "construct"), 1, null, "Каркас", null, 1, -1, "", -1, "", "", "", "", false, false, false, false, false);
+			ComponentsStore = new TreeStore(typeof(long), typeof(Nomenclature.NomType), typeof(int), typeof(string), typeof(string), typeof(string), typeof(int), typeof(int), typeof(string), typeof(int), typeof(string), typeof(string), typeof(string), typeof(string), typeof(bool), typeof(bool), typeof(bool), typeof(bool), typeof(bool), typeof(bool), typeof(int));
+			BasisIter = ComponentsStore.AppendValues ((long)-1, Enum.Parse(typeof(Nomenclature.NomType), "construct"), 1, null, "Каркас", null, 1, -1, "", -1, "", "", "", "", false, false, false, false, false, false, null);
 
 			ColumnCount = new Gtk.TreeViewColumn ();
 			ColumnCount.Title = "Кол-во";
@@ -139,7 +143,6 @@ namespace CupboardDesigner
 			ColumnPriceTotal.PackStart (CellPriceTotal, true);
 			ColumnPriceTotal.AddAttribute(CellPriceTotal, "text", (int)ComponentCol.price_total);
 
-
 			ColumnComment = new Gtk.TreeViewColumn ();
 			ColumnComment.Title = "Комментарий";
 			Gtk.CellRendererText CellComment = new Gtk.CellRendererText ();
@@ -152,10 +155,22 @@ namespace CupboardDesigner
 			ColumnComment.AddAttribute(CellComment, "text", (int)ComponentCol.comment);
 			ColumnComment.AddAttribute(CellComment, "editable", (int)ComponentCol.editable_comment);
 
+			ColumnDiscount = new Gtk.TreeViewColumn ();
+			ColumnDiscount.Title = "Скидка";
+			Gtk.CellRendererSpin CellDiscount = new Gtk.CellRendererSpin ();
+			CellDiscount.Visible = false;
+			CellDiscount.Edited += OnDiscountEdited;
+			CellDiscount.Adjustment = new Adjustment (0, -100, 100, 1, 10, 0);
+			ColumnDiscount.PackStart (CellDiscount, true);
+			ColumnDiscount.AddAttribute (CellDiscount, "text", (int)ComponentCol.discount);
+			ColumnDiscount.AddAttribute (CellDiscount, "visible", (int)ComponentCol.editable_discount);
+			ColumnDiscount.AddAttribute (CellDiscount, "editable", (int)ComponentCol.editable_discount);
+
 			treeviewComponents.AppendColumn("Название", new Gtk.CellRendererText (), "text", (int)ComponentCol.nomenclature_title);
 			treeviewComponents.AppendColumn(ColumnCount);
-			treeviewComponents.AppendColumn (ColumnPrice);
-			treeviewComponents.AppendColumn (ColumnPriceTotal);
+			treeviewComponents.AppendColumn(ColumnPrice);
+			treeviewComponents.AppendColumn(ColumnDiscount); 
+			treeviewComponents.AppendColumn(ColumnPriceTotal);
 			treeviewComponents.AppendColumn(ColumnMaterial);
 			treeviewComponents.AppendColumn(ColumnFacing);
 			treeviewComponents.AppendColumn(ColumnComment);
@@ -366,10 +381,11 @@ namespace CupboardDesigner
 									InDB = (long)ComponentsStore.GetValue(childIter, (int)ComponentCol.row_id) > 0;
 									if(HasValue) {
 										if(!InDB)
-											sql = "INSERT INTO order_cubes_details (order_id, cube_id, nomenclature_id, count, price, " +
-												"comment) VALUES (@order_id, @cube_id, @nomenclature_id, @count, @price, @comment)";
+											sql = "INSERT INTO order_cubes_details (order_id, cube_id, nomenclature_id, count, price, comment, " +
+												"discount) VALUES (@order_id, @cube_id, @nomenclature_id, @count, @price, @comment, @discount)";
 										else
-											sql = "UPDATE order_cubes_details SET count = @count, price = @price, comment = @comment WHERE id = @id";
+											sql = "UPDATE order_cubes_details " +
+												"SET count = @count, price = @price, comment = @comment, discount = @discount WHERE id = @id";
 										cmd = new SqliteCommand(sql, (SqliteConnection)QSMain.ConnectionDB, trans);
 										cmd.Parameters.AddWithValue("@id", (long)ComponentsStore.GetValue(childIter, (int)ComponentCol.row_id));
 										cmd.Parameters.AddWithValue("@order_id", ItemId);
@@ -378,6 +394,7 @@ namespace CupboardDesigner
 										cmd.Parameters.AddWithValue("@count", ComponentsStore.GetValue(childIter,(int)ComponentCol.count));
 										cmd.Parameters.AddWithValue("@price", ComponentsStore.GetValue(childIter, (int)ComponentCol.price));
 										cmd.Parameters.AddWithValue("@comment", DBWorks.ValueOrNull((string)ComponentsStore.GetValue(childIter, (int)ComponentCol.comment) != "", ComponentsStore.GetValue(childIter, (int)ComponentCol.comment)));
+										cmd.Parameters.AddWithValue("@discount", ComponentsStore.GetValue(childIter, (int)ComponentCol.discount));
 										cmd.ExecuteNonQuery();
 										if(!InDB)
 										{
@@ -407,10 +424,10 @@ namespace CupboardDesigner
 									bool InDB = (long)ComponentsStore.GetValue(childIter, (int)ComponentCol.row_id) > 0;
 									if(HasValue) {
 										if(!InDB)
-											sql = "INSERT INTO order_basis_details (order_id, basis_id, nomenclature_id, count, price, comment) " +
-												"VALUES (@order_id, @basis_id, @nomenclature_id, @count, @price, @comment)";
+											sql = "INSERT INTO order_basis_details (order_id, basis_id, nomenclature_id, count, price, comment, discount) " +
+												"VALUES (@order_id, @basis_id, @nomenclature_id, @count, @price, @comment, @discount)";
 										else
-											sql = "UPDATE order_basis_details SET count = @count, price = @price, comment = @comment WHERE id = @id";
+											sql = "UPDATE order_basis_details SET count = @count, price = @price, comment = @comment, discount = @discount WHERE id = @id";
 										cmd = new SqliteCommand(sql, (SqliteConnection)QSMain.ConnectionDB, trans);
 										cmd.Parameters.AddWithValue("@id", (long)ComponentsStore.GetValue(childIter, (int)ComponentCol.row_id));
 										cmd.Parameters.AddWithValue("@order_id", ItemId);
@@ -419,6 +436,7 @@ namespace CupboardDesigner
 										cmd.Parameters.AddWithValue("@count", ComponentsStore.GetValue(childIter,(int)ComponentCol.count));
 										cmd.Parameters.AddWithValue("@price", ComponentsStore.GetValue(childIter, (int)ComponentCol.price));
 										cmd.Parameters.AddWithValue("@comment", DBWorks.ValueOrNull((string)ComponentsStore.GetValue(childIter, (int)ComponentCol.comment) != "", ComponentsStore.GetValue(childIter, (int)ComponentCol.comment)));
+										cmd.Parameters.AddWithValue("@discount", ComponentsStore.GetValue(childIter, (int)ComponentCol.discount));
 										cmd.ExecuteNonQuery();
 										if(!InDB)
 										{
@@ -524,7 +542,9 @@ namespace CupboardDesigner
 						false,
 						false,
 						false,
-						false
+						false,
+						false,
+						0
 					);
 				}
 				//Loading basis and it's contents.
@@ -555,12 +575,14 @@ namespace CupboardDesigner
 							"",
 							DBWorks.GetString(rdr, "comment", ""),
 							price.ToString(),
-							(price * count).ToString(),
+							Math.Round(((price * count) + (price * count / 100 * DBWorks.GetInt(rdr, "discount", 0))), 0).ToString(),
 							true,
 							true,
 							false,
 							false,
-							true
+							true,
+							true,
+							DBWorks.GetInt(rdr, "discount", 0)
 						);
 					}
 				}
@@ -590,7 +612,9 @@ namespace CupboardDesigner
 							false,
 							true,
 							true,
-							true
+							true,
+							false,
+							0
 						);
 						string contents_sql = "SELECT order_cubes_details.*, nomenclature.type AS type, nomenclature.name AS name, " +
 							"nomenclature.description AS description FROM order_cubes_details LEFT JOIN nomenclature ON " +
@@ -603,6 +627,7 @@ namespace CupboardDesigner
 						using (SqliteDataReader contents_rdr = contents_cmd.ExecuteReader ()) {
 							while (contents_rdr.Read ()) {
 								Decimal NomenclaturePrice = DBWorks.GetDecimal (contents_rdr, "price", 0) * DBWorks.GetDecimal (contents_rdr, "count", 1);
+								NomenclaturePrice = NomenclaturePrice + NomenclaturePrice / 100 * DBWorks.GetInt(contents_rdr, "discount", 0);
 								Price += NomenclaturePrice;
 								ComponentsStore.AppendValues (
 									CubeIter,
@@ -619,12 +644,14 @@ namespace CupboardDesigner
 									"",
 									DBWorks.GetString(contents_rdr, "comment", ""),
 									(DBWorks.GetDecimal(contents_rdr, "price", 0)).ToString(),
-									NomenclaturePrice.ToString(),
+									(Math.Round(NomenclaturePrice, 0)).ToString(),
 									true,
 									true,
 									false,
 									false,
-									true
+									true,
+									true,
+									DBWorks.GetInt(contents_rdr, "discount", 0)
 								);
 							}
 							ComponentsStore.SetValue (CubeIter, (int)ComponentCol.price_total, Price.ToString ());
@@ -695,6 +722,27 @@ namespace CupboardDesigner
 				ComponentsStore.SetValue(iter, (int)ComponentCol.material, args.NewText);
 				ComponentsStore.SetValue(iter, (int)ComponentCol.material_id, MaterialNameList.GetValue(RefIter, 1));
 			}
+		}
+
+		void OnDiscountEdited(object o, EditedArgs args)
+		{
+			TreeIter iter;
+			int discount;
+			decimal price;
+
+			if (!ComponentsStore.GetIterFromString (out iter, args.Path))
+				return;
+			if (args.NewText == null){
+				logger.Warn ("text is empty");
+				return;
+			}
+			if (!int.TryParse(args.NewText, out discount))
+				return;
+			ComponentsStore.SetValue(iter, (int)ComponentCol.discount, discount);
+			price = Decimal.Parse((string)ComponentsStore.GetValue (iter, (int)ComponentCol.price));
+			price *= (int)ComponentsStore.GetValue (iter, (int)ComponentCol.count);
+			ComponentsStore.SetValue (iter, (int)ComponentCol.price_total, (Math.Round (price + price / 100 * discount, 0)).ToString ());
+			CalculateTotalCount ();
 		}
 
 		void OnFacingComboEdited (object o, EditedArgs args)
@@ -992,7 +1040,8 @@ namespace CupboardDesigner
 				{
 					if (pairs.TryGetValue (DBWorks.GetInt (rdr, "item_id", -1), out iter)) {
 						int count = DBWorks.GetInt (rdr, "count", 1);
-						Decimal price = count * Decimal.Parse(ComponentsStore.GetValue (iter, (int)ComponentCol.price).ToString());
+						Decimal price = count * Decimal.Parse((String)ComponentsStore.GetValue (iter, (int)ComponentCol.price));
+						price = price + price / 100 * (int)ComponentsStore.GetValue (iter, (int)ComponentCol.discount);
 						ComponentsStore.SetValue (iter, (int)ComponentCol.count, count);
 						ComponentsStore.SetValue (iter, (int)ComponentCol.price_total, price.ToString());
 					} else {
@@ -1016,7 +1065,9 @@ namespace CupboardDesigner
 							true,
 							false,
 							false,
-							true
+							true,
+							true, 
+							0
 						);
 					}
 				}
@@ -1056,7 +1107,7 @@ namespace CupboardDesigner
 
 			foreach (KeyValuePair<int, int> pair in Counts) {
 				Cube cube = OrderCupboard.Cubes.Find (c => c.NomenclatureId == pair.Key);
-				TreeIter CubeIter = ComponentsStore.AppendValues ((long)-1, Enum.Parse (typeof(Nomenclature.NomType), "cube"), pair.Key, null, cube.Name, null, pair.Value, -1, "", -1, "", "", "", "",false, false, true, true, true);
+				TreeIter CubeIter = ComponentsStore.AppendValues ((long)-1, Enum.Parse (typeof(Nomenclature.NomType), "cube"), pair.Key, null, cube.Name, null, pair.Value, -1, "", -1, "", "", "", "",false, false, true, true, true, false, 0);
 				string sql = "SELECT nomenclature.name as nomenclature, nomenclature.type, nomenclature.description, nomenclature.price, cubes_items.* FROM cubes_items " +
 					"LEFT JOIN nomenclature ON nomenclature.id = cubes_items.item_id " +
 					"WHERE cubes_id = @cubes_id";
@@ -1065,7 +1116,8 @@ namespace CupboardDesigner
 				Decimal Price = 0;
 				using (SqliteDataReader rdr = cmd.ExecuteReader ()) {
 					while (rdr.Read ()) {
-						Price += (DBWorks.GetDecimal (rdr, "price", 0) * pair.Value);
+						Decimal totalPrice = (DBWorks.GetDecimal (rdr, "price", 0) * pair.Value);
+						Price += totalPrice;
 						ComponentsStore.AppendValues (
 							CubeIter,
 							(long)-1,
@@ -1086,7 +1138,9 @@ namespace CupboardDesigner
 							true,
 							false,
 							false,
-							true
+							true,
+							true, 
+							0
 						);
 					}
 					ComponentsStore.SetValue (CubeIter, (int)ComponentCol.price_total, Price.ToString ());
@@ -1283,7 +1337,7 @@ namespace CupboardDesigner
 
 		protected void OnCheckbutton2Toggled (object sender, EventArgs e)
 		{
-			ColumnPrice.Visible = ColumnPriceTotal.Visible = checkbuttonShowPrice.Active;
+			ColumnPrice.Visible = ColumnPriceTotal.Visible = ColumnDiscount.Visible = checkbuttonShowPrice.Active;
 		}
 
 		protected void OnCheckbutton1Toggled (object sender, EventArgs e)
