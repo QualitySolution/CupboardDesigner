@@ -90,7 +90,9 @@ namespace CupboardDesigner
 
 			ComponentsStore = new TreeStore(typeof(long), typeof(Nomenclature.NomType), typeof(int), typeof(string), typeof(string), typeof(string), typeof(int), typeof(int), typeof(string), typeof(int), typeof(string), typeof(string), typeof(string), typeof(string), typeof(bool), typeof(bool), typeof(bool), typeof(bool), typeof(bool), typeof(bool), typeof(int), typeof(bool));
 			BasisIter = ComponentsStore.AppendValues ((long)-1, Enum.Parse(typeof(Nomenclature.NomType), "construct"), 1, null, "Каркас", null, 1, -1, "", -1, "", "", "", "", false, false, false, false, false, false, null, false);
-			ServiceIter = ComponentsStore.AppendValues ((long)-1, Enum.Parse(typeof(Nomenclature.NomType), "other"), 1, null, "Услуги", null, 1, -1, "", -1, "", "", "", "", false, false, false, false, false, false, null, false);
+			ServiceIter = ComponentsStore.InsertNodeAfter (BasisIter);
+			ComponentsStore.SetValues (ServiceIter, (long)-1, Enum.Parse (typeof(Nomenclature.NomType), "other"), 1, null, "Услуги", null, 1, -1, "", -1, "", "", "", "", false, false, false, false, false, false, null, false);
+			//ServiceIter = ComponentsStore.AppendValues ((long)-1, Enum.Parse(typeof(Nomenclature.NomType), "other"), 1, null, "Услуги", null, 1, -1, "", -1, "", "", "", "", false, false, false, false, false, false, null, false);
 
 			ColumnCount = new Gtk.TreeViewColumn ();
 			ColumnCount.Title = "Кол-во";
@@ -565,7 +567,9 @@ namespace CupboardDesigner
 						checkbuttonDiscount.Active = true;
 					labelTotalCount.LabelProp = String.Format("Итого {0} руб.", TotalPrice);
 					ComponentsStore.Remove(ref BasisIter);
-					BasisIter = ComponentsStore.AppendValues (
+					BasisIter = ComponentsStore.InsertNodeBefore(ServiceIter);
+					ComponentsStore.SetValues (
+						BasisIter,
 						(long)-1, 
 						Enum.Parse(typeof(Nomenclature.NomType), "construct"), 
 						basis.id, 
@@ -671,7 +675,9 @@ namespace CupboardDesigner
 				cmd.Parameters.AddWithValue("@order_id", id);
 				using (SqliteDataReader rdr = cmd.ExecuteReader()) {
 					while (rdr.Read()) {
-						TreeIter CubeIter = ComponentsStore.AppendValues (
+						TreeIter CubeIter = ComponentsStore.InsertNodeBefore(ServiceIter);
+							ComponentsStore.SetValues (
+							CubeIter,
 							DBWorks.GetLong(rdr, "id", -1), 
 							Enum.Parse (typeof(Nomenclature.NomType), "cube"), 
 							DBWorks.GetInt(rdr, "cube_id", -1),
@@ -1201,7 +1207,8 @@ namespace CupboardDesigner
 
 			foreach (KeyValuePair<int, int> pair in Counts) {
 				Cube cube = OrderCupboard.Cubes.Find (c => c.NomenclatureId == pair.Key);
-				TreeIter CubeIter = ComponentsStore.AppendValues ((long)-1, Enum.Parse (typeof(Nomenclature.NomType), "cube"), pair.Key, null, cube.Name, null, pair.Value, -1, "", -1, "", "", "", "",false, false, true, true, true, false, 0, false);
+				TreeIter CubeIter = ComponentsStore.InsertNodeBefore (ServiceIter);
+				ComponentsStore.SetValues (CubeIter, (long)-1, Enum.Parse (typeof(Nomenclature.NomType), "cube"), pair.Key, null, cube.Name, null, pair.Value, -1, "", -1, "", "", "", "",false, false, true, true, true, false, 0, false);
 				string sql = "SELECT nomenclature.name as nomenclature, nomenclature.type, nomenclature.description, nomenclature.price, cubes_items.* FROM cubes_items " +
 					"LEFT JOIN nomenclature ON nomenclature.id = cubes_items.item_id " +
 					"WHERE cubes_id = @cubes_id";
