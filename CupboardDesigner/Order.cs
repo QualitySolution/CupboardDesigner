@@ -19,6 +19,7 @@ namespace CupboardDesigner
 		private bool FillInProgress = false;
 		private TreeStore ComponentsStore;
 		private TreeModel MaterialNameList, FacingNameList;
+		private TreeIter BasisIter, ServiceIter;
 		private List<Cube> CubeList;
 		private int CubePxSize = 100;
 		private VBox vboxCubeList;
@@ -29,7 +30,6 @@ namespace CupboardDesigner
 		private List<CubeListItem> CubeWidgetList;
 		private Cupboard OrderCupboard;
 		private DragInformation CurrentDrag;
-		private TreeIter BasisIter;
 		private Decimal TotalPrice;
 		private int PriceCorrection = 0;
 		private Gtk.TreeViewColumn ColumnPrice;
@@ -39,6 +39,7 @@ namespace CupboardDesigner
 		private Gtk.TreeViewColumn ColumnPriceTotal;
 		private Gtk.TreeViewColumn ColumnComment;
 		private Gtk.TreeViewColumn ColumnDiscount;
+		private Gtk.TreeViewColumn ColumnName;
 
 		Gtk.TargetEntry[] TargetTable = new Gtk.TargetEntry[] {
 			new Gtk.TargetEntry ("application/cube", Gtk.TargetFlags.App, 0)
@@ -65,7 +66,8 @@ namespace CupboardDesigner
 			editable_facing,
 			editable_comment,
 			editable_discount,
-			discount
+			discount,
+			editable_name
 		}
 
 		public Order() : base(Gtk.WindowType.Toplevel)
@@ -86,8 +88,9 @@ namespace CupboardDesigner
 			FacingNameList = TempCombo.Model;
 			TempCombo.Destroy ();
 
-			ComponentsStore = new TreeStore(typeof(long), typeof(Nomenclature.NomType), typeof(int), typeof(string), typeof(string), typeof(string), typeof(int), typeof(int), typeof(string), typeof(int), typeof(string), typeof(string), typeof(string), typeof(string), typeof(bool), typeof(bool), typeof(bool), typeof(bool), typeof(bool), typeof(bool), typeof(int));
-			BasisIter = ComponentsStore.AppendValues ((long)-1, Enum.Parse(typeof(Nomenclature.NomType), "construct"), 1, null, "Каркас", null, 1, -1, "", -1, "", "", "", "", false, false, false, false, false, false, null);
+			ComponentsStore = new TreeStore(typeof(long), typeof(Nomenclature.NomType), typeof(int), typeof(string), typeof(string), typeof(string), typeof(int), typeof(int), typeof(string), typeof(int), typeof(string), typeof(string), typeof(string), typeof(string), typeof(bool), typeof(bool), typeof(bool), typeof(bool), typeof(bool), typeof(bool), typeof(int), typeof(bool));
+			BasisIter = ComponentsStore.AppendValues ((long)-1, Enum.Parse(typeof(Nomenclature.NomType), "construct"), 1, null, "Каркас", null, 1, -1, "", -1, "", "", "", "", false, false, false, false, false, false, null, false);
+			ServiceIter = ComponentsStore.AppendValues ((long)-1, Enum.Parse(typeof(Nomenclature.NomType), "other"), 1, null, "Услуги", null, 1, -1, "", -1, "", "", "", "", false, false, false, false, false, false, null, false);
 
 			ColumnCount = new Gtk.TreeViewColumn ();
 			ColumnCount.Title = "Кол-во";
@@ -166,7 +169,15 @@ namespace CupboardDesigner
 			ColumnDiscount.AddAttribute (CellDiscount, "visible", (int)ComponentCol.editable_discount);
 			ColumnDiscount.AddAttribute (CellDiscount, "editable", (int)ComponentCol.editable_discount);
 
-			treeviewComponents.AppendColumn("Название", new Gtk.CellRendererText (), "text", (int)ComponentCol.nomenclature_title);
+			ColumnName = new Gtk.TreeViewColumn ();
+			ColumnName.Title = "Название";
+			Gtk.CellRendererText CellName = new CellRendererText ();
+			CellName.Edited += OnCellNameEdited;
+			ColumnName.PackStart (CellName, true);
+			ColumnName.AddAttribute (CellName, "editable", (int)ComponentCol.editable_name);
+			ColumnName.AddAttribute (CellName, "text", (int)ComponentCol.nomenclature_title);
+
+			treeviewComponents.AppendColumn(ColumnName);
 			treeviewComponents.AppendColumn(ColumnCount);
 			treeviewComponents.AppendColumn(ColumnPrice);
 			treeviewComponents.AppendColumn(ColumnDiscount); 
@@ -333,10 +344,42 @@ namespace CupboardDesigner
 					ItemId = Convert.ToInt32(cmd.ExecuteScalar());
 					NewItem = false;
 				}
-				// Запись компонент
+				// Saving components
+				// Saving services
 				TreeIter iter, childIter;
+				if(ComponentsStore.IterHasChild(ServiceIter)) {
+					ComponentsStore.IterChildren(out childIter, ServiceIter);
+					do {
+						bool InDB = (long)ComponentsStore.GetValue(childIter, (int)ComponentCol.row_id) > 0;
+						if(!InDB)
+							sql = "INSERT INTO order_services (order_id, name, price, discount, comment) " +
+								"VALUES (@order_id, @name, @price, @discount, @comment)";
+						else
+							sql = "UPDATE order_services " +
+								"SET name = @name, price = @price, discount = @discount, comment = @comment " +
+								"WHERE id = @id";
+						cmd = new SqliteCommand(sql, (SqliteConnection)QSMain.ConnectionDB, trans);
+						cmd.Parameters.AddWithValue("@id", (long)ComponentsStore.GetValue(childIter, (int)ComponentCol.row_id));
+						cmd.Parameters.AddWithValue("@order_id", ItemId);
+						cmd.Parameters.AddWithValue("@name", (string)ComponentsStore.GetValue(childIter,(int)ComponentCol.nomenclature_title));
+						cmd.Parameters.AddWithValue("@price", ComponentsStore.GetValue(childIter,(int)ComponentCol.price));
+						cmd.Parameters.AddWithValue("@discount", (int)ComponentsStore.GetValue(childIter, (int)ComponentCol.discount));
+						cmd.Parameters.AddWithValue("@comment", (string)ComponentsStore.GetValue(childIter, (int)ComponentCol.comment));
+						cmd.ExecuteNonQuery();
+						if(!InDB)
+						{
+							sql = @"select last_insert_rowid()";
+							cmd = new SqliteCommand(sql, (SqliteConnection)QSMain.ConnectionDB, trans);
+							long RowId = (long) cmd.ExecuteScalar();
+							ComponentsStore.SetValue(childIter, (int)ComponentCol.row_id, (object)RowId);
+						}
+					} while (ComponentsStore.IterNext(ref childIter));
+					childIter = new TreeIter();
+				}
 				if(ComponentsStore.GetIterFirst(out iter)) {
 					do {	//If item is cube
+						if ((Nomenclature.NomType)ComponentsStore.GetValue(iter, (int)ComponentCol.nomenclature_type) == Nomenclature.NomType.other)
+							continue;
 						if ((Nomenclature.NomType)ComponentsStore.GetValue(iter, (int)ComponentCol.nomenclature_type) == Nomenclature.NomType.cube) {
 							//Writing common cube info to order_details
 							bool HasValue = (int) ComponentsStore.GetValue(iter, (int)ComponentCol.count) > 0;
@@ -483,7 +526,6 @@ namespace CupboardDesigner
 			NewItem = copy;
 			if(!copy)
 				ItemId = id;
-
 			MainClass.StatusMessage(String.Format ("Запрос заказа №{0}...", id));
 			string sql = "SELECT orders.* FROM orders WHERE orders.id = @id";
 			try
@@ -544,8 +586,43 @@ namespace CupboardDesigner
 						false,
 						false,
 						false,
-						0
+						0,
+						false
 					);
+				}
+				//Loading services.
+				sql = "select * from order_services where order_id = @order_id";
+				cmd = new SqliteCommand(sql, (SqliteConnection)QSMain.ConnectionDB);
+				cmd.Parameters.AddWithValue("@order_id", id);
+				using (SqliteDataReader rdr = cmd.ExecuteReader()) {
+					while(rdr.Read()) {
+						Decimal price = DBWorks.GetDecimal(rdr, "price", 0);
+						ComponentsStore.AppendValues (
+							ServiceIter,
+							DBWorks.GetLong(rdr, "id", -1),
+							Enum.Parse (typeof(Nomenclature.NomType), "other"),
+							-1,
+							"",
+							DBWorks.GetString(rdr, "name", ""), //Service name
+							"",
+							1,
+							-1,
+							"",
+							-1,
+							"",
+							DBWorks.GetString(rdr, "comment", ""),
+							price.ToString(),
+							(Math.Round(price + price / 100 * DBWorks.GetInt(rdr, "discount", 0), 0)).ToString(),
+							false,
+							true,
+							false,
+							false,
+							true,
+							true, 
+							DBWorks.GetInt(rdr, "discount", 0),
+							true
+						);
+					}
 				}
 				//Loading basis and it's contents.
 
@@ -582,7 +659,8 @@ namespace CupboardDesigner
 							false,
 							true,
 							true,
-							DBWorks.GetInt(rdr, "discount", 0)
+							DBWorks.GetInt(rdr, "discount", 0),
+							false
 						);
 					}
 				}
@@ -614,7 +692,8 @@ namespace CupboardDesigner
 							true,
 							true,
 							false,
-							0
+							0,
+							false
 						);
 						string contents_sql = "SELECT order_cubes_details.*, nomenclature.type AS type, nomenclature.name AS name, " +
 							"nomenclature.description AS description FROM order_cubes_details LEFT JOIN nomenclature ON " +
@@ -651,7 +730,8 @@ namespace CupboardDesigner
 									false,
 									true,
 									true,
-									DBWorks.GetInt(contents_rdr, "discount", 0)
+									DBWorks.GetInt(contents_rdr, "discount", 0),
+									false
 								);
 							}
 							ComponentsStore.SetValue (CubeIter, (int)ComponentCol.price_total, Price.ToString ());
@@ -772,6 +852,19 @@ namespace CupboardDesigner
 			}
 
 			ComponentsStore.SetValue(iter, (int)ComponentCol.comment, args.NewText);
+		}
+
+		void OnCellNameEdited (object o, EditedArgs args)
+		{
+			TreeIter iter;
+			if (!ComponentsStore.GetIterFromString (out iter, args.Path))
+				return;
+			if(args.NewText == null)
+			{
+				logger.Warn("newtext is empty");
+				return;
+			}
+			ComponentsStore.SetValue(iter, (int)ComponentCol.nomenclature_title, args.NewText);
 		}
 
 		protected void TestCanSave ()
@@ -1067,7 +1160,8 @@ namespace CupboardDesigner
 							false,
 							true,
 							true, 
-							0
+							0,
+							false
 						);
 					}
 				}
@@ -1107,7 +1201,7 @@ namespace CupboardDesigner
 
 			foreach (KeyValuePair<int, int> pair in Counts) {
 				Cube cube = OrderCupboard.Cubes.Find (c => c.NomenclatureId == pair.Key);
-				TreeIter CubeIter = ComponentsStore.AppendValues ((long)-1, Enum.Parse (typeof(Nomenclature.NomType), "cube"), pair.Key, null, cube.Name, null, pair.Value, -1, "", -1, "", "", "", "",false, false, true, true, true, false, 0);
+				TreeIter CubeIter = ComponentsStore.AppendValues ((long)-1, Enum.Parse (typeof(Nomenclature.NomType), "cube"), pair.Key, null, cube.Name, null, pair.Value, -1, "", -1, "", "", "", "",false, false, true, true, true, false, 0, false);
 				string sql = "SELECT nomenclature.name as nomenclature, nomenclature.type, nomenclature.description, nomenclature.price, cubes_items.* FROM cubes_items " +
 					"LEFT JOIN nomenclature ON nomenclature.id = cubes_items.item_id " +
 					"WHERE cubes_id = @cubes_id";
@@ -1140,7 +1234,8 @@ namespace CupboardDesigner
 							false,
 							true,
 							true, 
-							0
+							0,
+							false
 						);
 					}
 					ComponentsStore.SetValue (CubeIter, (int)ComponentCol.price_total, Price.ToString ());
@@ -1358,6 +1453,73 @@ namespace CupboardDesigner
 				checkbuttonDiscount.Label = "Наценка:";
 			else
 				checkbuttonDiscount.Label = "Скидка:";
+		}
+
+		protected void OnTreeviewComponentsButtonReleaseEvent (object o, ButtonReleaseEventArgs args)
+		{
+			TreeIter iter, tempIter;
+			if (args.Event.Button == 3) {
+				if (treeviewComponents.Selection.CountSelectedRows() == 1 && treeviewComponents.Selection.GetSelected(out iter)) {
+					if (ComponentsStore.IterParent (out tempIter, iter) || iter.Equals(ServiceIter)) {
+						if (tempIter.Equals(ServiceIter) || iter.Equals(ServiceIter)) {
+							Gtk.Menu menu = new Gtk.Menu ();
+							Gtk.MenuItem add = new Gtk.MenuItem ("Добавить новую услугу");
+							add.ButtonReleaseEvent += PopupMenuAddEvent;
+							Gtk.MenuItem delete = new Gtk.MenuItem ("Удалить услугу");
+							delete.ButtonReleaseEvent += PopupMenuDeleteEvent;
+							if (iter.Equals(ServiceIter))
+								delete.Sensitive = false;
+							menu.Append (add);
+							menu.Append (delete);
+							menu.ShowAll ();
+							menu.Popup (); 
+						}
+					}
+				}
+			}
+		}
+
+		private void PopupMenuAddEvent(object sender, EventArgs args) {
+			ComponentsStore.AppendValues (
+				ServiceIter,
+				(long)-1,
+				Enum.Parse (typeof(Nomenclature.NomType), "other"),
+				-1,
+				"",
+				"Название услуги", //Service name
+				"",
+				1,
+				-1,
+				"",
+				-1,
+				"",
+				"",
+				"0",
+				"0",
+				false,
+				true,
+				false,
+				false,
+				true,
+				true, 
+				0,
+				true
+			);
+		}
+
+		private void PopupMenuDeleteEvent(object sender, EventArgs args) {
+			TreeIter iter;
+			long row_id;
+			if (treeviewComponents.Selection.GetSelected (out iter)) {
+				if ((row_id = (long)ComponentsStore.GetValue (iter, (int)ComponentCol.row_id)) > 0) {
+					string sql = "delete from order_services where id = @id";
+					SqliteCommand cmd = new SqliteCommand(sql, (SqliteConnection)QSMain.ConnectionDB);
+					cmd.Parameters.AddWithValue("@id", row_id);
+					cmd.ExecuteNonQuery();
+				}
+				ComponentsStore.Remove (ref iter);
+			}
+			CalculateTotalCount ();
 		}
 	}
 }

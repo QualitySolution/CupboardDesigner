@@ -14,7 +14,7 @@ namespace CupboardDesigner
 		public bool NewItem;
 		private int ItemId;
 
-		internal enum NomType {cube, construct};
+		internal enum NomType {cube, construct, other};
 
 		public Nomenclature()
 		{

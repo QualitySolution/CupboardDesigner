@@ -174,7 +174,7 @@ namespace CupboardDesigner
 			this.notebook1 = new global::Gtk.Notebook ();
 			this.notebook1.CanFocus = true;
 			this.notebook1.Name = "notebook1";
-			this.notebook1.CurrentPage = 1;
+			this.notebook1.CurrentPage = 3;
 			// Container child notebook1.Gtk.Notebook+NotebookChild
 			this.hbox1 = new global::Gtk.HBox ();
 			this.hbox1.Name = "hbox1";
@@ -780,6 +780,7 @@ namespace CupboardDesigner
 			this.drawCupboard.DragBegin += new global::Gtk.DragBeginHandler (this.OnDrawCupboardDragBegin);
 			this.drawCupboard.DragDataDelete += new global::Gtk.DragDataDeleteHandler (this.OnDrawCupboardDragDataDelete);
 			this.buttonCubeListOrientation.Clicked += new global::System.EventHandler (this.OnButtonCubeListOrientationClicked);
+			this.treeviewComponents.ButtonReleaseEvent += new global::Gtk.ButtonReleaseEventHandler (this.OnTreeviewComponentsButtonReleaseEvent);
 			this.checkbuttonShowPrice.Toggled += new global::System.EventHandler (this.OnCheckbutton2Toggled);
 			this.checkbuttonDiscount.Toggled += new global::System.EventHandler (this.OnCheckbutton1Toggled);
 			this.spinbutton1.ValueChanged += new global::System.EventHandler (this.OnSpinbutton1ValueChanged);
