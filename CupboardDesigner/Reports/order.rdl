@@ -13,7 +13,7 @@
   <BottomMargin>.25in</BottomMargin>
   <DataSets>
     <DataSet Name="Data">
-      <Query >
+      <Query>
         <DataSourceName>DS1</DataSourceName>
         <CommandText>select null as article, cubes.name as nomenclature, cubes.width * 400 as width, cubes.height * 400 as height, null as length, order_details.count as count, order_details.facing as facing, order_details.material as material, order_details.comment as comment from order_details
 left join cubes on order_details.cube_id = cubes.id
@@ -34,7 +34,7 @@ where order_basis_details.order_id = @id;</CommandText>
           </QueryParameter>
         </QueryParameters>
       </Query>
-      <Fields >
+      <Fields>
         <Field Name="article">
           <DataField>article</DataField>
           <rd:TypeName>System.String</rd:TypeName>
@@ -158,6 +158,31 @@ LEFT JOIN basis ON basis.id = orders.basis_id
         <Field Name="cutting_base">
           <DataField>cutting_base</DataField>
           <TypeName>System.Int32</TypeName>
+        </Field>
+      </Fields>
+    </DataSet>
+    <DataSet Name="Services" >
+      <Query>
+        <DataSourceName>DS1</DataSourceName>
+        <CommandText>select name, price + price / 100 * discount as price, comment from order_services where order_id = 2;</CommandText>
+        <QueryParameters>
+          <QueryParameter Name="id">
+            <Value>=Parameters!id</Value>
+          </QueryParameter>
+        </QueryParameters>
+      </Query>
+      <Fields>
+        <Field Name="name">
+          <DataField>name</DataField>
+          <TypeName>System.String</TypeName>
+        </Field>
+        <Field Name="price">
+          <DataField>price</DataField>
+          <TypeName>System.Decimal</TypeName>
+        </Field>
+        <Field Name="comment">
+          <DataField>comment</DataField>
+          <TypeName>System.String</TypeName>
         </Field>
       </Fields>
     </DataSet>
@@ -381,8 +406,8 @@ LEFT JOIN basis ON basis.id = orders.basis_id
             </TableRow>
           </TableRows>
         </Details>
-        <Left>1.7pt</Left>
-        <Top>459.8pt</Top>
+        <Left>16.7pt</Left>
+        <Top>431.8pt</Top>
       </Table>
       <List Name="List1">
         <Height>127.21pt</Height>
@@ -537,7 +562,7 @@ LEFT JOIN basis ON basis.id = orders.basis_id
             <Width>72.27pt</Width>
             <Value>Примечания:</Value>
             <ZIndex>1</ZIndex>
-            <Left>10.8pt</Left>
+            <Left>7.8pt</Left>
             <Top>18.6pt</Top>
             <Style>
               <BorderStyle />
@@ -551,8 +576,8 @@ LEFT JOIN basis ON basis.id = orders.basis_id
             <Width>486.35pt</Width>
             <Value>={comment}</Value>
             <ZIndex>1</ZIndex>
-            <Left>80.2pt</Left>
-            <Top>18.3pt</Top>
+            <Left>80.20pt</Left>
+            <Top>18.30pt</Top>
             <Style>
               <BorderStyle>
                 <Default>Solid</Default>
@@ -583,9 +608,9 @@ LEFT JOIN basis ON basis.id = orders.basis_id
         </ReportItems>
       </List>
       <Image Name="Image1">
-        <Height>305.15pt</Height>
-        <Width>562.20pt</Width>
-        <Left>13.00pt</Left>
+        <Height>282.12pt</Height>
+        <Width>561.20pt</Width>
+        <Left>14.00pt</Left>
         <Top>145.00pt</Top>
         <Style>
           <BorderStyle>
@@ -653,6 +678,146 @@ LEFT JOIN basis ON basis.id = orders.basis_id
         <Value>logo_H</Value>
         <Sizing>FitProportional</Sizing>
       </Image>
+      <Table Name="Table1" >
+        <DataSetName>Services</DataSetName>
+        <NoRows>Query returned no rows!</NoRows>
+        <Style>
+          <BorderStyle>
+            <Default>Solid</Default>
+          </BorderStyle>
+        </Style>
+        <TableColumns>
+          <TableColumn>
+            <Width>215.6pt</Width>
+          </TableColumn>
+          <TableColumn>
+            <Width>76.3pt</Width>
+          </TableColumn>
+          <TableColumn>
+            <Width>283.4pt</Width>
+          </TableColumn>
+        </TableColumns>
+        <Header>
+          <TableRows>
+            <TableRow>
+              <Height>12.0pt</Height>
+              <TableCells>
+                <TableCell>
+                  <ReportItems>
+                    <Textbox Name="Textbox8">
+                      <Value>Услуга</Value>
+                      <Style>
+                        <TextAlign>Center</TextAlign>
+                        <BorderStyle>
+                          <Default>Solid</Default>
+                        </BorderStyle>
+                        <FontWeight>Bold</FontWeight>
+                        <BorderColor />
+                        <BorderWidth />
+                        <FontSize>9pt</FontSize>
+                      </Style>
+                    </Textbox>
+                  </ReportItems>
+                </TableCell>
+                <TableCell>
+                  <ReportItems>
+                    <Textbox Name="Textbox9">
+                      <Value>Цена</Value>
+                      <Style>
+                        <TextAlign>Center</TextAlign>
+                        <BorderStyle>
+                          <Default>Solid</Default>
+                        </BorderStyle>
+                        <FontWeight>Bold</FontWeight>
+                        <BorderColor />
+                        <BorderWidth />
+                        <FontSize>9pt</FontSize>
+                      </Style>
+                    </Textbox>
+                  </ReportItems>
+                </TableCell>
+                <TableCell>
+                  <ReportItems>
+                    <Textbox Name="Textbox12">
+                      <Value>Примечание</Value>
+                      <Style>
+                        <TextAlign>Center</TextAlign>
+                        <BorderStyle>
+                          <Default>Solid</Default>
+                        </BorderStyle>
+                        <FontWeight>Bold</FontWeight>
+                        <BorderColor />
+                        <BorderWidth />
+                        <FontSize>9pt</FontSize>
+                      </Style>
+                    </Textbox>
+                  </ReportItems>
+                </TableCell>
+              </TableCells>
+            </TableRow>
+          </TableRows>
+          <RepeatOnNewPage>true</RepeatOnNewPage>
+        </Header>
+        <Details>
+          <TableRows>
+            <TableRow>
+              <Height>12.0pt</Height>
+              <TableCells>
+                <TableCell>
+                  <ReportItems>
+                    <Textbox Name="Textbox13">
+                      <Value>=Fields!name.Value</Value>
+                      <CanGrow>true</CanGrow>
+                      <Style>
+                        <BorderStyle>
+                          <Default>Solid</Default>
+                        </BorderStyle>
+                        <FontSize>9pt</FontSize>
+                        <BorderColor />
+                        <BorderWidth />
+                      </Style>
+                    </Textbox>
+                  </ReportItems>
+                </TableCell>
+                <TableCell>
+                  <ReportItems>
+                    <Textbox Name="Textbox14">
+                      <Value>=Fields!price.Value</Value>
+                      <CanGrow>true</CanGrow>
+                      <Style>
+                        <BorderStyle>
+                          <Default>Solid</Default>
+                        </BorderStyle>
+                        <FontSize>9pt</FontSize>
+                        <BorderColor />
+                        <BorderWidth />
+                      </Style>
+                    </Textbox>
+                  </ReportItems>
+                </TableCell>
+                <TableCell>
+                  <ReportItems>
+                    <Textbox Name="Textbox18">
+                      <Value>=Fields!comment.Value</Value>
+                      <CanGrow>true</CanGrow>
+                      <Style>
+                        <BorderStyle>
+                          <Default>Solid</Default>
+                        </BorderStyle>
+                        <BorderColor />
+                        <BorderWidth />
+                        <FontSize>9pt</FontSize>
+                      </Style>
+                    </Textbox>
+                  </ReportItems>
+                </TableCell>
+              </TableCells>
+            </TableRow>
+          </TableRows>
+        </Details>
+        <Left>17.1pt</Left>
+        <Top>459.3pt</Top>
+      </Table>
     </ReportItems>
     <Height>554.3pt</Height>
   </Body>
