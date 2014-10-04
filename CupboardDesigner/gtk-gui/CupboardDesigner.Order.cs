@@ -789,23 +789,6 @@ namespace CupboardDesigner
 			this.goBackAction.Activated += new global::System.EventHandler (this.OnGoBackActionActivated);
 			this.goForwardAction.Activated += new global::System.EventHandler (this.OnGoForwardActionActivated);
 			this.saveAction.Activated += new global::System.EventHandler (this.OnSaveActionActivated);
-			this.notebook1.SwitchPage += new global::Gtk.SwitchPageHandler (this.OnNotebook1SwitchPage);
-			this.dateDeadlineS.DateChanged += new global::System.EventHandler (this.OnDateDeadlineSDateChanged);
-			this.dateDeadlineE.DateChanged += new global::System.EventHandler (this.OnDateDeadlineEDateChanged);
-			this.checkEstimation.Clicked += new global::System.EventHandler (this.OnCheckEstimationClicked);
-			this.comboCubeV.Changed += new global::System.EventHandler (this.OnComboCubeVChanged);
-			this.comboCubeH.Changed += new global::System.EventHandler (this.OnComboCubeHChanged);
-			this.drawCupboard.ExposeEvent += new global::Gtk.ExposeEventHandler (this.OnDrawCupboardExposeEvent);
-			this.drawCupboard.SizeAllocated += new global::Gtk.SizeAllocatedHandler (this.OnDrawCupboardSizeAllocated);
-			this.drawCupboard.DragMotion += new global::Gtk.DragMotionHandler (this.OnDrawCupboardDragMotion);
-			this.drawCupboard.DragDrop += new global::Gtk.DragDropHandler (this.OnDrawCupboardDragDrop);
-			this.drawCupboard.DragBegin += new global::Gtk.DragBeginHandler (this.OnDrawCupboardDragBegin);
-			this.drawCupboard.DragDataDelete += new global::Gtk.DragDataDeleteHandler (this.OnDrawCupboardDragDataDelete);
-			this.buttonCubeListOrientation.Clicked += new global::System.EventHandler (this.OnButtonCubeListOrientationClicked);
-			this.treeviewComponents.ButtonReleaseEvent += new global::Gtk.ButtonReleaseEventHandler (this.OnTreeviewComponentsButtonReleaseEvent);
-			this.checkbuttonShowPrice.Toggled += new global::System.EventHandler (this.OnCheckbutton2Toggled);
-			this.checkbuttonDiscount.Toggled += new global::System.EventHandler (this.OnCheckbutton1Toggled);
-			this.spinbutton1.ValueChanged += new global::System.EventHandler (this.OnSpinbutton1ValueChanged);
 		}
 	}
 }

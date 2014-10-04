@@ -9,43 +9,29 @@ using System.Collections.Generic;
 using Cairo;
 using Gdk;
 
-namespace CupboardDesigner
-{
-	public partial class Order : Gtk.Window
-	{
+namespace CupboardDesigner {
+	public partial class Order : Gtk.Window {
 		private static Logger logger = LogManager.GetCurrentClassLogger();
-		private bool NewItem = true;
-		private int ItemId;
-		private bool FillInProgress = false;
-		private TreeStore ComponentsStore;
-		private TreeModel MaterialNameList, FacingNameList;
-		private TreeIter BasisIter, ServiceIter;
-		private List<Cube> CubeList;
-		private int CubePxSize = 100;
+		private int ItemId, PriceCorrection = 0, CubePxSize = 100, MaxCubeVSize, MaxCubeHSize;
+		private bool FillInProgress = false, VerticalCubeList = true, NewItem = true;
 		private VBox vboxCubeList;
 		private HBox hboxCubeList, hboxTypeList;
-		private int MaxCubeVSize, MaxCubeHSize;
-		private bool VerticalCubeList = true;
+		private List<Cube> CubeList;
 		private List<CupboardListItem> TypeWidgetList;
 		private List<CubeListItem> CubeWidgetList;
 		private Cupboard OrderCupboard;
 		private DragInformation CurrentDrag;
 		private Decimal TotalPrice;
-		private int PriceCorrection = 0;
-		private Gtk.TreeViewColumn ColumnPrice;
-		private Gtk.TreeViewColumn ColumnCount;
-		private Gtk.TreeViewColumn ColumnMaterial;
-		private Gtk.TreeViewColumn ColumnFacing;
-		private Gtk.TreeViewColumn ColumnPriceTotal;
-		private Gtk.TreeViewColumn ColumnComment;
-		private Gtk.TreeViewColumn ColumnDiscount;
-		private Gtk.TreeViewColumn ColumnName;
+		private TreeStore ComponentsStore;
+		private TreeModel MaterialNameList, FacingNameList;
+		private TreeIter BasisIter, ServiceIter;
+		private Gtk.TreeViewColumn ColumnPrice, ColumnCount, ColumnMaterial, ColumnFacing, ColumnPriceTotal, ColumnComment, ColumnDiscount, ColumnName;
 
 		Gtk.TargetEntry[] TargetTable = new Gtk.TargetEntry[] {
 			new Gtk.TargetEntry ("application/cube", Gtk.TargetFlags.App, 0)
 		};
 
-		private enum ComponentCol{
+		private enum ComponentCol {
 			row_id,
 			nomenclature_type,
 			nomenclature_id,
@@ -70,8 +56,7 @@ namespace CupboardDesigner
 			editable_name
 		}
 
-		public Order() : base(Gtk.WindowType.Toplevel)
-		{
+		public Order() : base(Gtk.WindowType.Toplevel) {
 			this.Build();
 			notebook1.CurrentPage = 0;
 			ComboWorks.ComboFillReference(comboExhibition, "exhibition", ComboWorks.ListMode.WithNo, true, "ordinal");
@@ -88,11 +73,80 @@ namespace CupboardDesigner
 			FacingNameList = TempCombo.Model;
 			TempCombo.Destroy ();
 
-			ComponentsStore = new TreeStore(typeof(long), typeof(Nomenclature.NomType), typeof(int), typeof(string), typeof(string), typeof(string), typeof(int), typeof(int), typeof(string), typeof(int), typeof(string), typeof(string), typeof(string), typeof(string), typeof(bool), typeof(bool), typeof(bool), typeof(bool), typeof(bool), typeof(bool), typeof(int), typeof(bool));
-			BasisIter = ComponentsStore.AppendValues ((long)-1, Enum.Parse(typeof(Nomenclature.NomType), "construct"), 1, null, "Каркас", null, 1, -1, "", -1, "", "", "", "", false, false, false, false, false, false, null, false);
+			ComponentsStore = new TreeStore(
+				typeof(long), //row_id
+				typeof(Nomenclature.NomType), //nomenclature_type
+				typeof(int), //nomenclature_id
+				typeof(string), //nomenclature
+				typeof(string), //nomenclature_title
+				typeof(string), //nomenclature_description
+				typeof(int), //count
+				typeof(int), //material_id
+				typeof(string), //material
+				typeof(int), //facing_id
+				typeof(string), //facing
+				typeof(string), //comment
+				typeof(string), //price
+				typeof(string), //price_total
+				typeof(bool), //editable_count
+				typeof(bool), //editable_price
+				typeof(bool), //editable_material
+				typeof(bool), //editable_facing
+				typeof(bool), //editable_comment
+				typeof(bool), //editable_discount
+				typeof(int), //discount
+				typeof(bool)); //editable_name
+
+			BasisIter = ComponentsStore.AppendValues (
+				(long)-1, 
+				Enum.Parse(typeof(Nomenclature.NomType), "construct"), 
+				1, 
+				null, 
+				"Каркас", 
+				null, 
+				1, 
+				-1, 
+				"", 
+				-1, 
+				"", 
+				"", 
+				"", 
+				"", 
+				false, 
+				false, 
+				false, 
+				false, 
+				false, 
+				false, 
+				null, 
+				false);
+
 			ServiceIter = ComponentsStore.InsertNodeAfter (BasisIter);
-			ComponentsStore.SetValues (ServiceIter, (long)-1, Enum.Parse (typeof(Nomenclature.NomType), "other"), 1, null, "Услуги", null, 1, -1, "", -1, "", "", "", "", false, false, false, false, false, false, null, false);
-			//ServiceIter = ComponentsStore.AppendValues ((long)-1, Enum.Parse(typeof(Nomenclature.NomType), "other"), 1, null, "Услуги", null, 1, -1, "", -1, "", "", "", "", false, false, false, false, false, false, null, false);
+
+			ComponentsStore.SetValues (
+				ServiceIter, 
+				(long)-1, 
+				Enum.Parse (typeof(Nomenclature.NomType), "other"), 
+				1, 
+				null, 
+				"Услуги",
+				null, 
+				1, 
+				-1, 
+				"", 
+				-1, 
+				"", 
+				"", 
+				"", 
+				"", 
+				false, 
+				false, 
+				false, 
+				false, 
+				false, 
+				false, 
+				null, 
+				false);
 
 			ColumnCount = new Gtk.TreeViewColumn ();
 			ColumnCount.Title = "Кол-во";
@@ -204,10 +258,8 @@ namespace CupboardDesigner
 			string sql = "SELECT * FROM cubes ORDER BY ordinal";
 
 			SqliteCommand cmd = new SqliteCommand(sql, (SqliteConnection)QSMain.ConnectionDB);
-			using (SqliteDataReader rdr = cmd.ExecuteReader())
-			{
-				while(rdr.Read())
-				{
+			using (SqliteDataReader rdr = cmd.ExecuteReader()) {
+				while(rdr.Read()) {
 					if (rdr["image"] == DBNull.Value)
 						continue;
 					Cube TempCube = new Cube();
@@ -242,22 +294,19 @@ namespace CupboardDesigner
 			hboxTypeList = new HBox(false, 2);
 			Stream stream = System.Reflection.Assembly.GetExecutingAssembly().GetManifestResourceStream( "CupboardDesigner.icons.Yes_check.svg" );
 			byte[] temparray;
-			using(MemoryStream mstream = new MemoryStream())
-			{
+			using(MemoryStream mstream = new MemoryStream()) {
 				stream.CopyTo(mstream);
 				temparray = mstream.ToArray();
 			}
 			Rsvg.Handle CheckImage = new Rsvg.Handle(temparray);
 			sql = "SELECT * FROM basis ORDER BY ordinal ";
 			cmd = new SqliteCommand(sql, (SqliteConnection)QSMain.ConnectionDB);
-			using (SqliteDataReader rdr = cmd.ExecuteReader())
-			{
+			using (SqliteDataReader rdr = cmd.ExecuteReader()) {
 				Gtk.RadioButton FirstButton = null;
-				while(rdr.Read())
-				{
+				while(rdr.Read()) {
 					if (rdr["image"] == DBNull.Value)
 						continue;
-
+			
 					//Добавляем виджеты в лист
 					CupboardListItem TempWidget = new CupboardListItem(CheckImage);
 					TempWidget.id = rdr.GetInt32(rdr.GetOrdinal("id"));
@@ -298,8 +347,7 @@ namespace CupboardDesigner
 		/// <summary>
 		/// Saving order information to DB.
 		/// </summary>
-		private bool Save()
-		{
+		private bool Save() {
 			string sql;
 			if (NewItem) {
 				sql = "INSERT INTO orders (customer, estimation, contract, address, phone1, phone2, exhibition_id, basis_id, " +
@@ -369,8 +417,7 @@ namespace CupboardDesigner
 						cmd.Parameters.AddWithValue("@discount", (int)ComponentsStore.GetValue(childIter, (int)ComponentCol.discount));
 						cmd.Parameters.AddWithValue("@comment", (string)ComponentsStore.GetValue(childIter, (int)ComponentCol.comment));
 						cmd.ExecuteNonQuery();
-						if(!InDB)
-						{
+						if(!InDB) {
 							sql = @"select last_insert_rowid()";
 							cmd = new SqliteCommand(sql, (SqliteConnection)QSMain.ConnectionDB, trans);
 							long RowId = (long) cmd.ExecuteScalar();
@@ -406,16 +453,14 @@ namespace CupboardDesigner
 								cmd.Parameters.AddWithValue("@comment", DBWorks.ValueOrNull((string)ComponentsStore.GetValue(iter, (int)ComponentCol.comment) != "", ComponentsStore.GetValue(iter, (int)ComponentCol.comment)));
 								cmd.Parameters.AddWithValue("@price", ComponentsStore.GetValue(iter, (int)ComponentCol.price_total));
 								cmd.ExecuteNonQuery();
-								if(!InDB)
-								{
+								if(!InDB) {
 									sql = @"select last_insert_rowid()";
 									cmd = new SqliteCommand(sql, (SqliteConnection)QSMain.ConnectionDB, trans);
 									long RowId = (long) cmd.ExecuteScalar();
 									ComponentsStore.SetValue(iter, (int)ComponentCol.row_id, (object)RowId);
 								}
 							}
-							else if(InDB)
-							{
+							else if(InDB) {
 								sql = "DELETE FROM order_details WHERE id = @id";
 								cmd = new SqliteCommand(sql, (SqliteConnection)QSMain.ConnectionDB, trans);
 								cmd.Parameters.AddWithValue("@id", ComponentsStore.GetValue(iter, (int)ComponentCol.row_id));
@@ -443,16 +488,14 @@ namespace CupboardDesigner
 										cmd.Parameters.AddWithValue("@comment", DBWorks.ValueOrNull((string)ComponentsStore.GetValue(childIter, (int)ComponentCol.comment) != "", ComponentsStore.GetValue(childIter, (int)ComponentCol.comment)));
 										cmd.Parameters.AddWithValue("@discount", ComponentsStore.GetValue(childIter, (int)ComponentCol.discount));
 										cmd.ExecuteNonQuery();
-										if(!InDB)
-										{
+										if(!InDB) {
 											sql = @"select last_insert_rowid()";
 											cmd = new SqliteCommand(sql, (SqliteConnection)QSMain.ConnectionDB, trans);
 											long RowId = (long) cmd.ExecuteScalar();
 											ComponentsStore.SetValue(childIter, (int)ComponentCol.row_id, (object)RowId);
 										}
 									}
-									else if(InDB)
-									{
+									else if(InDB) {
 										sql = "DELETE FROM order_cubes_details WHERE id = @id";
 										cmd = new SqliteCommand(sql, (SqliteConnection)QSMain.ConnectionDB, trans);
 										cmd.Parameters.AddWithValue("@id", ComponentsStore.GetValue(childIter, (int)ComponentCol.row_id));
@@ -461,8 +504,7 @@ namespace CupboardDesigner
 								} while (ComponentsStore.IterNext(ref childIter));
 							}
 						}
-						else //Item is basis
-						{
+						else {	//Item is basis 
 							if(ComponentsStore.IterHasChild(iter)) {
 								ComponentsStore.IterChildren(out childIter, iter);
 								do { //Adding every nomenclature for basis
@@ -485,16 +527,14 @@ namespace CupboardDesigner
 										cmd.Parameters.AddWithValue("@comment", DBWorks.ValueOrNull((string)ComponentsStore.GetValue(childIter, (int)ComponentCol.comment) != "", ComponentsStore.GetValue(childIter, (int)ComponentCol.comment)));
 										cmd.Parameters.AddWithValue("@discount", ComponentsStore.GetValue(childIter, (int)ComponentCol.discount));
 										cmd.ExecuteNonQuery();
-										if(!InDB)
-										{
+										if(!InDB) {
 											sql = @"select last_insert_rowid()";
 											cmd = new SqliteCommand(sql, (SqliteConnection)QSMain.ConnectionDB, trans);
 											long RowId = (long) cmd.ExecuteScalar();
 											ComponentsStore.SetValue(childIter, (int)ComponentCol.row_id, (object)RowId);
 										}
 									}
-									else if(InDB)
-									{
+									else if(InDB) {
 										sql = "DELETE FROM order_basis_details WHERE id = @id";
 										cmd = new SqliteCommand(sql, (SqliteConnection)QSMain.ConnectionDB, trans);
 										cmd.Parameters.AddWithValue("@id", ComponentsStore.GetValue(childIter, (int)ComponentCol.row_id));
@@ -510,8 +550,7 @@ namespace CupboardDesigner
 				MainClass.MainWin.UpdateOrders();
 				return true;
 			}
-			catch (Exception ex)
-			{
+			catch (Exception ex) {
 				trans.Rollback();
 				logger.ErrorException("Ошибка записи заказа!", ex);
 				QSMain.ErrorMessage(this, ex);
@@ -524,16 +563,14 @@ namespace CupboardDesigner
 		/// </summary>
 		/// <param name="id">Identifier - order id in database</param>
 		/// <param name="copy">If set to <c>true</c> copy.</param>
-		public void Fill(int id, bool copy)
-		{
+		public void Fill(int id, bool copy) {
 			FillInProgress = true;
 			NewItem = copy;
 			if(!copy)
 				ItemId = id;
 			MainClass.StatusMessage(String.Format ("Запрос заказа №{0}...", id));
 			string sql = "SELECT orders.* FROM orders WHERE orders.id = @id";
-			try
-			{
+			try {
 				SqliteCommand cmd = new SqliteCommand(sql, (SqliteConnection) QSMain.ConnectionDB);
 				cmd.Parameters.AddWithValue("@id", id);
 
@@ -751,16 +788,14 @@ namespace CupboardDesigner
 				FillInProgress = false;
 				MainClass.StatusMessage("Ok");
 			}
-			catch (Exception ex)
-			{
+			catch (Exception ex) {
 				logger.ErrorException("Ошибка получения информации о заказе!", ex);
 				QSMain.ErrorMessage(this, ex);
 			}
 			TestCanSave();
 		}
 
-		void OnCountEdited(object o, EditedArgs args)
-		{
+		void OnCountEdited(object o, EditedArgs args) {
 			TreeIter iter;
 			int NewValue;
 			Decimal Price;
@@ -797,8 +832,7 @@ namespace CupboardDesigner
 			} catch(Exception e) { logger.WarnException ("Error occured in OnPriceEdited", e);}
 		}
 
-		void OnMaterialComboEdited (object o, EditedArgs args)
-		{
+		void OnMaterialComboEdited (object o, EditedArgs args) {
 			TreeIter iter, RefIter;
 			if (!ComponentsStore.GetIterFromString (out iter, args.Path))
 				return;
@@ -812,8 +846,7 @@ namespace CupboardDesigner
 			}
 		}
 
-		void OnDiscountEdited(object o, EditedArgs args)
-		{
+		void OnDiscountEdited(object o, EditedArgs args) {
 			TreeIter iter;
 			int discount;
 			decimal price;
@@ -833,8 +866,7 @@ namespace CupboardDesigner
 			CalculateTotalCount ();
 		}
 
-		void OnFacingComboEdited (object o, EditedArgs args)
-		{
+		void OnFacingComboEdited (object o, EditedArgs args) {
 			TreeIter iter, RefIter;
 			if (!ComponentsStore.GetIterFromString (out iter, args.Path))
 				return;
@@ -848,13 +880,11 @@ namespace CupboardDesigner
 			}
 		}
 
-		void OnCommentTextEdited (object o, EditedArgs args)
-		{
+		void OnCommentTextEdited (object o, EditedArgs args) {
 			TreeIter iter;
 			if (!ComponentsStore.GetIterFromString (out iter, args.Path))
 				return;
-			if(args.NewText == null)
-			{
+			if(args.NewText == null) {
 				logger.Warn("newtext is empty");
 				return;
 			}
@@ -862,32 +892,26 @@ namespace CupboardDesigner
 			ComponentsStore.SetValue(iter, (int)ComponentCol.comment, args.NewText);
 		}
 
-		void OnCellNameEdited (object o, EditedArgs args)
-		{
+		void OnCellNameEdited (object o, EditedArgs args) {
 			TreeIter iter;
 			if (!ComponentsStore.GetIterFromString (out iter, args.Path))
 				return;
-			if(args.NewText == null)
-			{
+			if(args.NewText == null) {
 				logger.Warn("newtext is empty");
 				return;
 			}
 			ComponentsStore.SetValue(iter, (int)ComponentCol.nomenclature_title, args.NewText);
 		}
 
-		protected void TestCanSave ()
-		{
+		protected void TestCanSave () {
 			bool Dateok = dateArrval.IsEmpty || dateDeadlineS.IsEmpty || dateArrval.Date <= dateDeadlineS.Date;
-
 			saveAction.Sensitive = Dateok;
 		}
 
 
-		protected void OnBasisChanged(object sender, EventArgs e)
-		{
+		protected void OnBasisChanged(object sender, EventArgs e) {
 			CupboardListItem basis = TypeWidgetList.Find(w => w.Button.Active);
-			if(basis == null)
-			{
+			if(basis == null) {
 				logger.Warn("Не найдена активная основа");
 				return;
 			}
@@ -895,26 +919,21 @@ namespace CupboardDesigner
 			UpdateBasisComponents(basis.id);
 		}
 
-		protected void OnComboCubeHChanged(object sender, EventArgs e)
-		{
+		protected void OnComboCubeHChanged(object sender, EventArgs e) {
 			OrderCupboard.CubesH = int.Parse(comboCubeH.ActiveText);
 			if(OrderCupboard.BorderImage != null)
 				OrderCupboard.BorderImage.ModifyDrawingImage();
 			CalculateCubePxSize(drawCupboard.Allocation);
-			UpdateArticles();
 		}
 
-		protected void OnComboCubeVChanged(object sender, EventArgs e)
-		{
+		protected void OnComboCubeVChanged(object sender, EventArgs e) {
 			OrderCupboard.CubesV = int.Parse(comboCubeV.ActiveText);
 			if(OrderCupboard.BorderImage != null)
 				OrderCupboard.BorderImage.ModifyDrawingImage();
 			CalculateCubePxSize(drawCupboard.Allocation);
-			UpdateArticles();
 		}
 
-		protected void OnDrawCupboardExposeEvent(object o, ExposeEventArgs args)
-		{
+		protected void OnDrawCupboardExposeEvent(object o, ExposeEventArgs args) {
 			using (Context cr = Gdk.CairoHelper.Create (args.Event.Window)) {
 				int w, h;
 				args.Event.Window.GetSize (out w, out h);
@@ -922,13 +941,11 @@ namespace CupboardDesigner
 			}
 		}
 
-		protected void OnDrawCupboardSizeAllocated(object o, SizeAllocatedArgs args)
-		{
+		protected void OnDrawCupboardSizeAllocated(object o, SizeAllocatedArgs args) {
 			CalculateCubePxSize(args.Allocation);
 		}
 
-		private void CalculateCubePxSize(Gdk.Rectangle CupboardPlace)
-		{
+		private void CalculateCubePxSize(Gdk.Rectangle CupboardPlace) {
 
 			int WidthWithoutGrid = CupboardPlace.Width ;
 			int HeightWithoutGrid = CupboardPlace.Height;
@@ -941,13 +958,9 @@ namespace CupboardDesigner
 			int ListPixelAddV = !VerticalCubeList ? scrolledCubeListH.HScrollbar.Allocation.Height + 64 : 0;
 			int ListPixelAddH = VerticalCubeList ? scrolledCubeListV.VScrollbar.Allocation.Width + 16 : 0;
 			if(VerticalCubeList)
-			{
 				WidthWithoutGrid = WidthTable - ListPixelAddH;
-			}
 			else
-			{
 				HeightWithoutGrid = HeightTable - ListPixelAddV;
-			}
 
 			// 1.2 это 2 бортика по караям которые равны 60% от куба
 			int MinCubeSizeForH = Convert.ToInt32(WidthWithoutGrid / (double.Parse(comboCubeH.ActiveText) + 1.2 + ListCybesH));
@@ -958,13 +971,11 @@ namespace CupboardDesigner
 			if (NeedCubePxSize > 100)
 				NeedCubePxSize = 100;
 
-			if(CubePxSize != NeedCubePxSize)
-			{
+			if(CubePxSize != NeedCubePxSize) {
 				CubePxSize = NeedCubePxSize;
 
 				int MaxHeight = 0, MaxWidth = 0;
-				foreach(Cube cube in CubeList)
-				{
+				foreach(Cube cube in CubeList) {
 					((CubeListItem)cube.Widget).CubePxSize = CubePxSize;
 					Requisition req = ((CubeListItem)cube.Widget).SizeRequest();
 					MaxHeight = Math.Max(MaxHeight, req.Height);
@@ -975,8 +986,7 @@ namespace CupboardDesigner
 			}
 		}
 
-		protected void OnDrawCupboardDragMotion(object o, DragMotionArgs args)
-		{
+		protected void OnDrawCupboardDragMotion(object o, DragMotionArgs args) {
 			logger.Debug ("Drag motion x={0} y={1}", args.X, args.Y);
 			int CubePosX = (args.X + (int)(CubePxSize * 1.5) - CurrentDrag.IconPosX - OrderCupboard.CupboardZeroX) / CubePxSize;
 			int CubePosY = (args.Y + (int)(CubePxSize * 1.5) - CurrentDrag.IconPosY - OrderCupboard.CupboardZeroY) / CubePxSize;
@@ -991,8 +1001,7 @@ namespace CupboardDesigner
 			args.RetVal = true;
 		}
 
-		protected void OnDrawCupboardDragDrop(object o, DragDropArgs args)
-		{
+		protected void OnDrawCupboardDragDrop(object o, DragDropArgs args) {
 			logger.Debug ("Drop");
 			int CubePosX = (args.X + (int)(CubePxSize * 1.5) - CurrentDrag.IconPosX - OrderCupboard.CupboardZeroX) / CubePxSize;
 			int CubePosY = (args.Y + (int)(CubePxSize * 1.5) - CurrentDrag.IconPosY - OrderCupboard.CupboardZeroY) / CubePxSize;
@@ -1000,18 +1009,15 @@ namespace CupboardDesigner
 			CubePosX--; CubePosY--;
 			logger.Debug ("CupBoard pos x={0} y={1}", CubePosX, CubePosY);
 			bool CanDrag = OrderCupboard.TestPutCube(CurrentDrag.cube, CubePosX, CubePosY);
-			if (CanDrag)
-			{
-				if(CurrentDrag.FromList)
-				{
+			if (CanDrag) {
+				if(CurrentDrag.FromList) {
 					Cube NewCube = CurrentDrag.cube.Clone();
 					NewCube.BoardPositionX = CubePosX;
 					NewCube.BoardPositionY = CubePosY;
 					OrderCupboard.Cubes.Add(NewCube);
 					UpdateCubeComponents();
 				} 
-				else
-				{
+				else {
 					CurrentDrag.cube.BoardPositionX = CubePosX;
 					CurrentDrag.cube.BoardPositionY = CubePosY;
 				}
@@ -1022,8 +1028,7 @@ namespace CupboardDesigner
 			drawCupboard.QueueDraw();
 		}
 
-		protected void OnDrawCupboardDragBegin(object o, DragBeginArgs args)
-		{
+		protected void OnDrawCupboardDragBegin(object o, DragBeginArgs args) {
 			int MousePosX, MousePosY;
 			drawCupboard.GetPointer(out MousePosX, out MousePosY);
 
@@ -1031,8 +1036,7 @@ namespace CupboardDesigner
 			int CubePosY = (MousePosY - OrderCupboard.CupboardZeroY) / CubePxSize;
 			Cube cube = OrderCupboard.GetCube(CubePosX, CubePosY);
 
-			if(cube == null)
-			{
+			if(cube == null) {
 				args.RetVal = false;
 				Gdk.Drag.Abort(args.Context, args.Context.StartTime);
 				return;
@@ -1040,8 +1044,7 @@ namespace CupboardDesigner
 
 			Pixmap pix = new Pixmap(drawCupboard.GdkWindow, cube.CubesH * CubePxSize, cube.CubesV * CubePxSize);
 
-			using (Context cr = Gdk.CairoHelper.Create(pix))
-			{
+			using (Context cr = Gdk.CairoHelper.Create(pix)) {
 				cube.DrawCube(cr, CubePxSize, true);
 			}
 			Gdk.Pixbuf pixbuf = Gdk.Pixbuf.FromDrawable(pix, Gdk.Colormap.System, 0, 0, 0, 0, cube.CubesH * CubePxSize, cube.CubesV * CubePxSize);
@@ -1053,35 +1056,30 @@ namespace CupboardDesigner
 			CurrentDrag.cube = cube;
 		}
 
-		protected void OnDrawCupboardDragDataDelete(object o, DragDataDeleteArgs args)
-		{
+		protected void OnDrawCupboardDragDataDelete(object o, DragDataDeleteArgs args) {
 			OrderCupboard.Cubes.Remove(CurrentDrag.cube);
 			UpdateCubeComponents();
 			args.RetVal = true;
 		}
 
-		protected void OnCubeListDragDrop(object o, DragDropArgs args)
-		{
+		protected void OnCubeListDragDrop(object o, DragDropArgs args) {
 			logger.Debug ("Drop to CubeList");
 			if (CurrentDrag.FromList)
 				Gtk.Drag.Finish(args.Context, false, false, args.Time);
-			else
-			{
+			else {
 				Gtk.Drag.Finish(args.Context, true, true, args.Time);
 				drawCupboard.QueueDraw();
 			}
 			args.RetVal = true;
 		}
 
-		void UpdateCubeList()
-		{
+		void UpdateCubeList() {
 			scrolledCubeListV.Visible = VerticalCubeList;
 			scrolledCubeListH.Visible = !VerticalCubeList;
 			Box boxCubeList = VerticalCubeList ? (Box)vboxCubeList : (Box) hboxCubeList;
 			Box ForRemove = !VerticalCubeList ? (Box)vboxCubeList : (Box) hboxCubeList;
 
-			foreach(CubeListItem item in CubeWidgetList)
-			{
+			foreach(CubeListItem item in CubeWidgetList) {
 				if(item.Parent != null)
 					ForRemove.Remove(item);
 				boxCubeList.Add(item);
@@ -1089,14 +1087,12 @@ namespace CupboardDesigner
 			boxCubeList.ShowAll();
 		}
 
-		protected void OnButtonCubeListOrientationClicked(object sender, EventArgs e)
-		{
+		protected void OnButtonCubeListOrientationClicked(object sender, EventArgs e) {
 			VerticalCubeList = !VerticalCubeList;
 			UpdateCubeList();
 		}
 
-		protected void OnNotebook1SwitchPage(object o, SwitchPageArgs args)
-		{
+		protected void OnNotebook1SwitchPage(object o, SwitchPageArgs args)	{
 			if (notebook1.CurrentPage == 2)
 				if (OrderCupboard.Clean())
 					UpdateCubeComponents();
@@ -1113,8 +1109,7 @@ namespace CupboardDesigner
 		/// Updates the basis components.
 		/// </summary>
 		/// <param name="id">Identifier of basis.</param>
-		private void UpdateBasisComponents(int id)
-		{
+		private void UpdateBasisComponents(int id) {
 			if (FillInProgress)
 				return;
 			Dictionary<int, TreeIter> pairs= new Dictionary<int, TreeIter> ();
@@ -1133,17 +1128,16 @@ namespace CupboardDesigner
 				"FROM basis_items LEFT JOIN nomenclature ON nomenclature.id = basis_items.item_id WHERE basis_id = @basis_id";
 			SqliteCommand cmd = new SqliteCommand(sql, (SqliteConnection)QSMain.ConnectionDB);
 			cmd.Parameters.AddWithValue("@basis_id", id);
-			using (SqliteDataReader rdr = cmd.ExecuteReader())
-			{
-				while (rdr.Read())
-				{
+			using (SqliteDataReader rdr = cmd.ExecuteReader()) {
+				while (rdr.Read()) {
 					if (pairs.TryGetValue (DBWorks.GetInt (rdr, "item_id", -1), out iter)) {
 						int count = DBWorks.GetInt (rdr, "count", 1);
 						Decimal price = count * Decimal.Parse((String)ComponentsStore.GetValue (iter, (int)ComponentCol.price));
 						price = price + price / 100 * (int)ComponentsStore.GetValue (iter, (int)ComponentCol.discount);
 						ComponentsStore.SetValue (iter, (int)ComponentCol.count, count);
 						ComponentsStore.SetValue (iter, (int)ComponentCol.price_total, price.ToString());
-					} else {
+					} 
+					else {
 						ComponentsStore.AppendValues (
 							BasisIter,
 							(long)-1,
@@ -1178,20 +1172,15 @@ namespace CupboardDesigner
 		/// <summary>
 		/// Updates the cube components. Adding one or removing if needed.
 		/// </summary>
-		private void UpdateCubeComponents()
-		{
+		private void UpdateCubeComponents() {
 			TreeIter iter;
 			Dictionary<int, int> Counts = OrderCupboard.GetAmounts();
 
-			if (ComponentsStore.GetIterFirst(out iter))
-			{
-				do
-				{
-					if ((Nomenclature.NomType)ComponentsStore.GetValue(iter, (int)ComponentCol.nomenclature_type) == Nomenclature.NomType.cube)
-					{
+			if (ComponentsStore.GetIterFirst(out iter)) {
+				do {
+					if ((Nomenclature.NomType)ComponentsStore.GetValue(iter, (int)ComponentCol.nomenclature_type) == Nomenclature.NomType.cube) {
 						int NomId = (int)ComponentsStore.GetValue(iter, (int)ComponentCol.nomenclature_id);
-						if(Counts.ContainsKey(NomId))
-						{
+						if(Counts.ContainsKey(NomId)) {
 							ComponentsStore.SetValue(iter, (int)ComponentCol.count, Counts[NomId]);
 							Counts.Remove(NomId);
 							UpdateTable(iter);
@@ -1251,23 +1240,7 @@ namespace CupboardDesigner
 			CalculateTotalCount();
 		}
 
-//TODO
-		private void UpdateArticles()
-		{
-			/*TreeIter iter;
-			if (ComponentsStore.GetIterFirst(out iter))
-			{
-				do
-				{
-					ComponentsStore.SetValue(iter, (int)ComponentCol.nomenclature_title, 
-						ReplaceArticle((string)ComponentsStore.GetValue(iter, (int)ComponentCol.nomenclature)));
-				}
-				while(ComponentsStore.IterNext(ref iter));
-			}*/
-		}
-
-		private string ReplaceArticle(string text)
-		{
+		private string ReplaceArticle(string text) {
 			string half = text.Replace("{L}", String.Format("{0}", OrderCupboard.CubesH * 40));
 			return half.Replace("{H}", String.Format("{0}", OrderCupboard.CubesV * 40));
 		}
@@ -1309,12 +1282,10 @@ namespace CupboardDesigner
 			Decimal TempTotal;
 			TreeIter iter, childIter;
 
-			if (ComponentsStore.GetIterFirst(out iter))
-			{
+			if (ComponentsStore.GetIterFirst(out iter)) {
 				TotalPrice = 0;
 				do {
-					if (ComponentsStore.IterHasChild(iter))
-					{
+					if (ComponentsStore.IterHasChild(iter)) {
 						TempTotal = 0;
 						ComponentsStore.IterChildren(out childIter, iter);
 						do {
@@ -1328,8 +1299,7 @@ namespace CupboardDesigner
 			labelTotalCount.LabelProp = String.Format("Итого: {0:C} ", Decimal.Round(TotalPrice + (TotalPrice / 100 * PriceCorrection), 0));
 		}
 
-		private void PrerareReport(bool Client)
-		{
+		private void PrerareReport(bool Client) {
 			if (!Save())
 				return;
 			string TempImagePath = System.IO.Path.Combine (System.IO.Path.GetTempPath (), String.Format("Cupboard{0}.png", ItemId));
@@ -1354,41 +1324,36 @@ namespace CupboardDesigner
 			if (Client) {
 				ReportPath = System.IO.Path.Combine (Directory.GetCurrentDirectory (), "Reports", "order" + ".rdl");
 				reportviewer1.LoadReport (new Uri (ReportPath), param, QSMain.ConnectionString);
-			} else {
+			} 
+			else {
 				ReportPath = System.IO.Path.Combine (Directory.GetCurrentDirectory (), "Reports", "order_factory" + ".rdl");
 				reportviewer2.LoadReport(new Uri(ReportPath), param, QSMain.ConnectionString);
 			}
 
 		}
 
-		protected void OnSaveActionActivated(object sender, EventArgs e)
-		{
+		protected void OnSaveActionActivated(object sender, EventArgs e) {
 			if (Save())
 				this.Destroy();
 		}
 
-		protected void OnGoBackActionActivated(object sender, EventArgs e)
-		{
+		protected void OnGoBackActionActivated(object sender, EventArgs e) {
 			notebook1.PrevPage();
 		}
 
-		protected void OnGoForwardActionActivated(object sender, EventArgs e)
-		{
+		protected void OnGoForwardActionActivated(object sender, EventArgs e) {
 			notebook1.NextPage();
 		}
 
-		protected void OnRevertToSavedActionActivated(object sender, EventArgs e)
-		{
+		protected void OnRevertToSavedActionActivated(object sender, EventArgs e) {
 			this.Destroy();
 		}
 
-		protected void OnCheckEstimationClicked(object sender, EventArgs e)
-		{
+		protected void OnCheckEstimationClicked(object sender, EventArgs e) {
 			entryContract.Sensitive = !checkEstimation.Active;
 		}
 
-		protected void OnEntryContractChanged(object sender, EventArgs e)
-		{
+		protected void OnEntryContractChanged(object sender, EventArgs e) {
 			int number;
 			if(int.TryParse(entryContract.Text, out number))
 				entryContract.ModifyText(StateType.Normal);
@@ -1431,33 +1396,11 @@ namespace CupboardDesigner
 			}
 		}
 
-		protected void OnZoomInActionActivated (object sender, EventArgs e)
-		{
-			throw new NotImplementedException ();
-		}
-
-		protected void OnZoomOutActionActivated (object sender, EventArgs e)
-		{
-			throw new NotImplementedException ();
-		}
-
-		protected void OnPdfActionActivated (object sender, EventArgs e)
-		{
-			throw new NotImplementedException ();
-		}
-
-		protected void OnRefreshActionActivated (object sender, EventArgs e)
-		{
-			throw new NotImplementedException ();
-		}
-
-		protected void OnCheckbutton2Toggled (object sender, EventArgs e)
-		{
+		protected void OnCheckbutton2Toggled (object sender, EventArgs e) {
 			ColumnPrice.Visible = ColumnPriceTotal.Visible = ColumnDiscount.Visible = checkbuttonShowPrice.Active;
 		}
 
-		protected void OnCheckbutton1Toggled (object sender, EventArgs e)
-		{
+		protected void OnCheckbutton1Toggled (object sender, EventArgs e) {
 			spinbutton1.Sensitive = checkbuttonDiscount.Active;
 			if (spinbutton1.Sensitive == false)
 				PriceCorrection = 0;
@@ -1466,8 +1409,7 @@ namespace CupboardDesigner
 			CalculateTotalCount ();
 		}
 
-		protected void OnSpinbutton1ValueChanged (object sender, EventArgs e) 
-		{
+		protected void OnSpinbutton1ValueChanged (object sender, EventArgs e)  {
 			PriceCorrection = spinbutton1.ValueAsInt;
 			CalculateTotalCount ();
 			if (spinbutton1.ValueAsInt > 0)
@@ -1540,6 +1482,22 @@ namespace CupboardDesigner
 				ComponentsStore.Remove (ref iter);
 			}
 			CalculateTotalCount ();
+		}
+
+		protected void OnZoomInActionActivated (object sender, EventArgs e) {
+			throw new NotImplementedException ();
+		}
+
+		protected void OnZoomOutActionActivated (object sender, EventArgs e) {
+			throw new NotImplementedException ();
+		}
+
+		protected void OnPdfActionActivated (object sender, EventArgs e) {
+			throw new NotImplementedException ();
+		}
+
+		protected void OnRefreshActionActivated (object sender, EventArgs e) {
+			throw new NotImplementedException ();
 		}
 	}
 }
