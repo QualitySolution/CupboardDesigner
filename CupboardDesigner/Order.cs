@@ -1361,21 +1361,6 @@ namespace CupboardDesigner
 
 		}
 
-		protected void OnOrderDatesChanged(object sender, EventArgs e)
-		{
-			TestCanSave();
-			bool Dateok = dateArrval.IsEmpty || dateDeadlineS.IsEmpty || dateArrval.Date <= dateDeadlineS.Date;
-			if(!Dateok)
-			{
-				MessageDialog md = new MessageDialog ( this, DialogFlags.DestroyWithParent,
-					MessageType.Warning, 
-					ButtonsType.Ok, 
-					"Дата сдачи должна быть позже даты прихода.");
-				md.Run ();
-				md.Destroy();
-			}
-		}
-
 		protected void OnSaveActionActivated(object sender, EventArgs e)
 		{
 			if (Save())
@@ -1411,16 +1396,39 @@ namespace CupboardDesigner
 				entryContract.ModifyText(StateType.Normal, new Gdk.Color(255,0,0)); 
 		}
 
-		protected void OnDateDeadlineSDateChanged(object sender, EventArgs e)
-		{
-			CultureInfo currentCulture = CultureInfo.CurrentCulture;
-			int WeekS = currentCulture.Calendar.GetWeekOfYear(dateDeadlineS.Date, currentCulture.DateTimeFormat.CalendarWeekRule,
-				           currentCulture.DateTimeFormat.FirstDayOfWeek);
-			int WeekE = currentCulture.Calendar.GetWeekOfYear(dateDeadlineE.Date, currentCulture.DateTimeFormat.CalendarWeekRule,
-				currentCulture.DateTimeFormat.FirstDayOfWeek);
-			if (WeekE != WeekS)
-				dateDeadlineE.Date = dateDeadlineS.Date.AddDays((double)(5 - currentCulture.Calendar.GetDayOfWeek(dateDeadlineS.Date)));
-			OnOrderDatesChanged(sender, e);
+		protected void OnDateDeadlineSDateChanged(object sender, EventArgs e) {
+			dateDeadlineE.Date = dateDeadlineS.Date.AddDays ((double)7);
+			TestCanSave ();
+			if (!(dateArrval.IsEmpty || dateDeadlineS.IsEmpty || dateArrval.Date <= dateDeadlineS.Date)) {
+				MessageDialog md = new MessageDialog (this, DialogFlags.DestroyWithParent,
+					                   MessageType.Warning, 
+					                   ButtonsType.Ok, 
+					                   "Дата сдачи заказа должна быть позже даты прихода.");
+				md.Run ();
+				md.Destroy ();
+				dateDeadlineS.Date = dateArrval.Date;
+			}
+			if (!(dateDeadlineS.Date <= dateDeadlineE.Date)) {
+				MessageDialog md = new MessageDialog (this, DialogFlags.DestroyWithParent,
+					                   MessageType.Warning, 
+					                   ButtonsType.Ok, 
+					                   "Крайний срок периода сдачи заказа не может быть раньше даты начала.");
+				md.Run ();
+				md.Destroy ();
+				dateDeadlineE.Date = dateDeadlineS.Date.AddDays ((double)7);
+			}
+		}
+
+		protected void OnDateDeadlineEDateChanged (object sender, EventArgs e) {
+			if (dateDeadlineS.IsEmpty && !dateDeadlineE.IsEmpty) {
+				MessageDialog md = new MessageDialog (this, DialogFlags.DestroyWithParent,
+					                   MessageType.Warning, 
+					                   ButtonsType.Ok, 
+					                   "Пожалуйста, введите сначала начальную дату периода сдачи заказа.");
+				md.Run ();
+				md.Destroy ();
+				saveAction.Sensitive = false;
+			}
 		}
 
 		protected void OnZoomInActionActivated (object sender, EventArgs e)
@@ -1468,8 +1476,7 @@ namespace CupboardDesigner
 				checkbuttonDiscount.Label = "Скидка:";
 		}
 
-		protected void OnTreeviewComponentsButtonReleaseEvent (object o, ButtonReleaseEventArgs args)
-		{
+		protected void OnTreeviewComponentsButtonReleaseEvent (object o, ButtonReleaseEventArgs args) {
 			TreeIter iter, tempIter;
 			if (args.Event.Button == 3) {
 				if (treeviewComponents.Selection.CountSelectedRows() == 1 && treeviewComponents.Selection.GetSelected(out iter)) {
@@ -1534,12 +1541,6 @@ namespace CupboardDesigner
 			}
 			CalculateTotalCount ();
 		}
-
-		protected void OnPrintActionActivated (object sender, EventArgs e)
-		{
-			throw new NotImplementedException ();
-		}
-
 	}
 }
 

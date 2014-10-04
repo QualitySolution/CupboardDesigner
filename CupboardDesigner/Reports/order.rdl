@@ -161,17 +161,17 @@ LEFT JOIN basis ON basis.id = orders.basis_id
         </Field>
       </Fields>
     </DataSet>
-    <DataSet Name="Services" >
-      <Query>
+    <DataSet Name="Services">
+      <Query >
         <DataSourceName>DS1</DataSourceName>
-        <CommandText>select name, price + price / 100 * discount as price, comment from order_services where order_id = 2;</CommandText>
+        <CommandText>select name, price + price / 100 * discount as price, comment from order_services where order_id = @id;</CommandText>
         <QueryParameters>
           <QueryParameter Name="id">
             <Value>=Parameters!id</Value>
           </QueryParameter>
         </QueryParameters>
       </Query>
-      <Fields>
+      <Fields >
         <Field Name="name">
           <DataField>name</DataField>
           <TypeName>System.String</TypeName>
@@ -678,13 +678,15 @@ LEFT JOIN basis ON basis.id = orders.basis_id
         <Value>logo_H</Value>
         <Sizing>FitProportional</Sizing>
       </Image>
-      <Table Name="Table1" >
+      <Table Name="Table1">
         <DataSetName>Services</DataSetName>
-        <NoRows>Query returned no rows!</NoRows>
+        <NoRows>Заказ не содержит услуг.</NoRows>
         <Style>
           <BorderStyle>
             <Default>Solid</Default>
           </BorderStyle>
+          <BorderColor  />
+          <BorderWidth  />
         </Style>
         <TableColumns>
           <TableColumn>

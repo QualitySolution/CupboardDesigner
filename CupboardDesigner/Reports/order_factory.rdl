@@ -181,7 +181,7 @@ LEFT JOIN basis ON basis.id = orders.basis_id
     <DataSet Name="Services">
       <Query>
         <DataSourceName>DS1</DataSourceName>
-        <CommandText>select name, price + price / 100 * discount as price, comment from order_services where order_id = 2;</CommandText>
+        <CommandText>select name, price + price / 100 * discount as price, comment from order_services where order_id = @id;</CommandText>
         <QueryParameters>
           <QueryParameter Name="id">
             <Value>=Parameters!id</Value>
@@ -299,16 +299,16 @@ where orders.id = @id and order_basis_details.order_id = @id;</CommandText>
         </Style>
         <TableColumns>
           <TableColumn>
-            <Width>188.9pt</Width>
+            <Width>181.9pt</Width>
           </TableColumn>
           <TableColumn>
             <Width>27.4pt</Width>
           </TableColumn>
           <TableColumn>
-            <Width>27.4pt</Width>
+            <Width>44.4pt</Width>
           </TableColumn>
           <TableColumn>
-            <Width>75.4pt</Width>
+            <Width>65.4pt</Width>
           </TableColumn>
           <TableColumn>
             <Width>79.4pt</Width>
@@ -916,11 +916,13 @@ where orders.id = @id and order_basis_details.order_id = @id;</CommandText>
       </Image>
       <Table Name="Table1">
         <DataSetName>Services</DataSetName>
-        <NoRows>Query returned no rows!</NoRows>
+        <NoRows>Заказ не содержит услуг.</NoRows>
         <Style>
           <BorderStyle>
             <Default>Solid</Default>
           </BorderStyle>
+          <BorderColor />
+          <BorderWidth />
         </Style>
         <TableColumns>
           <TableColumn>
