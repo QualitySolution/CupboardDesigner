@@ -133,9 +133,11 @@
     <None Include="Reports\order_factory.rdl">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
+    <None Include="Scripts\UpdateSchema.sql" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Widgets\" />
     <Folder Include="Reports\" />
+    <Folder Include="Scripts\" />
   </ItemGroup>
 </Project>
