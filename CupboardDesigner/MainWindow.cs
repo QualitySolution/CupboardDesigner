@@ -3,6 +3,7 @@ using Gtk;
 using CupboardDesigner;
 using QSProjectsLib;
 using NLog;
+using QSSupportLib;
 
 public partial class MainWindow: Gtk.Window
 {
@@ -22,6 +23,11 @@ public partial class MainWindow: Gtk.Window
 
 		PrerareOrders();
 		SetAdminMode(false); 
+		MainSupport.BaseParameters = new QSSupportLib.BaseParam(QSMain.ConnectionDB);
+		MainSupport.ProjectVerion = new AppVersion(System.Reflection.Assembly.GetExecutingAssembly().GetName().Name.ToString(),
+			"gpl",
+			System.Reflection.Assembly.GetExecutingAssembly().GetName().Version);
+		MainSupport.TestVersion(this); //Проверяем версию базы
 	}
 
 	protected void OnReferenceUpdate(object sender, QSMain.ReferenceUpdatedEventArgs e)
