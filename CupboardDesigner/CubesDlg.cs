@@ -53,7 +53,7 @@ namespace CupboardDesigner
 			treeviewNomenclature.ShowAll();
 
 			//Загрузка списка номенклатур
-			string sql = "SELECT id, name FROM nomenclature WHERE type = 'construct'";
+			string sql = "SELECT id, name FROM nomenclature WHERE type = 'cube'";
 			SqliteCommand cmd = new SqliteCommand(sql, (SqliteConnection)QSMain.ConnectionDB);
 			using (SqliteDataReader rdr = cmd.ExecuteReader())
 			{

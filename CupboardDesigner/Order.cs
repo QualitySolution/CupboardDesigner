@@ -740,10 +740,14 @@ namespace CupboardDesigner {
 							0,
 							false
 						);
-						string contents_sql = "SELECT order_cubes_details.*, nomenclature.type AS type, nomenclature.name AS name, " +
-							"nomenclature.description AS description FROM order_cubes_details LEFT JOIN nomenclature ON " +
-							"order_cubes_details.nomenclature_id = nomenclature.id WHERE order_cubes_details.order_id = @order_id " +
-							"AND order_cubes_details.cube_id = @cube_id";
+						string contents_sql = "SELECT * FROM " +
+							"(SELECT order_cubes_details.*, nomenclature.type AS type, nomenclature.name AS name, nomenclature.description AS description " +
+							"FROM order_cubes_details LEFT JOIN nomenclature ON order_cubes_details.nomenclature_id = nomenclature.id " +
+							"WHERE order_cubes_details.order_id = 2 AND order_cubes_details.cube_id = 1 " +
+							"UNION " +
+							"SELECT NULL AS id, 2 AS order_id, 1 AS cube_id, nomenclature.id AS nomenclature_id, 0 AS count, nomenclature.price AS price, " +
+							"NULL AS comment, 0 AS discount, nomenclature.type AS type, nomenclature.name AS name, nomenclature.description AS description " +
+							"FROM nomenclature LEFT JOIN cubes_items ON nomenclature.id = cubes_items.item_id WHERE cubes_items.cubes_id = 1) group by name";
 						SqliteCommand contents_cmd = new SqliteCommand (contents_sql, (SqliteConnection)QSMain.ConnectionDB);
 						contents_cmd.Parameters.AddWithValue ("@cube_id", DBWorks.GetInt(rdr, "cube_id", -1));
 						contents_cmd.Parameters.AddWithValue ("@order_id", id);
@@ -1482,22 +1486,6 @@ namespace CupboardDesigner {
 				ComponentsStore.Remove (ref iter);
 			}
 			CalculateTotalCount ();
-		}
-
-		protected void OnZoomInActionActivated (object sender, EventArgs e) {
-			throw new NotImplementedException ();
-		}
-
-		protected void OnZoomOutActionActivated (object sender, EventArgs e) {
-			throw new NotImplementedException ();
-		}
-
-		protected void OnPdfActionActivated (object sender, EventArgs e) {
-			throw new NotImplementedException ();
-		}
-
-		protected void OnRefreshActionActivated (object sender, EventArgs e) {
-			throw new NotImplementedException ();
 		}
 	}
 }

@@ -4,6 +4,8 @@ using CupboardDesigner;
 using QSProjectsLib;
 using NLog;
 using QSSupportLib;
+using System.IO;
+using Mono.Data.Sqlite;
 
 public partial class MainWindow: Gtk.Window
 {
@@ -27,7 +29,21 @@ public partial class MainWindow: Gtk.Window
 		MainSupport.ProjectVerion = new AppVersion(System.Reflection.Assembly.GetExecutingAssembly().GetName().Name.ToString(),
 			"gpl",
 			System.Reflection.Assembly.GetExecutingAssembly().GetName().Version);
-		MainSupport.TestVersion(this); //Проверяем версию базы
+		if (!MainSupport.TestVersionSilent ()) { //Проверяем версию базы
+			MainClass.StatusMessage ("Используется база старой версии. Обновляем...");
+			try {
+				string sql = File.ReadAllText (@"Scripts/UpdateSchema.sql");
+				SqliteCommand cmd = new SqliteCommand(sql, (SqliteConnection)QSMain.ConnectionDB);
+				cmd.ExecuteNonQuery();
+				MainClass.StatusMessage ("Обновление базы ОК.");
+			}
+			catch (Exception e) {
+				logger.ErrorException (e.Message, e);
+				MainClass.StatusMessage ("Обновление базы закончилось с ошибкой!");
+			}
+		}
+		else
+			MainClass.StatusMessage ("Обновление базы не требуется.");
 	}
 
 	protected void OnReferenceUpdate(object sender, QSMain.ReferenceUpdatedEventArgs e)

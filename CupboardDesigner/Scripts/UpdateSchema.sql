@@ -46,7 +46,6 @@ INSERT INTO cubes (name, ordinal, image, image_size, description, width, height)
 		CASE WHEN height is null THEN 1 ELSE height / 400 END as height
 	FROM nomenclature
 	WHERE type = 'cube';
-DELETE FROM nomenclature WHERE type = 'cube';
 
 -- Table: order_cubes_details
 CREATE TABLE order_cubes_details ( 
@@ -97,5 +96,24 @@ CREATE TABLE order_details (
     price       NUMERIC DEFAULT ( 0 ) 
 );
 
+INSERT INTO order_details 
+(order_id, cube_id, count, facing_id, facing, material_id, material, comment, price) 
+SELECT order_components.order_id, cubes.id, order_components.count, order_components.facing_id, facing.name, order_components.material_id, materials.name, order_components.comment, 0 as price
+FROM order_components 
+LEFT JOIN nomenclature ON nomenclature.id = order_components.nomenclature_id
+LEFT JOIN cubes ON cubes.name = nomenclature.name
+LEFT JOIN facing ON order_components.facing_id = facing.id
+LEFT JOIN materials ON order_components.material_id = materials.id
+WHERE nomenclature.type = 'cube';
+
+INSERT INTO order_basis_details
+(order_id, basis_id, nomenclature_id, count, price, comment, discount)
+SELECT order_components.order_id, orders.basis_id, nomenclature.id, order_components.count, 0 as price, order_components.comment, 0 as discount
+FROM order_components 
+LEFT JOIN nomenclature ON nomenclature.id = order_components.id
+LEFT JOIN orders ON orders.id = order_components.id
+WHERE nomenclature.type = 'construct';
+
+-- DELETE FROM nomenclature WHERE type = 'cube';
 -- Here must be logic for transferring order to new schema.
 -- DROP TABLE order_components
