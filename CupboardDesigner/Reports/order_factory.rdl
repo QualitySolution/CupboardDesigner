@@ -204,18 +204,18 @@ LEFT JOIN basis ON basis.id = orders.basis_id
       </Fields>
     </DataSet>
     <DataSet Name="Cubes">
-      <Query>
+      <Query >
         <DataSourceName>DS1</DataSourceName>
         <CommandText>select order_details.cube_id as cube_id, cubes.name as nomenclature, nomenclature.name as name, order_cubes_details.count as count, order_cubes_details.price as price ,cubes.width * 400 as width, cubes.height * 400 as height, 
-order_details.count as cube_count, order_details.facing as facing, order_details.material as material, order_details.comment as cube_comment, order_cubes_details.comment as comment, order_details.price as total_price from order_details
+order_details.count as cube_count, order_details.facing as facing, order_details.material as material, null as facing_basis, null as material_basis, order_details.comment as cube_comment, order_cubes_details.comment as comment, order_details.price as total_price from order_details
 left join cubes on order_details.cube_id = cubes.id
 left join order_cubes_details on order_cubes_details.cube_id = cubes.id
 left join nomenclature on nomenclature.id = order_cubes_details.nomenclature_id
 where order_details.order_id = @id and order_cubes_details.order_id = @id
 union
-select orders.basis_id as cube_id, basis.name as nomenclature, nomenclature.name as name, order_basis_details.count as count, order_basis_details.price as price , null as width, null as height, "1" as cube_count, null as facing, null as material, null as cube_comment, order_basis_details.comment as comment, orders.basis_price as total_price from orders
+select orders.basis_id as cube_id, basis.name as nomenclature, nomenclature.name as name, order_basis_details.count as count, order_basis_details.price as price , null as width, null as height, "1" as cube_count, null as facing, null as material, order_basis_details.facing as facing_basis, order_basis_details.material as material_basis, null as cube_comment, order_basis_details.comment as comment, orders.basis_price as total_price from orders
 left join basis on orders.basis_id = basis.id
-left join order_basis_details on order_basis_details.basis_id = basis.id
+ left join order_basis_details on order_basis_details.basis_id = basis.id
 left join nomenclature on nomenclature.id = order_basis_details.nomenclature_id
 where orders.id = @id and order_basis_details.order_id = @id;</CommandText>
         <QueryParameters>
@@ -224,7 +224,7 @@ where orders.id = @id and order_basis_details.order_id = @id;</CommandText>
           </QueryParameter>
         </QueryParameters>
       </Query>
-      <Fields>
+      <Fields >
         <Field Name="cube_id">
           <DataField>cube_id</DataField>
           <TypeName>System.Int32</TypeName>
@@ -276,6 +276,14 @@ where orders.id = @id and order_basis_details.order_id = @id;</CommandText>
         <Field Name="total_price">
           <DataField>total_price</DataField>
           <TypeName>System.Decimal</TypeName>
+        </Field>
+        <Field Name="facing_basis">
+          <DataField>facing_basis</DataField>
+          <TypeName>System.String</TypeName>
+        </Field>
+        <Field Name="material_basis">
+          <DataField>material_basis</DataField>
+          <TypeName>System.String</TypeName>
         </Field>
       </Fields>
     </DataSet>
@@ -486,8 +494,7 @@ where orders.id = @id and order_basis_details.order_id = @id;</CommandText>
                 <TableCell>
                   <ReportItems>
                     <Textbox Name="Textbox24">
-                      <Value>
-                      </Value>
+                      <Value>=Fields!material_basis.Value</Value>
                       <CanGrow>true</CanGrow>
                       <Style>
                         <BorderStyle>
@@ -503,8 +510,7 @@ where orders.id = @id and order_basis_details.order_id = @id;</CommandText>
                 <TableCell>
                   <ReportItems>
                     <Textbox Name="Textbox25">
-                      <Value>
-                      </Value>
+                      <Value>=Fields!facing_basis.Value</Value>
                       <CanGrow>true</CanGrow>
                       <Style>
                         <BorderStyle>
@@ -877,7 +883,7 @@ where orders.id = @id and order_basis_details.order_id = @id;</CommandText>
       <Textbox Name="Textbox33">
         <Height>13.50pt</Height>
         <Width>188.71pt</Width>
-        <Value>="Высота (H) " + Convert.ToString(First(Fields!delta_h.Value, "Order") + {?baseh} * 400 - First(Fields!cutting_base.Value, "Order") * 50) + " мм" + Iif(First(Fields!cutting_base.Value, "Order") = 1, " (урез.)", "")</Value>
+        <Value>="Высота (H) " + Convert.ToString(First(Fields!delta_h.Value, "Order") + {?baseh} * 400 - First(Fields!cutting_base.Value, "Order") * 50) + " мм" + Iif(First(Fields!cutting_base.Value, "Order") = 1, " (ус.)", "")</Value>
         <ZIndex>1</ZIndex>
         <Left>10.00pt</Left>
         <Top>202.30pt</Top>

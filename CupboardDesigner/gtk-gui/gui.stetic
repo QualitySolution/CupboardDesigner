@@ -2351,7 +2351,7 @@
                       <widget class="Gtk.CheckButton" id="checkCuttingBase">
                         <property name="MemberName" />
                         <property name="CanFocus">True</property>
-                        <property name="Label" translatable="yes">Урезанное основание</property>
+                        <property name="Label" translatable="yes">Усечённое основание</property>
                         <property name="DrawIndicator">True</property>
                         <property name="HasLabel">True</property>
                         <property name="UseUnderline">True</property>

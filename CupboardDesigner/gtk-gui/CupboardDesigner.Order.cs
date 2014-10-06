@@ -483,7 +483,7 @@ namespace CupboardDesigner
 			this.checkCuttingBase = new global::Gtk.CheckButton ();
 			this.checkCuttingBase.CanFocus = true;
 			this.checkCuttingBase.Name = "checkCuttingBase";
-			this.checkCuttingBase.Label = global::Mono.Unix.Catalog.GetString ("Урезанное основание");
+			this.checkCuttingBase.Label = global::Mono.Unix.Catalog.GetString ("Усечённое основание");
 			this.checkCuttingBase.DrawIndicator = true;
 			this.checkCuttingBase.UseUnderline = true;
 			this.table1.Add (this.checkCuttingBase);

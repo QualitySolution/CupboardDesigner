@@ -68,7 +68,11 @@ CREATE TABLE order_basis_details (
     count           INTEGER,
     price           NUMERIC,
     comment         TEXT,
-    discount        INTEGER DEFAULT ( 0 ) 
+    discount        INTEGER DEFAULT ( 0 ),
+    facing_id       INTEGER REFERENCES facing ( id ),
+    facing          TEXT    REFERENCES facing ( name ),
+    material_id     INTEGER REFERENCES materials ( id ),
+    material        TEXT    REFERENCES materials ( name )
 );
 
 -- Table: order_services
