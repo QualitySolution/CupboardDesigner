@@ -40,8 +40,8 @@ CREATE TABLE cubes (
     height      INTEGER        NOT NULL
                                DEFAULT '1' 
 );
-INSERT INTO cubes (name, ordinal, image, image_size, description, width, height)
-	SELECT name, ordinal, image, image_size, description, 
+INSERT INTO cubes (id, name, ordinal, image, image_size, description, width, height)
+	SELECT id, name, ordinal, image, image_size, description, 
 		CASE WHEN widht is null THEN 1 ELSE widht / 400 END as width, 
 		CASE WHEN height is null THEN 1 ELSE height / 400 END as height
 	FROM nomenclature
