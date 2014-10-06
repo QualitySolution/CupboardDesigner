@@ -677,20 +677,26 @@ namespace CupboardDesigner {
 				//Loading basis and it's contents.
 
 				sql = "SELECT * FROM " +
-					"(SELECT order_basis_details.*, nomenclature.type, nomenclature.name, nomenclature.description " +
+					"(SELECT order_basis_details.*, nomenclature.type, nomenclature.name, nomenclature.description, nomenclature.price_type " +
 					"FROM order_basis_details LEFT JOIN nomenclature ON order_basis_details.nomenclature_id = nomenclature.id " +
 					"WHERE order_basis_details.order_id = @order_id and order_basis_details.basis_id = @basis_id " +
 					"UNION " +
-					"SELECT nomenclature.id, @order_id AS order_id, @basis_id AS basis_id, nomenclature.id AS nomenclature_id, 0 AS count, nomenclature.price AS price, " +
-					"NULL AS comment, 0 AS discount, -1 as facing_id, null as facing, -1 as material_id, null as material, nomenclature.type AS type, nomenclature.name AS name, nomenclature.description AS description " +
+					"SELECT nomenclature.id, @order_id AS order_id, @basis_id AS basis_id, nomenclature.id AS nomenclature_id, 0 AS count, " +
+					"nomenclature.price AS price, NULL AS comment, 0 AS discount, -1 AS facing_id, NULL AS facing, -1 as material_id, " +
+					"NULL AS material, nomenclature.type AS type, nomenclature.name AS name, nomenclature.description AS description, nomenclature.price_type " +
 					"FROM nomenclature LEFT JOIN basis_items ON nomenclature.id = basis_items.item_id WHERE basis_items.basis_id = @basis_id) group by name;";
 				cmd = new SqliteCommand(sql, (SqliteConnection)QSMain.ConnectionDB);
 				cmd.Parameters.AddWithValue("@order_id", id);
 				cmd.Parameters.AddWithValue("@basis_id", basis.id);
 				using (SqliteDataReader rdr = cmd.ExecuteReader()) {
 					while(rdr.Read()) {
-						int count = DBWorks.GetInt(rdr, "count", -1);
-						decimal price = DBWorks.GetDecimal(rdr, "price", -1);
+						int count = DBWorks.GetInt(rdr, "count", 0);
+						decimal price = DBWorks.GetDecimal(rdr, "price", 0);
+						if (count < 1)
+							if (rdr["price_type"].ToString() == "width")
+								price *= OrderCupboard.CubesH;
+							else if (rdr["price_type"].ToString() == "height")
+								price *= OrderCupboard.CubesV;
 						ComponentsStore.AppendValues(
 							BasisIter,
 							DBWorks.GetLong(rdr, "id", -1),
@@ -935,17 +941,29 @@ namespace CupboardDesigner {
 		}
 
 		protected void OnComboCubeHChanged(object sender, EventArgs e) {
+			CupboardListItem basis = TypeWidgetList.Find (w => w.Button.Active);
+			if(basis == null) {
+				logger.Warn("Не найдена активная основа");
+				return;
+			}
 			OrderCupboard.CubesH = int.Parse(comboCubeH.ActiveText);
 			if(OrderCupboard.BorderImage != null)
 				OrderCupboard.BorderImage.ModifyDrawingImage();
 			CalculateCubePxSize(drawCupboard.Allocation);
+			UpdateBasisComponents (basis.id);
 		}
 
 		protected void OnComboCubeVChanged(object sender, EventArgs e) {
+			CupboardListItem basis = TypeWidgetList.Find (w => w.Button.Active);
+			if(basis == null) {
+				logger.Warn("Не найдена активная основа");
+				return;
+			}
 			OrderCupboard.CubesV = int.Parse(comboCubeV.ActiveText);
 			if(OrderCupboard.BorderImage != null)
 				OrderCupboard.BorderImage.ModifyDrawingImage();
 			CalculateCubePxSize(drawCupboard.Allocation);
+			UpdateBasisComponents (basis.id);
 		}
 
 		protected void OnDrawCupboardExposeEvent(object o, ExposeEventArgs args) {
@@ -1139,16 +1157,23 @@ namespace CupboardDesigner {
 				} while (ComponentsStore.IterNext (ref iter));
 			}
 
-			string sql = "SELECT nomenclature.name as nomenclature, nomenclature.type, nomenclature.description, nomenclature.price, basis_items.* " +
-				"FROM basis_items LEFT JOIN nomenclature ON nomenclature.id = basis_items.item_id WHERE basis_id = @basis_id";
+			string sql = "SELECT nomenclature.name as nomenclature, nomenclature.type, nomenclature.description, nomenclature.price, nomenclature.price_type, " +
+				"basis_items.* FROM basis_items LEFT JOIN nomenclature ON nomenclature.id = basis_items.item_id WHERE basis_id = @basis_id";
 			SqliteCommand cmd = new SqliteCommand(sql, (SqliteConnection)QSMain.ConnectionDB);
 			cmd.Parameters.AddWithValue("@basis_id", id);
 			using (SqliteDataReader rdr = cmd.ExecuteReader()) {
 				while (rdr.Read()) {
+					int count = DBWorks.GetInt (rdr, "count", 1);
+					Decimal price = DBWorks.GetDecimal (rdr, "price", 0);
+					if (rdr["price_type"].ToString() == "width")
+						price *= OrderCupboard.CubesH;
+					else if (rdr["price_type"].ToString() == "height")
+						price *= OrderCupboard.CubesV;
+
 					if (pairs.TryGetValue (DBWorks.GetInt (rdr, "item_id", -1), out iter)) {
-						int count = DBWorks.GetInt (rdr, "count", 1);
-						Decimal price = count * Decimal.Parse((String)ComponentsStore.GetValue (iter, (int)ComponentCol.price));
-						price = price + price / 100 * (int)ComponentsStore.GetValue (iter, (int)ComponentCol.discount);
+						ComponentsStore.SetValue (iter, (int)ComponentCol.price, price.ToString());
+						price *= count;
+						Math.Round(price = price + price / 100 * (int)ComponentsStore.GetValue (iter, (int)ComponentCol.discount), 0);
 						ComponentsStore.SetValue (iter, (int)ComponentCol.count, count);
 						ComponentsStore.SetValue (iter, (int)ComponentCol.price_total, price.ToString());
 					} 
@@ -1167,8 +1192,8 @@ namespace CupboardDesigner {
 							-1,
 							"",
 							"",
-							DBWorks.GetDecimal (rdr, "price", 0).ToString (),
-							(DBWorks.GetDecimal (rdr, "price", 0) * DBWorks.GetInt (rdr, "count", 0)).ToString (),
+							price.ToString (),
+							(price * count).ToString (),
 							true,
 							true,
 							true,

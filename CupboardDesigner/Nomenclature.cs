@@ -15,6 +15,7 @@ namespace CupboardDesigner
 		private int ItemId;
 
 		internal enum NomType {cube, construct, other};
+		internal enum PriceType {none, height, width};
 
 		public Nomenclature()
 		{
@@ -50,6 +51,7 @@ namespace CupboardDesigner
 					labelId.Text = rdr["id"].ToString();
 					entryName.Text = rdr["name"].ToString();
 					comboType.Active = (int) Enum.Parse(typeof(NomType), rdr["type"].ToString());
+					comboPrice.Active = rdr["price_type"].ToString() == null  || rdr["price_type"].ToString() == "" ? 0 : (int) Enum.Parse(typeof(PriceType), rdr["price_type"].ToString());
 					entryArticle.Text = DBWorks.GetString(rdr, "article", "");
 					entryDescription.Text = DBWorks.GetString(rdr, "description", "");
 					spinH.Value = DBWorks.GetInt(rdr, "height", 0);
@@ -86,13 +88,13 @@ namespace CupboardDesigner
 			string sql;
 			if(NewItem)
 			{
-				sql = "INSERT INTO nomenclature (type, article, name, description, widht, lenght, height, plusl, plush, price) " +
-					"VALUES (@type, @article, @name, @description, @widht, @lenght, @height, @plusl, @plush, @price)";
+				sql = "INSERT INTO nomenclature (type, article, name, description, widht, lenght, height, plusl, plush, price, price_type) " +
+					"VALUES (@type, @article, @name, @description, @widht, @lenght, @height, @plusl, @plush, @price, @price_type)";
 			}
 			else
 			{
 				sql = "UPDATE nomenclature SET type = @type, article = @article, name = @name, description = @description, " +
-					"widht = @widht, lenght = @lenght, height = @height, plusl = @plusl, plush = @plush, price = @price WHERE id = @id";
+					"widht = @widht, lenght = @lenght, height = @height, plusl = @plusl, plush = @plush, price = @price, price_type = @price_type WHERE id = @id";
 			}
 			MainClass.StatusMessage("Запись номенклатуры...");
 			SqliteTransaction trans = (SqliteTransaction)QSMain.ConnectionDB.BeginTransaction();
@@ -111,6 +113,7 @@ namespace CupboardDesigner
 				cmd.Parameters.AddWithValue("@plush", DBWorks.ValueOrNull(comboType.Active == (int)NomType.construct , checkPlusH.Active));
 				cmd.Parameters.AddWithValue("@plusl", DBWorks.ValueOrNull(comboType.Active == (int)NomType.construct, checkPlusL.Active));
 				cmd.Parameters.AddWithValue("@price", DBWorks.ValueOrNull(spinPrice.ValueAsInt > 0, spinPrice.ValueAsInt));
+				cmd.Parameters.AddWithValue("@price_type", ((PriceType) comboPrice.Active).ToString() );
 
 				cmd.ExecuteNonQuery();
 

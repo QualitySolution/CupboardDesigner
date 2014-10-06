@@ -12,6 +12,7 @@ ALTER TABLE orders ADD COLUMN basis_price NUMERIC DEFAULT ( 0 );
 
 -- Table: nomenclature
 ALTER TABLE nomenclature ADD COLUMN price NUMERIC DEFAULT ( 0 );
+ALTER TABLE nomenclature ADD COLUMN price_type TEXT;
 
 -- Table: cubes_items
 CREATE TABLE cubes_items ( 
@@ -52,7 +53,7 @@ CREATE TABLE order_cubes_details (
     id              INTEGER PRIMARY KEY AUTOINCREMENT,
     order_id        INTEGER REFERENCES orders ( id ),
     cube_id         INTEGER REFERENCES cubes ( id ),
-    nomenclature_id INTEGER REFERENCES nomenclature ( id ),
+    nomenclature_id INTEGER,
     count           INTEGER,
     price           NUMERIC,
     comment         TEXT,
@@ -64,7 +65,7 @@ CREATE TABLE order_basis_details (
     id              INTEGER PRIMARY KEY AUTOINCREMENT,
     order_id        INTEGER REFERENCES orders ( id ),
     basis_id        INTEGER REFERENCES basis ( id ),
-    nomenclature_id INTEGER REFERENCES nomenclature ( id ),
+    nomenclature_id INTEGER,
     count           INTEGER,
     price           NUMERIC,
     comment         TEXT,
@@ -118,6 +119,5 @@ LEFT JOIN nomenclature ON nomenclature.id = order_components.id
 LEFT JOIN orders ON orders.id = order_components.id
 WHERE nomenclature.type = 'construct';
 
--- DELETE FROM nomenclature WHERE type = 'cube';
--- Here must be logic for transferring order to new schema.
--- DROP TABLE order_components
+DROP TABLE order_components;
+DELETE FROM nomenclature WHERE type = 'cube';
