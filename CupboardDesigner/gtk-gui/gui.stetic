@@ -1836,7 +1836,8 @@
           <widget class="Gtk.Notebook" id="notebook1">
             <property name="MemberName" />
             <property name="CanFocus">True</property>
-            <property name="CurrentPage">0</property>
+            <property name="CurrentPage">1</property>
+            <signal name="SwitchPage" handler="OnNotebook1SwitchPage" />
             <child>
               <widget class="Gtk.HBox" id="hbox1">
                 <property name="MemberName" />
@@ -1861,6 +1862,7 @@
                         <property name="DrawIndicator">True</property>
                         <property name="HasLabel">True</property>
                         <property name="UseUnderline">True</property>
+                        <signal name="Clicked" handler="OnCheckEstimationClicked" />
                       </widget>
                       <packing>
                         <property name="LeftAttach">1</property>
@@ -2082,6 +2084,7 @@
                             <property name="Date">0</property>
                             <property name="IsEditable">True</property>
                             <property name="AutoSeparation">True</property>
+                            <signal name="DateChanged" handler="OnDateDeadlineSDateChanged" />
                           </widget>
                           <packing>
                             <property name="Position">0</property>
@@ -2107,6 +2110,7 @@
                             <property name="Date">0</property>
                             <property name="IsEditable">True</property>
                             <property name="AutoSeparation">True</property>
+                            <signal name="DateChanged" handler="OnDateDeadlineEDateChanged" />
                           </widget>
                           <packing>
                             <property name="Position">2</property>
@@ -2387,6 +2391,7 @@
 14
 15</property>
                         <property name="Active">0</property>
+                        <signal name="Changed" handler="OnComboCubeHChanged" />
                       </widget>
                       <packing>
                         <property name="LeftAttach">1</property>
@@ -2417,6 +2422,7 @@
 9
 10</property>
                         <property name="Active">0</property>
+                        <signal name="Changed" handler="OnComboCubeVChanged" />
                       </widget>
                       <packing>
                         <property name="TopAttach">1</property>
@@ -2538,6 +2544,7 @@
                         <property name="Label" translatable="yes" />
                         <property name="UseUnderline">True</property>
                         <property name="Relief">None</property>
+                        <signal name="Clicked" handler="OnButtonCubeListOrientationClicked" />
                       </widget>
                       <packing>
                         <property name="TopAttach">1</property>
@@ -2558,6 +2565,12 @@
                     <child>
                       <widget class="Gtk.DrawingArea" id="drawCupboard">
                         <property name="MemberName" />
+                        <signal name="ExposeEvent" handler="OnDrawCupboardExposeEvent" />
+                        <signal name="SizeAllocated" handler="OnDrawCupboardSizeAllocated" />
+                        <signal name="DragMotion" handler="OnDrawCupboardDragMotion" />
+                        <signal name="DragDrop" handler="OnDrawCupboardDragDrop" />
+                        <signal name="DragBegin" handler="OnDrawCupboardDragBegin" />
+                        <signal name="DragDataDelete" handler="OnDrawCupboardDragDataDelete" />
                       </widget>
                       <packing>
                         <property name="AutoSize">False</property>
@@ -2662,6 +2675,7 @@
                         <property name="MemberName" />
                         <property name="CanFocus">True</property>
                         <property name="ShowScrollbars">True</property>
+                        <signal name="ButtonReleaseEvent" handler="OnTreeviewComponentsButtonReleaseEvent" />
                       </widget>
                     </child>
                   </widget>
@@ -2683,6 +2697,7 @@
                         <property name="DrawIndicator">True</property>
                         <property name="HasLabel">True</property>
                         <property name="UseUnderline">True</property>
+                        <signal name="Toggled" handler="OnCheckbutton2Toggled" />
                       </widget>
                       <packing>
                         <property name="Position">0</property>
@@ -2697,6 +2712,7 @@
                         <property name="DrawIndicator">True</property>
                         <property name="HasLabel">True</property>
                         <property name="UseUnderline">True</property>
+                        <signal name="Toggled" handler="OnCheckbutton1Toggled" />
                       </widget>
                       <packing>
                         <property name="Position">1</property>
@@ -2716,6 +2732,7 @@
                         <property name="ClimbRate">1</property>
                         <property name="Numeric">True</property>
                         <property name="UpdatePolicy">IfValid</property>
+                        <signal name="ValueChanged" handler="OnSpinbutton1ValueChanged" />
                       </widget>
                       <packing>
                         <property name="Position">2</property>
