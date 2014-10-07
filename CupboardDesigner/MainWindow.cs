@@ -30,20 +30,23 @@ public partial class MainWindow: Gtk.Window
 			"gpl",
 			System.Reflection.Assembly.GetExecutingAssembly().GetName().Version);
 		if (!MainSupport.TestVersionSilent ()) { //Проверяем версию базы
-			MainClass.StatusMessage ("Используется база старой версии. Обновляем...");
+			logger.Info ("Используется база старой версии. Обновляем...");
+			SqliteTransaction trans = ((SqliteConnection)QSMain.ConnectionDB).BeginTransaction();
 			try {
 				string sql = File.ReadAllText (@"Scripts/UpdateSchema.sql");
-				SqliteCommand cmd = new SqliteCommand(sql, (SqliteConnection)QSMain.ConnectionDB);
+				SqliteCommand cmd = new SqliteCommand(sql, (SqliteConnection)QSMain.ConnectionDB, trans);
 				cmd.ExecuteNonQuery();
-				MainClass.StatusMessage ("Обновление базы ОК.");
+				trans.Commit();
+				logger.Info ("Обновление базы ОК.");
 			}
 			catch (Exception e) {
-				logger.ErrorException (e.Message, e);
-				MainClass.StatusMessage ("Обновление базы закончилось с ошибкой!");
+				trans.Rollback();
+				logger.ErrorException("Обновление базы закончилось с ошибкой!", e);
+				QSMain.ErrorMessage(this, e);
 			}
 		}
 		else
-			MainClass.StatusMessage ("Обновление базы не требуется.");
+			logger.Info ("Обновление базы не требуется.");
 	}
 
 	protected void OnReferenceUpdate(object sender, QSMain.ReferenceUpdatedEventArgs e)

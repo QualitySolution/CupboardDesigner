@@ -112,11 +112,11 @@ LEFT JOIN materials ON order_components.material_id = materials.id
 WHERE nomenclature.type = 'cube';
 
 INSERT INTO order_basis_details
-(order_id, basis_id, nomenclature_id, count, price, comment, discount)
-SELECT order_components.order_id, orders.basis_id, nomenclature.id, order_components.count, 0 as price, order_components.comment, 0 as discount
+(order_id, basis_id, nomenclature_id, facing_id, material_id, count, price, comment, discount)
+SELECT order_components.order_id, orders.basis_id, order_components.nomenclature_id, order_components.facing_id, order_components.material_id, order_components.count, 0 as price, order_components.comment, 0 as discount
 FROM order_components 
-LEFT JOIN nomenclature ON nomenclature.id = order_components.id
-LEFT JOIN orders ON orders.id = order_components.id
+LEFT JOIN nomenclature ON nomenclature.id = order_components.nomenclature_id
+LEFT JOIN orders ON orders.id = order_components.order_id
 WHERE nomenclature.type = 'construct';
 
 DROP TABLE order_components;
