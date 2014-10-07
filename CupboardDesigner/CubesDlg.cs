@@ -93,9 +93,7 @@ namespace CupboardDesigner
 
 					if(rdr["image"] != DBNull.Value)
 					{
-						int size = DBWorks.GetInt(rdr, "image_size", 0);
-						ImageFile = new byte[size];
-						rdr.GetBytes(rdr.GetOrdinal("image"), 0, ImageFile, 0, size);
+						ImageFile = (byte[])rdr[rdr.GetOrdinal("image")];
 						drawCube.QueueDraw();
 					}
 				}

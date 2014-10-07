@@ -268,9 +268,7 @@ namespace CupboardDesigner {
 					TempCube.Description = DBWorks.GetString(rdr, "description", "");
 					TempCube.Height = DBWorks.GetInt(rdr, "height", 0) * 400;
 					TempCube.Widht = DBWorks.GetInt(rdr, "width", 0) * 400;
-					int size = DBWorks.GetInt(rdr, "image_size", 0);
-					byte[] ImageFile = new byte[size];
-					rdr.GetBytes(rdr.GetOrdinal("image"), 0, ImageFile, 0, size);
+					byte[] ImageFile = (byte[])rdr[rdr.GetOrdinal("image")];
 					TempCube.LoadSvg(ImageFile);
 					CubeList.Add(TempCube);
 					MaxCubeVSize = Math.Max(MaxCubeVSize, TempCube.CubesV);
