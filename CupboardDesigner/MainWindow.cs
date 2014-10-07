@@ -33,7 +33,13 @@ public partial class MainWindow: Gtk.Window
 			logger.Info ("Используется база старой версии. Обновляем...");
 			SqliteTransaction trans = ((SqliteConnection)QSMain.ConnectionDB).BeginTransaction();
 			try {
-				string sql = File.ReadAllText (@"Scripts/UpdateSchema.sql");
+				string sql;
+				using(Stream stream = System.Reflection.Assembly.GetExecutingAssembly().GetManifestResourceStream("CupboardDesigner.Scripts.UpdateSchema.sql"))
+				{
+					StreamReader reader = new StreamReader(stream);
+					sql = reader.ReadToEnd();
+				}
+
 				SqliteCommand cmd = new SqliteCommand(sql, (SqliteConnection)QSMain.ConnectionDB, trans);
 				cmd.ExecuteNonQuery();
 				trans.Commit();
