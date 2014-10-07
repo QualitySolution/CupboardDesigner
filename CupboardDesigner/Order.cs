@@ -130,8 +130,8 @@ namespace CupboardDesigner {
 				1, 
 				null, 
 				"Услуги",
-				null, 
-				1, 
+				"Кликните правой кнопкой мышы для добавления услуги", 
+				0, 
 				-1, 
 				"", 
 				-1, 
@@ -672,6 +672,7 @@ namespace CupboardDesigner {
 						);
 					}
 				}
+				CalculateServiceCount();
 				//Loading basis and it's contents.
 
 				sql = "SELECT * FROM " +
@@ -1505,6 +1506,13 @@ namespace CupboardDesigner {
 				0,
 				true
 			);
+			CalculateServiceCount();
+		}
+
+		private void CalculateServiceCount()
+		{
+			ComponentsStore.SetValue(ServiceIter, (int)ComponentCol.count, 
+				(int)ComponentsStore.IterNChildren(ServiceIter));
 		}
 
 		private void PopupMenuDeleteEvent(object sender, EventArgs args) {
@@ -1520,6 +1528,7 @@ namespace CupboardDesigner {
 				ComponentsStore.Remove (ref iter);
 			}
 			CalculateTotalCount ();
+			CalculateServiceCount();
 		}
 	}
 }
