@@ -14,7 +14,6 @@ namespace CupboardDesigner
 		private static Logger logger = LogManager.GetCurrentClassLogger();
 		public bool NewItem;
 		private int ItemId;
-		private SVGHelper ImageHelper;
 		private byte[] ImageFile;
 		private bool ImageChanged = false;
 		private ListStore NomenclatureStore;
@@ -140,7 +139,8 @@ namespace CupboardDesigner
 		protected	void TestCanSave ()
 		{
 			bool Nameok = entryName.Text != "";
-			buttonOk.Sensitive = Nameok;
+			bool ImageOk = ImageFile != null;
+			buttonOk.Sensitive = Nameok && ImageOk;
 		}
 
 		void OnCountSpinEdited (object o, EditedArgs args)
@@ -243,8 +243,8 @@ namespace CupboardDesigner
 					sql = "UPDATE cubes SET image_size = @image_size, image = @image WHERE id = @id";
 					cmd = new SqliteCommand(sql, (SqliteConnection)QSMain.ConnectionDB, trans);
 					cmd.Parameters.AddWithValue("@id", ItemId);
-					cmd.Parameters.AddWithValue("@image_size", ImageHelper.OriginalFile.Length);
-					cmd.Parameters.AddWithValue("@image", ImageHelper.OriginalFile);
+					cmd.Parameters.AddWithValue("@image_size", ImageFile.Length);
+					cmd.Parameters.AddWithValue("@image", ImageFile);
 					cmd.ExecuteNonQuery();
 				}
 
@@ -262,7 +262,7 @@ namespace CupboardDesigner
 
 		protected void OnButtonLoadImageClicked(object sender, EventArgs e)
 		{
-			FileChooserDialog Chooser = new FileChooserDialog("Выберите svg для загрузки...", 
+			FileChooserDialog Chooser = new FileChooserDialog("Выберите svg для загрузки...",
 				this,
 				FileChooserAction.Open,
 				"Отмена", ResponseType.Cancel,
@@ -282,7 +282,7 @@ namespace CupboardDesigner
 			if((ResponseType) Chooser.Run () == ResponseType.Accept)
 			{
 				Chooser.Hide();
-				MainClass.StatusMessage("Загрузка изображения основы...");
+				MainClass.StatusMessage("Загрузка изображения куба...");
 				if(entryName.Text == "")
 				{
 					entryName.Text = System.IO.Path.GetFileNameWithoutExtension(Chooser.Filename);
@@ -292,31 +292,15 @@ namespace CupboardDesigner
 					using (MemoryStream ms = new MemoryStream())
 					{
 						fs.CopyTo(ms);
-						SVGHelper FrameTest = new SVGHelper();
-						byte[] NewFile = ms.ToArray();
-						if(FrameTest.LoadImage(NewFile))
-						{
-							ImageHelper = FrameTest;
-							ImageHelper.PrepairForDBSave();
-							ImageChanged = true;
-						}
-						else
-						{
-							MessageDialog md = new MessageDialog ( this, DialogFlags.DestroyWithParent,
-								MessageType.Warning, 
-								ButtonsType.Ok, 
-								"Не удалось загрузить изображение основы. Для успешной загрузки формат файла должен быть svg. " +
-								"В файле изображения должен быть прямоугольник(rect) с id=framework указывающий положение рамки в которую вставлюятся кубы. " +
-								"Размерность исходного изображения должна быть 1 куб.");
-							md.Run ();
-							md.Destroy();
-						}
+						ImageFile = ms.ToArray();
 					}
 				}
+				ImageChanged = true;
 				drawCube.QueueDraw();
 				MainClass.StatusMessage("Ok");
 			}
 			Chooser.Destroy ();
+			TestCanSave();
 		}
 
 

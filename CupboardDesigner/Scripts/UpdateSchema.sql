@@ -1,7 +1,7 @@
 -- Table: base_parameters
 INSERT INTO base_parameters (name, str_value)
 VALUES 	('product_name', 'CupboardDesigner'), 
-	('version', '1.1.0.0'), 
+	('version', '1.1'), 
 	('edition', 'gpl');
 
 -- Table: orders
@@ -32,9 +32,9 @@ CREATE TABLE cubes (
                                UNIQUE,
     name        VARCHAR( 50 )  NOT NULL
                                UNIQUE,
-    ordinal     INTEGER        UNIQUE,
-    image       BLOB           NOT NULL,
-    image_size  INTEGER        NOT NULL,
+    ordinal     INTEGER,
+    image       BLOB,
+    image_size  INTEGER,
     description VARCHAR,
     width       INTEGER        NOT NULL
                                DEFAULT '1',
