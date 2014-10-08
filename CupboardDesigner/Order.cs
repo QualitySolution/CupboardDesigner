@@ -830,6 +830,7 @@ namespace CupboardDesigner {
 				Price = Decimal.Parse((String)ComponentsStore.GetValue(iter, (int)ComponentCol.price));
 				ComponentsStore.SetValue(iter, (int)ComponentCol.count, NewValue);
 				ComponentsStore.SetValue(iter, (int)ComponentCol.price_total, (Price * NewValue).ToString());
+				CalculateTotalCount ();
 			} catch(Exception e) { logger.WarnException ("Error occured in OnCountEdited.", e);}
 		}
 
