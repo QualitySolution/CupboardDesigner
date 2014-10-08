@@ -1460,6 +1460,12 @@ INSERT INTO [nomenclature] ([id], [type], [ordinal], [article], [name], [widht],
 INSERT INTO [nomenclature] ([id], [type], [ordinal], [article], [name], [widht], [height], [plush], [lenght], [plusl], [description], [image], [image_size], [price], [price_type]) VALUES (72, 'construct', 72, null, 'Освещение 4 лампы', null, null, 0, null, 0, 'в ком-те блок питания + сумматор', null, null, 8470, 'none');
 INSERT INTO [nomenclature] ([id], [type], [ordinal], [article], [name], [widht], [height], [plush], [lenght], [plusl], [description], [image], [image_size], [price], [price_type]) VALUES (73, 'construct', 73, null, 'Дополнительно 1', null, null, 0, null, 0, null, null, null, null, 'none');
 INSERT INTO [nomenclature] ([id], [type], [ordinal], [article], [name], [widht], [height], [plush], [lenght], [plusl], [description], [image], [image_size], [price], [price_type]) VALUES (74, 'construct', 74, null, 'Дополнительно 2', null, null, 0, null, 0, null, null, null, null, 'none');
+INSERT INTO [nomenclature] ([id], [type], [ordinal], [article], [name], [widht], [height], [plush], [lenght], [plusl], [description], [image], [image_size], [price], [price_type]) VALUES (75, 'cube', 75, null, 'Каркас ниши гориз.', null, null, null, null, null, 'Боковой каркас 40мм под запил 45 градусов  для встроенных шкафов , обвязка по периметру', null, null, 3752, 'width');
+INSERT INTO [nomenclature] ([id], [type], [ordinal], [article], [name], [widht], [height], [plush], [lenght], [plusl], [description], [image], [image_size], [price], [price_type]) VALUES (76, 'cube', 76, null, 'Каркас ниши верт.', null, null, null, null, null, 'Боковой каркас 40мм под запил 45 градусов  для встроенных шкафов , обвязка по периметру', null, null, 3752, 'height');
+INSERT INTO [nomenclature] ([id], [type], [ordinal], [article], [name], [widht], [height], [plush], [lenght], [plusl], [description], [image], [image_size], [price], [price_type]) VALUES (77, 'cube', 77, null, 'Задняя стенка 3х3', null, null, null, null, null, null, null, null, 3870, 'none');
+INSERT INTO [nomenclature] ([id], [type], [ordinal], [article], [name], [widht], [height], [plush], [lenght], [plusl], [description], [image], [image_size], [price], [price_type]) VALUES (78, 'cube', 78, null, 'Задняя стенка 3х2', null, null, null, null, null, null, null, null, 2580, 'none');
+INSERT INTO [nomenclature] ([id], [type], [ordinal], [article], [name], [widht], [height], [plush], [lenght], [plusl], [description], [image], [image_size], [price], [price_type]) VALUES (79, 'cube', 79, null, 'Задняя стенка 4х3', null, null, null, null, null, null, null, null, 5160, 'none');
+               
 
 -- Добавляем цены к старой номенклатуре
 UPDATE nomenclature SET description = 'Толщина 40 мм', price = 4500, price_type = 'width' WHERE id = 37 ;
@@ -1472,3 +1478,64 @@ UPDATE nomenclature SET description = '', price = 3300, price_type = 'width' WHE
 UPDATE nomenclature SET description = '', price = 1500, price_type = 'width' WHERE id = 45 ;
 UPDATE nomenclature SET description = '', price = 1500, price_type = 'width' WHERE id = 46 ;
 UPDATE nomenclature SET description = '', price = 1720, price_type = 'none' WHERE id = 47 ;
+
+-- Вносим комплектацию кубов
+INSERT INTO [cubes_items] ([id], [cubes_id], [item_id], [count]) VALUES (1, 18, 50, 1);
+INSERT INTO [cubes_items] ([id], [cubes_id], [item_id], [count]) VALUES (2, 19, 50, 1);
+INSERT INTO [cubes_items] ([id], [cubes_id], [item_id], [count]) VALUES (3, 19, 62, 1);
+INSERT INTO [cubes_items] ([id], [cubes_id], [item_id], [count]) VALUES (4, 20, 50, 1);
+INSERT INTO [cubes_items] ([id], [cubes_id], [item_id], [count]) VALUES (5, 20, 62, 1);
+INSERT INTO [cubes_items] ([id], [cubes_id], [item_id], [count]) VALUES (6, 21, 50, 1);
+INSERT INTO [cubes_items] ([id], [cubes_id], [item_id], [count]) VALUES (7, 21, 64, 1);
+INSERT INTO [cubes_items] ([id], [cubes_id], [item_id], [count]) VALUES (8, 22, 50, 1);
+INSERT INTO [cubes_items] ([id], [cubes_id], [item_id], [count]) VALUES (9, 22, 57, 1);
+INSERT INTO [cubes_items] ([id], [cubes_id], [item_id], [count]) VALUES (10, 23, 50, 1);
+INSERT INTO [cubes_items] ([id], [cubes_id], [item_id], [count]) VALUES (11, 23, 57, 1);
+INSERT INTO [cubes_items] ([id], [cubes_id], [item_id], [count]) VALUES (12, 24, 50, 1);
+INSERT INTO [cubes_items] ([id], [cubes_id], [item_id], [count]) VALUES (13, 24, 54, 1);
+INSERT INTO [cubes_items] ([id], [cubes_id], [item_id], [count]) VALUES (14, 25, 50, 1);
+INSERT INTO [cubes_items] ([id], [cubes_id], [item_id], [count]) VALUES (15, 25, 55, 1);
+INSERT INTO [cubes_items] ([id], [cubes_id], [item_id], [count]) VALUES (16, 49, 51, 1);
+INSERT INTO [cubes_items] ([id], [cubes_id], [item_id], [count]) VALUES (17, 49, 56, 1);
+INSERT INTO [cubes_items] ([id], [cubes_id], [item_id], [count]) VALUES (18, 26, 51, 1);
+INSERT INTO [cubes_items] ([id], [cubes_id], [item_id], [count]) VALUES (19, 27, 51, 1);
+INSERT INTO [cubes_items] ([id], [cubes_id], [item_id], [count]) VALUES (20, 28, 51, 1);
+INSERT INTO [cubes_items] ([id], [cubes_id], [item_id], [count]) VALUES (21, 28, 58, 1);
+INSERT INTO [cubes_items] ([id], [cubes_id], [item_id], [count]) VALUES (22, 28, 62, 1);
+INSERT INTO [cubes_items] ([id], [cubes_id], [item_id], [count]) VALUES (23, 29, 51, 1);
+INSERT INTO [cubes_items] ([id], [cubes_id], [item_id], [count]) VALUES (24, 29, 58, 1);
+INSERT INTO [cubes_items] ([id], [cubes_id], [item_id], [count]) VALUES (25, 29, 65, 1);
+INSERT INTO [cubes_items] ([id], [cubes_id], [item_id], [count]) VALUES (26, 30, 52, 1);
+INSERT INTO [cubes_items] ([id], [cubes_id], [item_id], [count]) VALUES (27, 30, 59, 1);
+INSERT INTO [cubes_items] ([id], [cubes_id], [item_id], [count]) VALUES (28, 30, 62, 2);
+INSERT INTO [cubes_items] ([id], [cubes_id], [item_id], [count]) VALUES (29, 31, 52, 1);
+INSERT INTO [cubes_items] ([id], [cubes_id], [item_id], [count]) VALUES (30, 31, 59, 1);
+INSERT INTO [cubes_items] ([id], [cubes_id], [item_id], [count]) VALUES (31, 31, 65, 2);
+INSERT INTO [cubes_items] ([id], [cubes_id], [item_id], [count]) VALUES (32, 32, 53, 1);
+INSERT INTO [cubes_items] ([id], [cubes_id], [item_id], [count]) VALUES (33, 33, 53, 1);
+INSERT INTO [cubes_items] ([id], [cubes_id], [item_id], [count]) VALUES (34, 33, 60, 1);
+INSERT INTO [cubes_items] ([id], [cubes_id], [item_id], [count]) VALUES (35, 33, 63, 1);
+INSERT INTO [cubes_items] ([id], [cubes_id], [item_id], [count]) VALUES (36, 34, 53, 1);
+INSERT INTO [cubes_items] ([id], [cubes_id], [item_id], [count]) VALUES (37, 34, 60, 1);
+INSERT INTO [cubes_items] ([id], [cubes_id], [item_id], [count]) VALUES (38, 34, 66, 1);
+INSERT INTO [cubes_items] ([id], [cubes_id], [item_id], [count]) VALUES (39, 35, 53, 1);
+INSERT INTO [cubes_items] ([id], [cubes_id], [item_id], [count]) VALUES (40, 35, 61, 1);
+INSERT INTO [cubes_items] ([id], [cubes_id], [item_id], [count]) VALUES (41, 35, 63, 1);
+INSERT INTO [cubes_items] ([id], [cubes_id], [item_id], [count]) VALUES (42, 36, 53, 1);
+INSERT INTO [cubes_items] ([id], [cubes_id], [item_id], [count]) VALUES (43, 36, 61, 1);
+INSERT INTO [cubes_items] ([id], [cubes_id], [item_id], [count]) VALUES (44, 36, 66, 1);
+INSERT INTO [cubes_items] ([id], [cubes_id], [item_id], [count]) VALUES (45, 50, 75, 2);
+INSERT INTO [cubes_items] ([id], [cubes_id], [item_id], [count]) VALUES (46, 50, 76, 2);
+INSERT INTO [cubes_items] ([id], [cubes_id], [item_id], [count]) VALUES (47, 50, 77, 1);
+INSERT INTO [cubes_items] ([id], [cubes_id], [item_id], [count]) VALUES (48, 51, 75, 2);
+INSERT INTO [cubes_items] ([id], [cubes_id], [item_id], [count]) VALUES (49, 51, 76, 2);
+INSERT INTO [cubes_items] ([id], [cubes_id], [item_id], [count]) VALUES (50, 51, 78, 1);
+INSERT INTO [cubes_items] ([id], [cubes_id], [item_id], [count]) VALUES (51, 52, 75, 2);
+INSERT INTO [cubes_items] ([id], [cubes_id], [item_id], [count]) VALUES (52, 52, 76, 2);
+INSERT INTO [cubes_items] ([id], [cubes_id], [item_id], [count]) VALUES (53, 52, 78, 1);
+INSERT INTO [cubes_items] ([id], [cubes_id], [item_id], [count]) VALUES (54, 53, 75, 2);
+INSERT INTO [cubes_items] ([id], [cubes_id], [item_id], [count]) VALUES (55, 53, 76, 2);
+INSERT INTO [cubes_items] ([id], [cubes_id], [item_id], [count]) VALUES (56, 53, 79, 1);
+INSERT INTO [cubes_items] ([id], [cubes_id], [item_id], [count]) VALUES (57, 54, 75, 2);
+INSERT INTO [cubes_items] ([id], [cubes_id], [item_id], [count]) VALUES (58, 54, 76, 2);
+INSERT INTO [cubes_items] ([id], [cubes_id], [item_id], [count]) VALUES (59, 54, 79, 1);
