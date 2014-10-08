@@ -24,11 +24,7 @@ namespace CupboardDesigner
 				QSMain.ErrorMessage(MainWin, (Exception) e.ExceptionObject);
 			};
 			CreateProjectParam();
-			//Настраиваем общую билиотеку
-			QSMain.NewStatusText += delegate(object sender, QSProjectsLib.QSMain.NewStatusTextEventArgs e) 
-			{
-				StatusMessage (e.NewText);
-			};
+
 			CreateConnection();
 
 			MainWin = new MainWindow();
@@ -201,8 +197,7 @@ namespace CupboardDesigner
 
 		public static void StatusMessage(string message)
 		{
-			StatusBarLabel.Text = message;
-			logger.Info(message);
+			StatusBarLabel.LabelProp = message;
 			while (GLib.MainContext.Pending())
 			{
 				Gtk.Main.Iteration();

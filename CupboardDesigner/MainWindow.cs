@@ -20,6 +20,7 @@ public partial class MainWindow: Gtk.Window
 		this.Title = Product.Product;
 
 		MainClass.StatusBarLabel = labelStatus;
+		QSMain.MakeNewStatusTargetForNlog("StatusMessage", "CupboardDesigner.MainClass, CupboardDesigner");
 		Reference.RunReferenceItemDlg += OnRunReferenceItemDialog;
 		QSMain.ReferenceUpdated += OnReferenceUpdate;
 
