@@ -1238,16 +1238,23 @@ namespace CupboardDesigner {
 				Cube cube = OrderCupboard.Cubes.Find (c => c.NomenclatureId == pair.Key);
 				TreeIter CubeIter = ComponentsStore.InsertNodeBefore (ServiceIter);
 				ComponentsStore.SetValues (CubeIter, (long)-1, Enum.Parse (typeof(Nomenclature.NomType), "cube"), pair.Key, null, cube.Name, null, pair.Value, -1, "", -1, "", "", "", "",false, false, true, true, true, false, 0, false);
-				string sql = "SELECT nomenclature.name as nomenclature, nomenclature.type, nomenclature.description, nomenclature.price, cubes_items.* FROM cubes_items " +
+				string sql = "SELECT nomenclature.name as nomenclature, nomenclature.type, nomenclature.description, nomenclature.price, nomenclature.price_type, cubes_items.* FROM cubes_items " +
 					"LEFT JOIN nomenclature ON nomenclature.id = cubes_items.item_id " +
 					"WHERE cubes_id = @cubes_id";
 				SqliteCommand cmd = new SqliteCommand (sql, (SqliteConnection)QSMain.ConnectionDB);
 				cmd.Parameters.AddWithValue ("@cubes_id", pair.Key);
-				Decimal Price = 0;
+				Decimal costOfCube = 0;
 				using (SqliteDataReader rdr = cmd.ExecuteReader ()) {
 					while (rdr.Read ()) {
-						Decimal totalPrice = (DBWorks.GetDecimal (rdr, "price", 0) * pair.Value);
-						Price += totalPrice;
+						Decimal price = DBWorks.GetDecimal (rdr, "price", 0);
+						if (rdr["price_type"].ToString() == "width")
+							price *= cube.CubesH;
+						else if (rdr["price_type"].ToString() == "height")
+							price *= cube.CubesV;
+
+						int count = DBWorks.GetInt(rdr, "count", 1) * pair.Value;
+						Decimal totalPrice = price * count;
+						costOfCube += totalPrice;
 						ComponentsStore.AppendValues (
 							CubeIter,
 							(long)-1,
@@ -1256,14 +1263,14 @@ namespace CupboardDesigner {
 							DBWorks.GetString (rdr, "nomenclature", "нет"),
 							ReplaceArticle (DBWorks.GetString (rdr, "nomenclature", "нет")),
 							DBWorks.GetString (rdr, "description", ""),
-							DBWorks.GetInt (rdr, "count", 1) * pair.Value,
+							count,
 							-1,
 							"",
 							-1,
 							"",
 							"",
-							(DBWorks.GetDecimal(rdr, "price", 0)).ToString(),
-							(DBWorks.GetDecimal(rdr, "price", 0) * DBWorks.GetInt (rdr, "count", 1) * pair.Value).ToString(),
+							price.ToString(),
+							totalPrice.ToString(),
 							true,
 							true,
 							false,
@@ -1274,7 +1281,7 @@ namespace CupboardDesigner {
 							false
 						);
 					}
-					ComponentsStore.SetValue (CubeIter, (int)ComponentCol.price_total, Price.ToString ());
+					ComponentsStore.SetValue (CubeIter, (int)ComponentCol.price_total, costOfCube.ToString ());
 				}
 			}
 			CalculateTotalCount();
