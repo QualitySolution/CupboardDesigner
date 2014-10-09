@@ -13,22 +13,23 @@
   <BottomMargin>.25in</BottomMargin>
   <DataSets>
     <DataSet Name="Data">
-      <Query>
+      <Query >
         <DataSourceName>DS1</DataSourceName>
         <CommandText>select * from
-(select order_details.cube_id as cube_id, null as owner, null as article, cubes.name as nomenclature, cubes.width * 400 as width, cubes.height * 400 as height, null as length, 
-order_details.count as count, order_details.facing as facing, order_details.material as material, order_details.comment as comment from order_details
+(select order_details.cube_id as cube_id, null as owner, null as article, cubes.name as nomenclature, cubes.width * 400 as width, cubes.height * 400 as height, null as length, order_details.count as count, facing.name as facing, materials.name as material, order_details.comment as comment 
+from order_details
 left join cubes on order_details.cube_id = cubes.id
+left join facing on order_details.facing_id = facing.id
+left join materials on order_details.material_id = materials.id
 where order_details.order_id = @id
 union 
-select null as cube_id, order_cubes_details.cube_id as owner, null as article, nomenclature.name as nomenclature, nomenclature.widht * 400 as width, nomenclature.height  * 400 as height, 
-null as length, order_cubes_details.count as count, null as facing, null as material, order_cubes_details.comment as comment from order_cubes_details
+select null as cube_id, order_cubes_details.cube_id as owner, null as article, nomenclature.name as nomenclature, nomenclature.widht * 400 as width, nomenclature.height  * 400 as height, null as length, order_cubes_details.count as count, null as facing, null as material, order_cubes_details.comment as comment 
+from order_cubes_details
 left join nomenclature on order_cubes_details.nomenclature_id = nomenclature.id
 where order_cubes_details.order_id = @id ) 
-
 union 
-select null as cube_id, null as owner, null as article, nomenclature.name as nomenclature, nomenclature.widht as width, nomenclature.height as height, nomenclature.lenght as length, 
-order_basis_details.count as count, null as facing, null as material, order_basis_details.comment as comment from order_basis_details 
+select null as cube_id, null as owner, null as article, nomenclature.name as nomenclature, nomenclature.widht as width, nomenclature.height as height, nomenclature.lenght as length, order_basis_details.count as count, null as facing, null as material, order_basis_details.comment as comment 
+from order_basis_details 
 left join nomenclature on order_basis_details.nomenclature_id = nomenclature.id 
 where order_basis_details.order_id = @id</CommandText>
         <QueryParameters>
@@ -43,7 +44,7 @@ where order_basis_details.order_id = @id</CommandText>
           </QueryParameter>
         </QueryParameters>
       </Query>
-      <Fields>
+      <Fields >
         <Field Name="article">
           <DataField>article</DataField>
           <rd:TypeName>System.String</rd:TypeName>
@@ -204,19 +205,23 @@ LEFT JOIN basis ON basis.id = orders.basis_id
       </Fields>
     </DataSet>
     <DataSet Name="Cubes">
-      <Query >
+      <Query>
         <DataSourceName>DS1</DataSourceName>
         <CommandText>select order_details.cube_id as cube_id, cubes.name as nomenclature, nomenclature.name as name, order_cubes_details.count as count, order_cubes_details.price as price ,cubes.width * 400 as width, cubes.height * 400 as height, 
-order_details.count as cube_count, order_details.facing as facing, order_details.material as material, null as facing_basis, null as material_basis, order_details.comment as cube_comment, order_cubes_details.comment as comment, order_details.price as total_price from order_details
+order_details.count as cube_count, facing.name as facing, materials.name as material, null as facing_basis, null as material_basis, order_details.comment as cube_comment, order_cubes_details.comment as comment, order_details.price as total_price from order_details
 left join cubes on order_details.cube_id = cubes.id
 left join order_cubes_details on order_cubes_details.cube_id = cubes.id
 left join nomenclature on nomenclature.id = order_cubes_details.nomenclature_id
+left join facing on order_details.facing_id = facing.id
+left join materials on materials.id = order_details.material_id
 where order_details.order_id = @id and order_cubes_details.order_id = @id
 union
-select orders.basis_id as cube_id, basis.name as nomenclature, nomenclature.name as name, order_basis_details.count as count, order_basis_details.price as price , null as width, null as height, "1" as cube_count, null as facing, null as material, order_basis_details.facing as facing_basis, order_basis_details.material as material_basis, null as cube_comment, order_basis_details.comment as comment, orders.basis_price as total_price from orders
+select orders.basis_id as cube_id, basis.name as nomenclature, nomenclature.name as name, order_basis_details.count as count, order_basis_details.price as price , null as width, null as height, "1" as cube_count, null as facing, null as material, facing.name as facing_basis, materials.name as material_basis, null as cube_comment, order_basis_details.comment as comment, orders.basis_price as total_price from orders
 left join basis on orders.basis_id = basis.id
- left join order_basis_details on order_basis_details.basis_id = basis.id
+left join order_basis_details on order_basis_details.basis_id = basis.id
 left join nomenclature on nomenclature.id = order_basis_details.nomenclature_id
+left join facing on order_basis_details.facing_id = facing.id
+left join materials on materials.id = order_basis_details.material_id
 where orders.id = @id and order_basis_details.order_id = @id;</CommandText>
         <QueryParameters>
           <QueryParameter Name="id">
@@ -224,7 +229,7 @@ where orders.id = @id and order_basis_details.order_id = @id;</CommandText>
           </QueryParameter>
         </QueryParameters>
       </Query>
-      <Fields >
+      <Fields>
         <Field Name="cube_id">
           <DataField>cube_id</DataField>
           <TypeName>System.Int32</TypeName>

@@ -15,12 +15,16 @@
     <DataSet Name="Data">
       <Query >
         <DataSourceName>DS1</DataSourceName>
-        <CommandText>select null as article, cubes.name as nomenclature, cubes.width * 400 as width, cubes.height * 400 as height, null as length, order_details.count as count, order_details.facing as facing, order_details.material as material, order_details.comment as comment from order_details
+        <CommandText>select null as article, cubes.name as nomenclature, cubes.width * 400 as width, cubes.height * 400 as height, null as length, order_details.count as count, facing.name as facing, materials.name as material, order_details.comment as comment from order_details
 left join cubes on order_details.cube_id = cubes.id
+left join facing on order_details.facing_id = facing.id
+left join materials on materials.id = order_details.material_id
 where order_details.order_id = @id
 union 
-select null as article, nomenclature.name as nomenclature, nomenclature.widht as width, nomenclature.height as height, nomenclature.lenght as length, order_basis_details.count as count, order_basis_details.facing as facing, order_basis_details.material as material, order_basis_details.comment as comment from order_basis_details 
+select null as article, nomenclature.name as nomenclature, nomenclature.widht as width, nomenclature.height as height, nomenclature.lenght as length, order_basis_details.count as count, facing.name as facing, materials.name as material, order_basis_details.comment as comment from order_basis_details 
 left join nomenclature on order_basis_details.nomenclature_id = nomenclature.id 
+left join facing on order_basis_details.facing_id = facing.id
+left join materials on materials.id = order_basis_details.material_id
 where order_basis_details.order_id = @id;</CommandText>
         <QueryParameters>
           <QueryParameter Name="id">

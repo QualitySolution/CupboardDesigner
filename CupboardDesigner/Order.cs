@@ -434,11 +434,11 @@ namespace CupboardDesigner {
 							bool InDB = (long)ComponentsStore.GetValue(iter, (int)ComponentCol.row_id) > 0;
 							if(HasValue) {
 								if(!InDB)
-									sql = "INSERT INTO order_details (order_id, cube_id, count, facing_id, facing, material_id, material, comment, price) " +
-										"VALUES (@order_id, @nomenclature_id, @count, @facing_id, @facing, @material_id, @material, @comment, @price)";
+									sql = "INSERT INTO order_details (order_id, cube_id, count, facing_id, material_id, comment, price) " +
+										"VALUES (@order_id, @nomenclature_id, @count, @facing_id, @material_id, @comment, @price)";
 								else
-									sql = "UPDATE order_details SET count = @count, facing_id = @facing_id, facing = @facing, " +
-										"material_id = @material_id, material = @material, comment = @comment, price = @price WHERE id = @id";
+									sql = "UPDATE order_details SET count = @count, facing_id = @facing_id, " +
+										"material_id = @material_id, comment = @comment, price = @price WHERE id = @id";
 								cmd = new SqliteCommand(sql, (SqliteConnection)QSMain.ConnectionDB, trans);
 								cmd.Parameters.AddWithValue("@id", (long)ComponentsStore.GetValue(iter, (int)ComponentCol.row_id));
 								cmd.Parameters.AddWithValue("@order_id", ItemId);
@@ -446,8 +446,6 @@ namespace CupboardDesigner {
 								cmd.Parameters.AddWithValue("@count", ComponentsStore.GetValue(iter,(int)ComponentCol.count));
 								cmd.Parameters.AddWithValue("@material_id", DBWorks.ValueOrNull((int)ComponentsStore.GetValue(iter,(int)ComponentCol.material_id) > 0, ComponentsStore.GetValue(iter, (int)ComponentCol.material_id)));
 								cmd.Parameters.AddWithValue("@facing_id", DBWorks.ValueOrNull((int)ComponentsStore.GetValue(iter, (int)ComponentCol.facing_id) > 0, ComponentsStore.GetValue(iter, (int)ComponentCol.facing_id)));
-								cmd.Parameters.AddWithValue("@material", DBWorks.ValueOrNull((string)ComponentsStore.GetValue(iter,(int)ComponentCol.material) != "", ComponentsStore.GetValue(iter, (int)ComponentCol.material)));
-								cmd.Parameters.AddWithValue("@facing", DBWorks.ValueOrNull((string)ComponentsStore.GetValue(iter, (int)ComponentCol.facing) != "", ComponentsStore.GetValue(iter, (int)ComponentCol.facing)));
 								cmd.Parameters.AddWithValue("@comment", DBWorks.ValueOrNull((string)ComponentsStore.GetValue(iter, (int)ComponentCol.comment) != "", ComponentsStore.GetValue(iter, (int)ComponentCol.comment)));
 								cmd.Parameters.AddWithValue("@price", ComponentsStore.GetValue(iter, (int)ComponentCol.price_total));
 								cmd.ExecuteNonQuery();
@@ -510,13 +508,13 @@ namespace CupboardDesigner {
 									bool InDB = (long)ComponentsStore.GetValue(childIter, (int)ComponentCol.row_id) > 0;
 									if(HasValue) {
 										if(!InDB)
-											sql = "INSERT INTO order_basis_details (order_id, basis_id, nomenclature_id, count, " +
-												"price, comment, discount, facing_id, facing, material_id, material) " +
-												"VALUES (@order_id, @basis_id, @nomenclature_id, @count, @price, @comment, " +
-												"@discount, @facing_id, @facing, @material_id, @material)";
+											sql = "INSERT INTO order_basis_details (order_id, basis_id, nomenclature_id, " +
+												"count, price, comment, discount, facing_id, material_id) " +
+												"VALUES (@order_id, @basis_id, @nomenclature_id, @count, " +
+												"@price, @comment, @discount, @facing_id, @material_id)";
 										else
-											sql = "UPDATE order_basis_details SET count = @count, price = @price, comment = @comment, discount = @discount, " +
-												"facing_id = @facing_id, facing = @facing, material_id = @material_id, material = @material WHERE id = @id";
+											sql = "UPDATE order_basis_details SET count = @count, price = @price, comment = @comment, " +
+												"discount = @discount, facing_id = @facing_id, material_id = @material_id WHERE id = @id";
 										cmd = new SqliteCommand(sql, (SqliteConnection)QSMain.ConnectionDB, trans);
 										cmd.Parameters.AddWithValue("@id", (long)ComponentsStore.GetValue(childIter, (int)ComponentCol.row_id));
 										cmd.Parameters.AddWithValue("@order_id", ItemId);
@@ -527,9 +525,7 @@ namespace CupboardDesigner {
 										cmd.Parameters.AddWithValue("@comment", DBWorks.ValueOrNull((string)ComponentsStore.GetValue(childIter, (int)ComponentCol.comment) != "", ComponentsStore.GetValue(childIter, (int)ComponentCol.comment)));
 										cmd.Parameters.AddWithValue("@discount", ComponentsStore.GetValue(childIter, (int)ComponentCol.discount));
 										cmd.Parameters.AddWithValue("@facing_id", ComponentsStore.GetValue(childIter, (int)ComponentCol.facing_id));
-										cmd.Parameters.AddWithValue("@facing", ComponentsStore.GetValue(childIter, (int)ComponentCol.facing));
 										cmd.Parameters.AddWithValue("@material_id", ComponentsStore.GetValue(childIter, (int)ComponentCol.material_id));
-										cmd.Parameters.AddWithValue("@material", ComponentsStore.GetValue(childIter, (int)ComponentCol.material));
 
 										cmd.ExecuteNonQuery();
 										if(!InDB) {
@@ -676,14 +672,22 @@ namespace CupboardDesigner {
 				//Loading basis and it's contents.
 
 				sql = "SELECT * FROM (" +
-					"SELECT order_basis_details.*, nomenclature.type, nomenclature.name, nomenclature.description, nomenclature.price_type " +
-					"FROM order_basis_details LEFT JOIN nomenclature ON order_basis_details.nomenclature_id = nomenclature.id " +
+					"SELECT order_basis_details.id as id, order_basis_details.nomenclature_id as nomenclature_id, order_basis_details.count as count, " +
+					"order_basis_details.price as price, order_basis_details.comment as comment, order_basis_details.discount as discount, " +
+					"order_basis_details.facing_id as facing_id, facing.name as facing, order_basis_details.material_id as material_id, " +
+					"materials.name as material, nomenclature.type, nomenclature.name, nomenclature.description, nomenclature.price_type " +
+					"FROM order_basis_details " +
+					"LEFT JOIN nomenclature ON order_basis_details.nomenclature_id = nomenclature.id " +
+					"LEFT JOIN facing ON order_basis_details.facing_id = facing.id " +
+					"LEFT JOIN materials ON order_basis_details.material_id = materials.id " +
 					"WHERE order_basis_details.order_id = @order_id and order_basis_details.basis_id = @basis_id " +
 					"UNION " +
-					"SELECT nomenclature.id, @order_id AS order_id, @basis_id AS basis_id, nomenclature.id AS nomenclature_id, 0 AS count, " +
-					"nomenclature.price AS price, NULL AS comment, 0 AS discount, -1 AS facing_id, NULL AS facing, -1 as material_id, " +
-					"NULL AS material, nomenclature.type AS type, nomenclature.name AS name, nomenclature.description AS description, nomenclature.price_type " +
-					"FROM nomenclature LEFT JOIN basis_items ON nomenclature.id = basis_items.item_id WHERE basis_items.basis_id = @basis_id) group by name;";
+					"SELECT -1 as id, nomenclature.id AS nomenclature_id, 0 AS count, nomenclature.price AS price, " +
+					"NULL AS comment, 0 AS discount, -1 AS facing_id, NULL AS facing, -1 as material_id, NULL AS material, " +
+					"nomenclature.type AS type, nomenclature.name AS name, nomenclature.description AS description, nomenclature.price_type " +
+					"FROM nomenclature " +
+					"LEFT JOIN basis_items ON nomenclature.id = basis_items.item_id " +
+					"WHERE basis_items.basis_id = @basis_id) group by name";
 				cmd = new SqliteCommand(sql, (SqliteConnection)QSMain.ConnectionDB);
 				cmd.Parameters.AddWithValue("@order_id", id);
 				cmd.Parameters.AddWithValue("@basis_id", basis.id);
@@ -724,8 +728,14 @@ namespace CupboardDesigner {
 					}
 				}
 				//Loading cubes.
-				sql = "SELECT order_details.*, cubes.name FROM order_details " +
-					"LEFT JOIN cubes ON order_details.cube_id = cubes.id WHERE order_id = @order_id";
+				sql = "SELECT order_details.id as id, order_details.cube_id as cube_id, order_details.count as count, " +
+					"order_details.facing_id as facing_id, facing.name as facing, order_details.material_id as material_id, " +
+					"materials.name as material, order_details.comment as comment, order_details.price as price, cubes.name " +
+					"FROM order_details " +
+					"LEFT JOIN cubes ON order_details.cube_id = cubes.id " +
+					"LEFT JOIN facing ON facing.id = order_details.facing_id " +
+					"LEFT JOIN materials ON materials.id = order_details.material_id " +
+					"WHERE order_id = @order_id;";
 				cmd = new SqliteCommand(sql, (SqliteConnection)QSMain.ConnectionDB);
 				cmd.Parameters.AddWithValue("@order_id", id);
 				using (SqliteDataReader rdr = cmd.ExecuteReader()) {
@@ -756,14 +766,20 @@ namespace CupboardDesigner {
 							0,
 							false
 						);
-						string contents_sql = "SELECT * FROM " +
-							"(SELECT order_cubes_details.*, nomenclature.type AS type, nomenclature.name AS name, nomenclature.description AS description " +
-							"FROM order_cubes_details LEFT JOIN nomenclature ON order_cubes_details.nomenclature_id = nomenclature.id " +
+						string contents_sql = "SELECT * FROM (" +
+							"SELECT order_cubes_details.id, order_cubes_details.nomenclature_id, order_cubes_details.count as count, " +
+							"order_cubes_details.price as price, order_cubes_details.comment as comment, order_cubes_details.discount as discount, " +
+							"nomenclature.type AS type, nomenclature.name AS name, nomenclature.description AS description " +
+							"FROM order_cubes_details " +
+							"LEFT JOIN nomenclature ON order_cubes_details.nomenclature_id = nomenclature.id " +
 							"WHERE order_cubes_details.order_id = @order_id AND order_cubes_details.cube_id = @cube_id " +
 							"UNION " +
-							"SELECT NULL AS id, @order_id AS order_id, @cube_id AS cube_id, nomenclature.id AS nomenclature_id, 0 AS count, nomenclature.price AS price, " +
-							"NULL AS comment, 0 AS discount, nomenclature.type AS type, nomenclature.name AS name, nomenclature.description AS description " +
-							"FROM nomenclature LEFT JOIN cubes_items ON nomenclature.id = cubes_items.item_id WHERE cubes_items.cubes_id = @cube_id) group by name";
+							"SELECT -1 AS id, nomenclature.id AS nomenclature_id, 0 AS count, nomenclature.price AS price, NULL AS comment, " +
+							"0 AS discount, nomenclature.type AS type, nomenclature.name AS name, nomenclature.description AS description " +
+							"FROM nomenclature " +
+							"LEFT JOIN cubes_items ON nomenclature.id = cubes_items.item_id " +
+							"WHERE cubes_items.cubes_id = @cube_id" +
+							") group by name;";
 						SqliteCommand contents_cmd = new SqliteCommand (contents_sql, (SqliteConnection)QSMain.ConnectionDB);
 						contents_cmd.Parameters.AddWithValue ("@cube_id", DBWorks.GetInt(rdr, "cube_id", -1));
 						contents_cmd.Parameters.AddWithValue ("@order_id", id);
