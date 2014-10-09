@@ -51,8 +51,8 @@ INSERT INTO cubes (id, name, ordinal, image, image_size, description, width, hei
 -- Table: order_cubes_details
 CREATE TABLE order_cubes_details ( 
     id              INTEGER PRIMARY KEY AUTOINCREMENT,
-    order_id        INTEGER REFERENCES orders ( id ),
-    cube_id         INTEGER REFERENCES cubes ( id ),
+    order_id        INTEGER REFERENCES orders ( id ) ON DELETE CASCADE,
+    cube_id         INTEGER REFERENCES cubes ( id ) ON DELETE CASCADE,
     nomenclature_id INTEGER,
     count           INTEGER,
     price           NUMERIC,
@@ -63,8 +63,8 @@ CREATE TABLE order_cubes_details (
 -- Table: order_basis_details
 CREATE TABLE order_basis_details ( 
     id              INTEGER PRIMARY KEY AUTOINCREMENT,
-    order_id        INTEGER REFERENCES orders ( id ),
-    basis_id        INTEGER REFERENCES basis ( id ),
+    order_id        INTEGER REFERENCES orders ( id ) ON DELETE CASCADE,
+    basis_id        INTEGER REFERENCES basis ( id ) ON DELETE CASCADE,
     nomenclature_id INTEGER,
     count           INTEGER,
     price           NUMERIC,
@@ -77,7 +77,7 @@ CREATE TABLE order_basis_details (
 -- Table: order_services
 CREATE TABLE order_services ( 
     id       INTEGER,
-    order_id INTEGER,
+    order_id INTEGER REFERENCES orders ( id ) ON DELETE CASCADE,
     name     TEXT,
     price    NUMERIC,
     discount INTEGER,
@@ -88,7 +88,7 @@ CREATE TABLE order_services (
 -- Table: order_details
 CREATE TABLE order_details ( 
     id          INTEGER PRIMARY KEY AUTOINCREMENT,
-    order_id    INTEGER REFERENCES orders ( id ),
+    order_id    INTEGER REFERENCES orders ( id ) ON DELETE CASCADE,
     cube_id     INTEGER REFERENCES cubes ( id ),
     count       INTEGER,
     facing_id   INTEGER REFERENCES facing ( id ),
@@ -112,6 +112,12 @@ FROM order_components
 LEFT JOIN nomenclature ON nomenclature.id = order_components.nomenclature_id
 LEFT JOIN orders ON orders.id = order_components.order_id
 WHERE nomenclature.type = 'construct';
+
+DELETE FROM order_details WHERE order_id NOT IN (
+SELECT id FROM orders);
+
+DELETE FROM order_basis_details WHERE order_id NOT IN (
+SELECT id FROM orders);
 
 DROP TABLE order_components;
 DELETE FROM nomenclature WHERE type = 'cube';

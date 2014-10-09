@@ -60,16 +60,26 @@ namespace CupboardDesigner
 			PrepareTable.SqlSelect = "SELECT name, id FROM cubes ";
 			PrepareTable.DisplayString = "{0}";
 			PrepareTable.PrimaryKey = new TableInfo.PrimaryKeys("id");
-			PrepareTable.DeleteItems.Add("orders", 
-				new TableInfo.DeleteDependenceItem("WHERE cubes_id = @id ", "", "@id"));
+			PrepareTable.DeleteItems.Add("order_details", 
+				new TableInfo.DeleteDependenceItem("WHERE cube_id = @id ", "", "@id"));
 			Tables.Add("cubes", PrepareTable);
+
+			PrepareTable = new TableInfo();
+			PrepareTable.ObjectsName = "Кубы в заказах";
+			PrepareTable.ObjectName = "куб в заказе";
+			PrepareTable.SqlSelect = "SELECT order_details.order_id, order_details.count, cubes.name, order_details.id FROM order_details " +
+				"LEFT JOIN cubes ON order_details.cube_id = cubes.id ";
+			PrepareTable.DisplayString = "{1} куб(ов) \"{2}\" в заказе №{0}";
+			PrepareTable.PrimaryKey = new  TableInfo.PrimaryKeys("id");
+			Tables.Add("order_details", PrepareTable);
 
 			PrepareTable = new TableInfo();
 			PrepareTable.ObjectsName = "Компоненты каркаса";
 			PrepareTable.ObjectName = "компонент каркаса";
-			PrepareTable.SqlSelect = "SELECT nomenclature.name, basis_items.id FROM basis_items " +
-				"LEFT JOIN nomenclature ON nomenclature.id = basis_items.item_id ";
-			PrepareTable.DisplayString = "Компонент {0}";
+			PrepareTable.SqlSelect = "SELECT nomenclature.name, basis.name, basis_items.id FROM basis_items " +
+				"LEFT JOIN nomenclature ON nomenclature.id = basis_items.item_id " +
+				"LEFT JOIN basis ON basis_items.basis_id = basis.id ";
+			PrepareTable.DisplayString = "Компонент {0} в {1}";
 			PrepareTable.PrimaryKey = new  TableInfo.PrimaryKeys("id");
 			Tables.Add("basis_items", PrepareTable);
 
@@ -81,9 +91,32 @@ namespace CupboardDesigner
 			PrepareTable.PrimaryKey = new  TableInfo.PrimaryKeys("id");
 			PrepareTable.DeleteItems.Add("basis_items", 
 				new TableInfo.DeleteDependenceItem("WHERE item_id = @id ", "", "@id"));
-			PrepareTable.DeleteItems.Add("order_components", 
+			PrepareTable.DeleteItems.Add("cubes_items", 
+				new TableInfo.DeleteDependenceItem("WHERE item_id = @id ", "", "@id"));
+			PrepareTable.DeleteItems.Add("order_basis_details", 
+				new TableInfo.DeleteDependenceItem("WHERE nomenclature_id = @id ", "", "@id"));
+			PrepareTable.DeleteItems.Add("order_cubes_details", 
 				new TableInfo.DeleteDependenceItem("WHERE nomenclature_id = @id ", "", "@id"));
 			Tables.Add("nomenclature", PrepareTable);
+
+			PrepareTable = new TableInfo();
+			PrepareTable.ObjectsName = "Компоненты куба";
+			PrepareTable.ObjectName = "Компонент куба";
+			PrepareTable.SqlSelect = "SELECT nomenclature.name, cubes.name, cubes_items.id FROM cubes_items " +
+				"LEFT JOIN nomenclature ON cubes_items.item_id = nomenclature.id " +
+				"LEFT JOIN cubes ON cubes_items.cubes_id = cubes.id ";
+			PrepareTable.DisplayString = "{0} в кубе {1}";
+			PrepareTable.PrimaryKey = new  TableInfo.PrimaryKeys("id");
+			Tables.Add("cubes_items", PrepareTable);
+
+			PrepareTable = new TableInfo();
+			PrepareTable.ObjectsName = "Компоненты куба из заказов";
+			PrepareTable.ObjectName = "Компонент куба из заказа";
+			PrepareTable.SqlSelect = "SELECT nomenclature.name, order_cubes_details.order_id, order_cubes_details.id as id FROM order_cubes_details " +
+				"LEFT JOIN nomenclature ON order_cubes_details.nomenclature_id = nomenclature.id ";
+			PrepareTable.DisplayString = "{0} в заказе №{1}";
+			PrepareTable.PrimaryKey = new  TableInfo.PrimaryKeys("id");
+			Tables.Add("order_cubes_details", PrepareTable);
 
 			PrepareTable = new TableInfo();
 			PrepareTable.ObjectsName = "Выставки";
@@ -101,7 +134,9 @@ namespace CupboardDesigner
 			PrepareTable.SqlSelect = "SELECT name, id FROM materials ";
 			PrepareTable.DisplayString = "{0}";
 			PrepareTable.PrimaryKey = new  TableInfo.PrimaryKeys("id");
-			PrepareTable.ClearItems.Add ("order_components", 
+			PrepareTable.ClearItems.Add ("order_details", 
+				new TableInfo.ClearDependenceItem ("WHERE material_id = @material_id ", "", "@material_id", "material_id"));
+			PrepareTable.ClearItems.Add ("order_basis_details", 
 				new TableInfo.ClearDependenceItem ("WHERE material_id = @material_id ", "", "@material_id", "material_id"));
 			Tables.Add("materials", PrepareTable);
 
@@ -111,18 +146,20 @@ namespace CupboardDesigner
 			PrepareTable.SqlSelect = "SELECT name, id FROM facing ";
 			PrepareTable.DisplayString = "{0}";
 			PrepareTable.PrimaryKey = new  TableInfo.PrimaryKeys("id");
-			PrepareTable.ClearItems.Add ("order_components", 
+			PrepareTable.ClearItems.Add ("order_details", 
+				new TableInfo.ClearDependenceItem ("WHERE facing_id = @facing_id ", "", "@facing_id", "facing_id"));
+			PrepareTable.ClearItems.Add ("order_basis_details", 
 				new TableInfo.ClearDependenceItem ("WHERE facing_id = @facing_id ", "", "@facing_id", "facing_id"));
 			Tables.Add("facing", PrepareTable);
 
 			PrepareTable = new TableInfo();
-			PrepareTable.ObjectsName = "Компоненты заказа";
-			PrepareTable.ObjectName = "компонент заказа";
-			PrepareTable.SqlSelect = "SELECT nomenclature.name, order_components.count, order_id, order_components.id FROM order_components " +
-				"LEFT JOIN nomenclature ON nomenclature.id = order_components.nomenclature_id ";
-			PrepareTable.DisplayString = "Компонент {0} - {1} шт. в заказе №{2}";
+			PrepareTable.ObjectsName = "Компоненты каркаса из заказов";
+			PrepareTable.ObjectName = "Компонент каркаса из заказов";
+			PrepareTable.SqlSelect = "SELECT nomenclature.name, order_basis_details.order_id, order_basis_details.id as id FROM order_basis_details " +
+				"LEFT JOIN nomenclature ON order_basis_details.nomenclature_id = nomenclature.id ";
+			PrepareTable.DisplayString = "{0} в заказе №{1}";
 			PrepareTable.PrimaryKey = new  TableInfo.PrimaryKeys("id");
-			Tables.Add("order_components", PrepareTable);
+			Tables.Add("order_basis_details", PrepareTable);
 
 			PrepareTable = new TableInfo();
 			PrepareTable.ObjectsName = "Заказы";
