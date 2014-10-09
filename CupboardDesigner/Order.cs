@@ -728,9 +728,9 @@ namespace CupboardDesigner {
 					}
 				}
 				//Loading cubes.
-				sql = "SELECT order_details.id as id, order_details.cube_id as cube_id, order_details.count as count, " +
-					"order_details.facing_id as facing_id, facing.name as facing, order_details.material_id as material_id, " +
-					"materials.name as material, order_details.comment as comment, order_details.price as price, cubes.name " +
+				sql = "SELECT order_details.id as id, order_details.cube_id as cube_id, order_details.count as count, order_details.facing_id as facing_id, " +
+					"facing.name as facing, order_details.material_id as material_id, materials.name as material, order_details.comment as comment, " +
+					"order_details.price as price, cubes.name, cubes.width as width, cubes.height as height " +
 					"FROM order_details " +
 					"LEFT JOIN cubes ON order_details.cube_id = cubes.id " +
 					"LEFT JOIN facing ON facing.id = order_details.facing_id " +
@@ -769,13 +769,13 @@ namespace CupboardDesigner {
 						string contents_sql = "SELECT * FROM (" +
 							"SELECT order_cubes_details.id, order_cubes_details.nomenclature_id, order_cubes_details.count as count, " +
 							"order_cubes_details.price as price, order_cubes_details.comment as comment, order_cubes_details.discount as discount, " +
-							"nomenclature.type AS type, nomenclature.name AS name, nomenclature.description AS description " +
+							"nomenclature.type AS type, nomenclature.name AS name, nomenclature.description AS description, nomenclature.price_type as price_type " +
 							"FROM order_cubes_details " +
 							"LEFT JOIN nomenclature ON order_cubes_details.nomenclature_id = nomenclature.id " +
 							"WHERE order_cubes_details.order_id = @order_id AND order_cubes_details.cube_id = @cube_id " +
 							"UNION " +
-							"SELECT -1 AS id, nomenclature.id AS nomenclature_id, 0 AS count, nomenclature.price AS price, NULL AS comment, " +
-							"0 AS discount, nomenclature.type AS type, nomenclature.name AS name, nomenclature.description AS description " +
+							"SELECT -1 AS id, nomenclature.id AS nomenclature_id, 0 AS count, nomenclature.price AS price, NULL AS comment, 0 AS discount, " +
+							"nomenclature.type AS type, nomenclature.name AS name, nomenclature.description AS description, nomenclature.price_type as price_type " +
 							"FROM nomenclature " +
 							"LEFT JOIN cubes_items ON nomenclature.id = cubes_items.item_id " +
 							"WHERE cubes_items.cubes_id = @cube_id" +
@@ -784,11 +784,18 @@ namespace CupboardDesigner {
 						contents_cmd.Parameters.AddWithValue ("@cube_id", DBWorks.GetInt(rdr, "cube_id", -1));
 						contents_cmd.Parameters.AddWithValue ("@order_id", id);
 						decimal Price = 0;
+						int width = DBWorks.GetInt(rdr, "width", 1);
+						int height = DBWorks.GetInt(rdr, "height", 1);
 						using (SqliteDataReader contents_rdr = contents_cmd.ExecuteReader ()) {
 							while (contents_rdr.Read ()) {
-								Decimal NomenclaturePrice = DBWorks.GetDecimal (contents_rdr, "price", 0) * DBWorks.GetDecimal (contents_rdr, "count", 1);
-								NomenclaturePrice = NomenclaturePrice + NomenclaturePrice / 100 * DBWorks.GetInt(contents_rdr, "discount", 0);
-								Price += NomenclaturePrice;
+								Decimal NomenclaturePrice = DBWorks.GetDecimal (contents_rdr, "price", 0);
+								if (DBWorks.GetDecimal (contents_rdr, "count", 1) < 1)
+									if (contents_rdr["price_type"].ToString() == "width")
+										NomenclaturePrice *= width;
+									else if (contents_rdr["price_type"].ToString() == "height")
+										NomenclaturePrice *= height;
+								NomenclaturePrice = Math.Round(NomenclaturePrice + NomenclaturePrice / 100 * DBWorks.GetInt(contents_rdr, "discount", 0), 0);
+								Price += NomenclaturePrice * DBWorks.GetDecimal (contents_rdr, "count", 1);
 								ComponentsStore.AppendValues (
 									CubeIter,
 									DBWorks.GetLong(contents_rdr, "id", -1),
@@ -803,8 +810,8 @@ namespace CupboardDesigner {
 									-1,
 									"",
 									DBWorks.GetString(contents_rdr, "comment", ""),
-									(DBWorks.GetDecimal(contents_rdr, "price", 0)).ToString(),
-									(Math.Round(NomenclaturePrice, 0)).ToString(),
+									NomenclaturePrice.ToString(),
+									(NomenclaturePrice * DBWorks.GetDecimal (contents_rdr, "count", 1)).ToString(),
 									true,
 									true,
 									false,
@@ -1257,16 +1264,23 @@ namespace CupboardDesigner {
 				Cube cube = OrderCupboard.Cubes.Find (c => c.NomenclatureId == pair.Key);
 				TreeIter CubeIter = ComponentsStore.InsertNodeBefore (ServiceIter);
 				ComponentsStore.SetValues (CubeIter, (long)-1, Enum.Parse (typeof(Nomenclature.NomType), "cube"), pair.Key, null, cube.Name, null, pair.Value, -1, "", -1, "", "", "", "",false, false, true, true, true, false, 0, false);
-				string sql = "SELECT nomenclature.name as nomenclature, nomenclature.type, nomenclature.description, nomenclature.price, cubes_items.* FROM cubes_items " +
+				string sql = "SELECT nomenclature.name as nomenclature, nomenclature.type, nomenclature.description, nomenclature.price, nomenclature.price_type, cubes_items.* FROM cubes_items " +
 					"LEFT JOIN nomenclature ON nomenclature.id = cubes_items.item_id " +
 					"WHERE cubes_id = @cubes_id";
 				SqliteCommand cmd = new SqliteCommand (sql, (SqliteConnection)QSMain.ConnectionDB);
 				cmd.Parameters.AddWithValue ("@cubes_id", pair.Key);
-				Decimal Price = 0;
+				Decimal costOfCube = 0;
 				using (SqliteDataReader rdr = cmd.ExecuteReader ()) {
 					while (rdr.Read ()) {
-						Decimal totalPrice = (DBWorks.GetDecimal (rdr, "price", 0) * pair.Value);
-						Price += totalPrice;
+						Decimal price = DBWorks.GetDecimal (rdr, "price", 0);
+						if (rdr["price_type"].ToString() == "width")
+							price *= cube.CubesH;
+						else if (rdr["price_type"].ToString() == "height")
+							price *= cube.CubesV;
+
+						int count = DBWorks.GetInt(rdr, "count", 1) * pair.Value;
+						Decimal totalPrice = price * count;
+						costOfCube += totalPrice;
 						ComponentsStore.AppendValues (
 							CubeIter,
 							(long)-1,
@@ -1275,14 +1289,14 @@ namespace CupboardDesigner {
 							DBWorks.GetString (rdr, "nomenclature", "нет"),
 							ReplaceArticle (DBWorks.GetString (rdr, "nomenclature", "нет")),
 							DBWorks.GetString (rdr, "description", ""),
-							DBWorks.GetInt (rdr, "count", 1) * pair.Value,
+							count,
 							-1,
 							"",
 							-1,
 							"",
 							"",
-							(DBWorks.GetDecimal(rdr, "price", 0)).ToString(),
-							(DBWorks.GetDecimal(rdr, "price", 0) * DBWorks.GetInt (rdr, "count", 1) * pair.Value).ToString(),
+							price.ToString(),
+							totalPrice.ToString(),
 							true,
 							true,
 							false,
@@ -1293,7 +1307,7 @@ namespace CupboardDesigner {
 							false
 						);
 					}
-					ComponentsStore.SetValue (CubeIter, (int)ComponentCol.price_total, Price.ToString ());
+					ComponentsStore.SetValue (CubeIter, (int)ComponentCol.price_total, costOfCube.ToString ());
 				}
 			}
 			CalculateTotalCount();
