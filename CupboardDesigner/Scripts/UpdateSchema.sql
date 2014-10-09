@@ -71,9 +71,7 @@ CREATE TABLE order_basis_details (
     comment         TEXT,
     discount        INTEGER DEFAULT ( 0 ),
     facing_id       INTEGER REFERENCES facing ( id ),
-    facing          TEXT    REFERENCES facing ( name ),
-    material_id     INTEGER REFERENCES materials ( id ),
-    material        TEXT    REFERENCES materials ( name )
+    material_id     INTEGER REFERENCES materials ( id )
 );
 
 -- Table: order_services
@@ -94,21 +92,17 @@ CREATE TABLE order_details (
     cube_id     INTEGER REFERENCES cubes ( id ),
     count       INTEGER,
     facing_id   INTEGER REFERENCES facing ( id ),
-    facing      TEXT    REFERENCES facing ( name ),
     material_id INTEGER REFERENCES materials ( id ),
-    material    TEXT    REFERENCES materials ( name ),
     comment     TEXT,
     price       NUMERIC DEFAULT ( 0 ) 
 );
 
 INSERT INTO order_details 
-(order_id, cube_id, count, facing_id, facing, material_id, material, comment, price) 
-SELECT order_components.order_id, cubes.id, order_components.count, order_components.facing_id, facing.name, order_components.material_id, materials.name, order_components.comment, 0 as price
+(order_id, cube_id, count, facing_id, material_id, comment, price) 
+SELECT order_components.order_id, cubes.id, order_components.count, order_components.facing_id, order_components.material_id, order_components.comment, 0 as price
 FROM order_components 
 LEFT JOIN nomenclature ON nomenclature.id = order_components.nomenclature_id
 LEFT JOIN cubes ON cubes.name = nomenclature.name
-LEFT JOIN facing ON order_components.facing_id = facing.id
-LEFT JOIN materials ON order_components.material_id = materials.id
 WHERE nomenclature.type = 'cube';
 
 INSERT INTO order_basis_details
