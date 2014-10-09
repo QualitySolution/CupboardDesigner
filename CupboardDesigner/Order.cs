@@ -682,7 +682,7 @@ namespace CupboardDesigner {
 					"LEFT JOIN materials ON order_basis_details.material_id = materials.id " +
 					"WHERE order_basis_details.order_id = @order_id and order_basis_details.basis_id = @basis_id " +
 					"UNION " +
-					"SELECT -1 as id, nomenclature.id AS nomenclature_id, 0 AS count, nomenclature.price AS price, " +
+					"SELECT NULL as id, nomenclature.id AS nomenclature_id, 0 AS count, nomenclature.price AS price, " +
 					"NULL AS comment, 0 AS discount, -1 AS facing_id, NULL AS facing, -1 as material_id, NULL AS material, " +
 					"nomenclature.type AS type, nomenclature.name AS name, nomenclature.description AS description, nomenclature.price_type " +
 					"FROM nomenclature " +
@@ -774,7 +774,7 @@ namespace CupboardDesigner {
 							"LEFT JOIN nomenclature ON order_cubes_details.nomenclature_id = nomenclature.id " +
 							"WHERE order_cubes_details.order_id = @order_id AND order_cubes_details.cube_id = @cube_id " +
 							"UNION " +
-							"SELECT -1 AS id, nomenclature.id AS nomenclature_id, 0 AS count, nomenclature.price AS price, NULL AS comment, 0 AS discount, " +
+							"SELECT NULL AS id, nomenclature.id AS nomenclature_id, 0 AS count, nomenclature.price AS price, NULL AS comment, 0 AS discount, " +
 							"nomenclature.type AS type, nomenclature.name AS name, nomenclature.description AS description, nomenclature.price_type as price_type " +
 							"FROM nomenclature " +
 							"LEFT JOIN cubes_items ON nomenclature.id = cubes_items.item_id " +
@@ -1168,19 +1168,23 @@ namespace CupboardDesigner {
 		private void UpdateBasisComponents(int id) {
 			if (FillInProgress)
 				return;
-			Dictionary<int, TreeIter> pairs= new Dictionary<int, TreeIter> ();
+			Dictionary<int, TreeIter> pairs = new Dictionary<int, TreeIter> ();
 			TreeIter iter;
 			//Making all components inside basis NULL.
 			if (ComponentsStore.IterHasChild (BasisIter)) {
 				ComponentsStore.IterChildren (out iter, BasisIter);
 				do {
+					if ((long)ComponentsStore.GetValue(iter, (int)ComponentCol.row_id) == (long)-1)
+						if (!ComponentsStore.Remove(ref iter))
+							break;
+						else
+							continue;
 					ComponentsStore.SetValue (iter, (int)ComponentCol.count, 0);
 					ComponentsStore.SetValue (iter, (int)ComponentCol.price_total, "0");
-					if ((long)ComponentsStore.GetValue(iter, (int)ComponentCol.row_id) == (long)-1)
-						ComponentsStore.Remove(ref iter);
-					else
-						pairs.Add((int)ComponentsStore.GetValue(iter, (int)ComponentCol.nomenclature_id), iter);
-				} while (ComponentsStore.IterNext (ref iter));
+					pairs.Add((int)ComponentsStore.GetValue(iter, (int)ComponentCol.nomenclature_id), iter);
+					if (!ComponentsStore.IterNext (ref iter))
+						break;
+				} while (true);
 			}
 
 			string sql = "SELECT nomenclature.name as nomenclature, nomenclature.type, nomenclature.description, nomenclature.price, nomenclature.price_type, " +
@@ -1195,11 +1199,10 @@ namespace CupboardDesigner {
 						price *= OrderCupboard.CubesH;
 					else if (rdr["price_type"].ToString() == "height")
 						price *= OrderCupboard.CubesV;
-
 					if (pairs.TryGetValue (DBWorks.GetInt (rdr, "item_id", -1), out iter)) {
 						ComponentsStore.SetValue (iter, (int)ComponentCol.price, price.ToString());
 						price *= count;
-						Math.Round(price = price + price / 100 * (int)ComponentsStore.GetValue (iter, (int)ComponentCol.discount), 0);
+						price = Math.Round(price + price / 100 * (int)ComponentsStore.GetValue (iter, (int)ComponentCol.discount), 0);
 						ComponentsStore.SetValue (iter, (int)ComponentCol.count, count);
 						ComponentsStore.SetValue (iter, (int)ComponentCol.price_total, price.ToString());
 					} 
