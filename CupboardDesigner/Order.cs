@@ -959,6 +959,8 @@ namespace CupboardDesigner {
 				logger.Warn("Не найдена активная основа");
 				return;
 			}
+			if (sender != null && basis.Button != sender)
+				return;
 			OrderCupboard.BorderImage.LoadImage(basis.Image.OriginalFile);
 			UpdateBasisComponents(basis.id);
 		}
