@@ -1173,18 +1173,21 @@ namespace CupboardDesigner {
 			//Making all components inside basis NULL.
 			if (ComponentsStore.IterHasChild (BasisIter)) {
 				ComponentsStore.IterChildren (out iter, BasisIter);
+				bool removed;
 				do {
-					if ((long)ComponentsStore.GetValue(iter, (int)ComponentCol.row_id) == (long)-1)
+					removed = false;
+					if ((long)ComponentsStore.GetValue(iter, (int)ComponentCol.row_id) == (long)-1) {
 						if (!ComponentsStore.Remove(ref iter))
 							break;
-						else
+						else {
+							removed = true;
 							continue;
+						}
+					}
 					ComponentsStore.SetValue (iter, (int)ComponentCol.count, 0);
 					ComponentsStore.SetValue (iter, (int)ComponentCol.price_total, "0");
 					pairs.Add((int)ComponentsStore.GetValue(iter, (int)ComponentCol.nomenclature_id), iter);
-					if (!ComponentsStore.IterNext (ref iter))
-						break;
-				} while (true);
+				} while (removed || ComponentsStore.IterNext (ref iter));
 			}
 
 			string sql = "SELECT nomenclature.name as nomenclature, nomenclature.type, nomenclature.description, nomenclature.price, nomenclature.price_type, " +
