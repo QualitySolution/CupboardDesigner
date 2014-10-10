@@ -129,6 +129,9 @@ namespace CupboardDesigner
 		{
 			if (OriginalFile == null)
 				return;
+			AddX = (float)(BaseWidht / 2) * (CubesH - 1);
+			AddY = (float)(BaseHeight / 2) * (CubesV - 1);
+
 			if(CubesV == 1 && CubesH == 1)
 			{
 				DrawingSvg = new Handle(OriginalFile);
@@ -141,8 +144,6 @@ namespace CupboardDesigner
 			if(clip != null)
 				clip.Parent.Children.Remove(clip);
 
-			AddX = (float)(BaseWidht / 2) * (CubesH - 1);
-			AddY = (float)(BaseHeight / 2) * (CubesV - 1);
 			foreach(SvgLine line in imagefile.Children.FindSvgElementsOf<SvgLine>())
 			{
 				line.StartX = FixX(line.StartX);
