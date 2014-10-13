@@ -215,7 +215,7 @@ namespace CupboardDesigner {
 			ColumnComment.AddAttribute(CellComment, "editable", (int)ComponentCol.editable_comment);
 
 			ColumnDiscount = new Gtk.TreeViewColumn ();
-			ColumnDiscount.Title = "Скидка";
+			ColumnDiscount.Title = "Наценка";
 			Gtk.CellRendererSpin CellDiscount = new Gtk.CellRendererSpin ();
 			CellDiscount.Visible = false;
 			CellDiscount.Edited += OnDiscountEdited;
@@ -1549,6 +1549,7 @@ namespace CupboardDesigner {
 				true
 			);
 			CalculateServiceCount();
+			CalculateTotalCount ();
 		}
 
 		private void CalculateServiceCount()
@@ -1569,9 +1570,8 @@ namespace CupboardDesigner {
 				}
 				ComponentsStore.Remove (ref iter);
 			}
-			CalculateTotalCount ();
 			CalculateServiceCount();
+			CalculateTotalCount ();
 		}
 	}
 }
-
