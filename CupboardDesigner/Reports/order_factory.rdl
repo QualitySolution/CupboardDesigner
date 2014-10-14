@@ -94,7 +94,7 @@ where order_basis_details.order_id = @id</CommandText>
     <DataSet Name="Order">
       <Query>
         <DataSourceName>DS1</DataSourceName>
-        <CommandText>SELECT customer, orders.address as customaddress, phone1, orders.phone2, arrval, deadline_s, deadline_e, contract, exhibition.name as exhibition, exhibition.phone as exphone1, exhibition.phone2 as exphone2, total_price, price_correction, exhibition.address, comment, basis.delta_h, basis.delta_l, orders.cutting_base FROM orders
+        <CommandText>SELECT customer, orders.address as customaddress, phone1, orders.phone2, arrval, deadline_s, deadline_e, contract, exhibition.name as exhibition, exhibition.phone as exphone1, exhibition.phone2 as exphone2, total_price, price_correction, exhibition.address, comment, basis.width, basis.delta_h, basis.delta_l, orders.cutting_base FROM orders
  LEFT JOIN exhibition ON exhibition_id = exhibition.id
 LEFT JOIN basis ON basis.id = orders.basis_id
  WHERE orders.id = @id</CommandText>
@@ -144,6 +144,10 @@ LEFT JOIN basis ON basis.id = orders.basis_id
         <Field Name="comment">
           <DataField>comment</DataField>
           <TypeName>System.String</TypeName>
+        </Field>
+        <Field Name="width">
+          <DataField>width</DataField>
+          <TypeName>System.Int64</TypeName>
         </Field>
         <Field Name="delta_h">
           <DataField>delta_h</DataField>
@@ -812,7 +816,7 @@ where orders.id = @id and order_basis_details.order_id = @id;</CommandText>
       <Textbox Name="Textbox32">
         <Height>12.75pt</Height>
         <Width>123.43pt</Width>
-        <Value>="Ширина (W) " + Convert.ToString(Max(Fields!widht.Value, "Data")) + " мм"</Value>
+        <Value>="Ширина (W) " + Convert.ToString(First(Fields!width.Value, "Order")) + " мм"</Value>
         <ZIndex>1</ZIndex>
         <Left>10.0pt</Left>
         <Top>187.4pt</Top>

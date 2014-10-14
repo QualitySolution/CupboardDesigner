@@ -14,6 +14,9 @@ ALTER TABLE orders ADD COLUMN basis_price NUMERIC DEFAULT ( 0 );
 ALTER TABLE nomenclature ADD COLUMN price NUMERIC DEFAULT ( 0 );
 ALTER TABLE nomenclature ADD COLUMN price_type TEXT;
 
+-- Table: basis
+ALTER TABLE basis ADD COLUMN width INTEGER DEFAULT ( 0 );
+
 -- Table: cubes_items
 CREATE TABLE cubes_items ( 
     id       INTEGER NOT NULL
@@ -1452,7 +1455,7 @@ INSERT INTO [nomenclature] ([id], [type], [ordinal], [article], [name], [widht],
 INSERT INTO [nomenclature] ([id], [type], [ordinal], [article], [name], [widht], [height], [plush], [lenght], [plusl], [description], [image], [image_size], [price], [price_type]) VALUES (64, 'cube', 64, null, 'Вставка 3 (на 1 куб)', null, null, null, null, null, null, null, null, 1400, 'none');
 INSERT INTO [nomenclature] ([id], [type], [ordinal], [article], [name], [widht], [height], [plush], [lenght], [plusl], [description], [image], [image_size], [price], [price_type]) VALUES (65, 'cube', 65, null, 'Вставка 4 (на 1 куб)', null, null, null, null, null, 'Стекло  прозрачное 6 мм', null, null, 400, 'none');
 INSERT INTO [nomenclature] ([id], [type], [ordinal], [article], [name], [widht], [height], [plush], [lenght], [plusl], [description], [image], [image_size], [price], [price_type]) VALUES (66, 'cube', 66, null, 'Вставка 5 (на 2 куба)', null, null, null, null, null, 'Стекло  прозрачное 6 мм', null, null, 800, 'none');
-INSERT INTO [nomenclature] ([id], [type], [ordinal], [article], [name], [widht], [height], [plush], [lenght], [plusl], [description], [image], [image_size], [price], [price_type]) VALUES (67, 'construct', 67, null, 'Бок 40мм под запил', null, null, 0, null, 0, 'Боковой каркас 40мм под запил 45 градусов  для встроенных шкафов , обвязка по периметру', null, null, 3752, 'height');
+INSERT INTO [nomenclature] ([id], [type], [ordinal], [article], [name], [widht], [height], [plush], [lenght], [plusl], [description], [image], [image_size], [price], [price_type]) VALUES (67, 'construct', 67, null, 'Бок 40мм под запил (гориз.)', null, null, 0, null, 0, 'Боковой каркас 40мм под запил 45 градусов для встроенных шкафов, обвязка по периметру', null, null, 3752, 'width');
 INSERT INTO [nomenclature] ([id], [type], [ordinal], [article], [name], [widht], [height], [plush], [lenght], [plusl], [description], [image], [image_size], [price], [price_type]) VALUES (68, 'cube', 68, null, 'Задняя стенка', null, null, null, null, null, '4 мм для кубов более 4*4', null, null, 430, 'none');
 INSERT INTO [nomenclature] ([id], [type], [ordinal], [article], [name], [widht], [height], [plush], [lenght], [plusl], [description], [image], [image_size], [price], [price_type]) VALUES (69, 'construct', 69, null, 'Освещение 1 лампа', null, null, 0, null, 0, 'в ком-те блок питания + сумматор', null, null, 5200, 'none');
 INSERT INTO [nomenclature] ([id], [type], [ordinal], [article], [name], [widht], [height], [plush], [lenght], [plusl], [description], [image], [image_size], [price], [price_type]) VALUES (70, 'construct', 70, null, 'Освещение 2 лампы', null, null, 0, null, 0, 'в ком-те блок питания + сумматор', null, null, 6290, 'none');
@@ -1465,7 +1468,16 @@ INSERT INTO [nomenclature] ([id], [type], [ordinal], [article], [name], [widht],
 INSERT INTO [nomenclature] ([id], [type], [ordinal], [article], [name], [widht], [height], [plush], [lenght], [plusl], [description], [image], [image_size], [price], [price_type]) VALUES (77, 'cube', 77, null, 'Задняя стенка 3х3', null, null, null, null, null, null, null, null, 3870, 'none');
 INSERT INTO [nomenclature] ([id], [type], [ordinal], [article], [name], [widht], [height], [plush], [lenght], [plusl], [description], [image], [image_size], [price], [price_type]) VALUES (78, 'cube', 78, null, 'Задняя стенка 3х2', null, null, null, null, null, null, null, null, 2580, 'none');
 INSERT INTO [nomenclature] ([id], [type], [ordinal], [article], [name], [widht], [height], [plush], [lenght], [plusl], [description], [image], [image_size], [price], [price_type]) VALUES (79, 'cube', 79, null, 'Задняя стенка 4х3', null, null, null, null, null, null, null, null, 5160, 'none');
-               
+INSERT INTO [nomenclature] ([id], [type], [ordinal], [article], [name], [widht], [height], [plush], [lenght], [plusl], [description], [image], [image_size], [price], [price_type]) VALUES (80, 'construct', 67, null, 'Бок 40мм под запил (верт.)', null, null, 0, null, 0, 'Боковой каркас 40мм под запил 45 градусов  для встроенных шкафов , обвязка по периметру', null, null, 3752, 'height');
+  
+-- Добавляем ширину к каркасам
+UPDATE basis SET width = 400 WHERE id = 1 ;
+UPDATE basis SET width = 424 WHERE id = 3 ;
+UPDATE basis SET width = 424 WHERE id = 4 ;
+UPDATE basis SET width = 424, delta_h = 165 WHERE id = 5 ;
+UPDATE basis SET width = 424 WHERE id = 6 ;
+UPDATE basis SET width = 424 WHERE id = 8 ;
+UPDATE basis SET width = 400 WHERE id = 10 ;
 
 -- Добавляем цены к старой номенклатуре
 UPDATE nomenclature SET description = 'Толщина 40 мм', price = 4500, price_type = 'width' WHERE id = 37 ;
@@ -1478,6 +1490,7 @@ UPDATE nomenclature SET description = '', price = 3300, price_type = 'width' WHE
 UPDATE nomenclature SET description = '', price = 1500, price_type = 'width' WHERE id = 45 ;
 UPDATE nomenclature SET description = '', price = 1500, price_type = 'width' WHERE id = 46 ;
 UPDATE nomenclature SET description = '', price = 1720, price_type = 'none' WHERE id = 47 ;
+UPDATE nomenclature SET description = '', price = 6000, price_type = 'none' WHERE id = 48 ;
 
 -- Вносим комплектацию кубов
 INSERT INTO [cubes_items] ([id], [cubes_id], [item_id], [count]) VALUES (1, 18, 50, 1);
@@ -1584,3 +1597,6 @@ INSERT INTO [basis_items] ([id], [basis_id], [item_id], [count]) VALUES (84, 10,
 INSERT INTO [basis_items] ([id], [basis_id], [item_id], [count]) VALUES (85, 10, 72, 0);
 INSERT INTO [basis_items] ([id], [basis_id], [item_id], [count]) VALUES (86, 10, 73, 0);
 INSERT INTO [basis_items] ([id], [basis_id], [item_id], [count]) VALUES (87, 10, 74, 0);
+INSERT INTO [basis_items] ([id], [basis_id], [item_id], [count]) VALUES (88, 10, 67, 2);
+INSERT INTO [basis_items] ([id], [basis_id], [item_id], [count]) VALUES (89, 10, 80, 2);
+DELETE FROM [basis_items] WHERE [id] = 43;

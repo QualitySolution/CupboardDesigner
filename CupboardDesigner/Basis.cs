@@ -88,6 +88,7 @@ namespace CupboardDesigner
 
 					labelId.Text = rdr["id"].ToString();
 					entryName.Text = rdr["name"].ToString();
+					spinW.Value = rdr.GetDouble(rdr.GetOrdinal("width"));
 					spinH.Value = rdr.GetDouble(rdr.GetOrdinal("delta_h"));
 					spinL.Value = rdr.GetDouble(rdr.GetOrdinal("delta_l"));
 
@@ -172,12 +173,12 @@ namespace CupboardDesigner
 			string sql;
 			if (NewItem)
 			{
-				sql = "INSERT INTO basis (name, delta_l, delta_h) " +
-					"VALUES (@name, @delta_l, @delta_h)";
+				sql = "INSERT INTO basis (name, width, delta_l, delta_h) " +
+					"VALUES (@name, @width, @delta_l, @delta_h)";
 			}
 			else
 			{
-				sql = "UPDATE basis SET name = @name, delta_l = @delta_l, delta_h = @delta_h WHERE id = @id";
+				sql = "UPDATE basis SET name = @name, width = @width, delta_l = @delta_l, delta_h = @delta_h WHERE id = @id";
 			}
 			SqliteTransaction trans = ((SqliteConnection)QSMain.ConnectionDB).BeginTransaction();
 			MainClass.StatusMessage("Запись основы...");
@@ -187,6 +188,7 @@ namespace CupboardDesigner
 
 				cmd.Parameters.AddWithValue("@id", ItemId);
 				cmd.Parameters.AddWithValue("@name", entryName.Text);
+				cmd.Parameters.AddWithValue("@width", spinW.ValueAsInt);
 				cmd.Parameters.AddWithValue("@delta_l", spinL.ValueAsInt);
 				cmd.Parameters.AddWithValue("@delta_h", spinH.ValueAsInt);
 
