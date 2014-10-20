@@ -1478,6 +1478,9 @@ UPDATE basis SET width = 424 WHERE id = 6 ;
 UPDATE basis SET width = 424 WHERE id = 8 ;
 UPDATE basis SET width = 400 WHERE id = 10 ;
 
+-- Исправляем название фигурного наличника
+UPDATE nomenclature SET name = 'Фигурный наличник (шт.)' WHERE id = 47;
+
 -- Добавляем цены к старой номенклатуре
 UPDATE nomenclature SET description = 'Толщина 40 мм', price = 4500, price_type = 'width' WHERE id = 37 ;
 UPDATE nomenclature SET description = 'Под покраску', price = 9365, price_type = 'width' WHERE id = 38 ;
