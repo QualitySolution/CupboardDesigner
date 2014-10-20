@@ -1474,7 +1474,7 @@ INSERT INTO [nomenclature] ([id], [type], [ordinal], [article], [name], [widht],
 UPDATE basis SET width = 400 WHERE id = 1 ;
 UPDATE basis SET width = 424 WHERE id = 3 ;
 UPDATE basis SET width = 424 WHERE id = 4 ;
-UPDATE basis SET width = 424, delta_h = 165 WHERE id = 5 ;
+UPDATE basis SET width = 424, delta_h = 232 WHERE id = 5 ;
 UPDATE basis SET width = 424 WHERE id = 6 ;
 UPDATE basis SET width = 424 WHERE id = 8 ;
 UPDATE basis SET width = 400 WHERE id = 10 ;

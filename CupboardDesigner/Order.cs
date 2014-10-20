@@ -715,7 +715,7 @@ namespace CupboardDesigner {
 							DBWorks.GetString(rdr, "facing", ""),
 							DBWorks.GetString(rdr, "comment", ""),
 							price.ToString(),
-							Math.Round(((price * count) + (price * count / 100 * DBWorks.GetInt(rdr, "discount", 0))), 0).ToString(),
+							"",
 							true,
 							true,
 							true,
@@ -783,7 +783,6 @@ namespace CupboardDesigner {
 						SqliteCommand contents_cmd = new SqliteCommand (contents_sql, (SqliteConnection)QSMain.ConnectionDB);
 						contents_cmd.Parameters.AddWithValue ("@cube_id", DBWorks.GetInt(rdr, "cube_id", -1));
 						contents_cmd.Parameters.AddWithValue ("@order_id", id);
-						decimal Price = 0;
 						int width = DBWorks.GetInt(rdr, "width", 1);
 						int height = DBWorks.GetInt(rdr, "height", 1);
 						using (SqliteDataReader contents_rdr = contents_cmd.ExecuteReader ()) {
@@ -794,8 +793,6 @@ namespace CupboardDesigner {
 										NomenclaturePrice *= width;
 									else if (contents_rdr["price_type"].ToString() == "height")
 										NomenclaturePrice *= height;
-								NomenclaturePrice = Math.Round(NomenclaturePrice + NomenclaturePrice / 100 * DBWorks.GetInt(contents_rdr, "discount", 0), 0);
-								Price += NomenclaturePrice * DBWorks.GetDecimal (contents_rdr, "count", 1);
 								ComponentsStore.AppendValues (
 									CubeIter,
 									DBWorks.GetLong(contents_rdr, "id", -1),
@@ -811,7 +808,7 @@ namespace CupboardDesigner {
 									"",
 									DBWorks.GetString(contents_rdr, "comment", ""),
 									NomenclaturePrice.ToString(),
-									(NomenclaturePrice * DBWorks.GetDecimal (contents_rdr, "count", 1)).ToString(),
+									"",
 									true,
 									true,
 									false,
@@ -822,11 +819,10 @@ namespace CupboardDesigner {
 									false
 								);
 							}
-							ComponentsStore.SetValue (CubeIter, (int)ComponentCol.price_total, Price.ToString ());
 						}
 					}
 				}
-				CalculateTotalCount();
+				CalculateTotalPrice();
 				basis.Button.Click();
 				FillInProgress = false;
 				MainClass.StatusMessage("Ok");
@@ -841,7 +837,6 @@ namespace CupboardDesigner {
 		void OnCountEdited(object o, EditedArgs args) {
 			TreeIter iter;
 			int NewValue;
-			Decimal Price;
 
 			if (!ComponentsStore.GetIterFromString (out iter, args.Path))
 				return;
@@ -850,10 +845,8 @@ namespace CupboardDesigner {
 					NewValue = 1;
 				else
 					NewValue = int.Parse (args.NewText); 
-				Price = Decimal.Parse((String)ComponentsStore.GetValue(iter, (int)ComponentCol.price));
 				ComponentsStore.SetValue(iter, (int)ComponentCol.count, NewValue);
-				ComponentsStore.SetValue(iter, (int)ComponentCol.price_total, (Price * NewValue).ToString());
-				CalculateTotalCount ();
+				CalculateTotalPrice ();
 			} catch(Exception e) { logger.WarnException ("Error occured in OnCountEdited.", e);}
 		}
 
@@ -868,11 +861,8 @@ namespace CupboardDesigner {
 					NewValue = 0;
 				else
 					NewValue = Decimal.Parse (args.NewText);
-				int count = (int)ComponentsStore.GetValue (iter, (int)ComponentCol.count);
-				ComponentsStore.SetValue(iter, (int)ComponentCol.price_total, (count * NewValue).ToString());
 				ComponentsStore.SetValue(iter, (int)ComponentCol.price, (NewValue).ToString());
-				CalculateTotalCount ();
-				return;
+				CalculateTotalPrice ();
 			} catch(Exception e) { logger.WarnException ("Error occured in OnPriceEdited", e);}
 		}
 
@@ -893,7 +883,6 @@ namespace CupboardDesigner {
 		void OnDiscountEdited(object o, EditedArgs args) {
 			TreeIter iter;
 			int discount;
-			decimal price;
 
 			if (!ComponentsStore.GetIterFromString (out iter, args.Path))
 				return;
@@ -901,13 +890,10 @@ namespace CupboardDesigner {
 				logger.Warn ("text is empty");
 				return;
 			}
-			if (!int.TryParse(args.NewText, out discount))
-				return;
-			ComponentsStore.SetValue(iter, (int)ComponentCol.discount, discount);
-			price = Decimal.Parse((string)ComponentsStore.GetValue (iter, (int)ComponentCol.price));
-			price *= (int)ComponentsStore.GetValue (iter, (int)ComponentCol.count);
-			ComponentsStore.SetValue (iter, (int)ComponentCol.price_total, (Math.Round (price + price / 100 * discount, 0)).ToString ());
-			CalculateTotalCount ();
+			if (int.TryParse (args.NewText, out discount)) {
+				ComponentsStore.SetValue (iter, (int)ComponentCol.discount, discount);
+				CalculateTotalPrice ();
+			}
 		}
 
 		void OnFacingComboEdited (object o, EditedArgs args) {
@@ -932,7 +918,6 @@ namespace CupboardDesigner {
 				logger.Warn("newtext is empty");
 				return;
 			}
-
 			ComponentsStore.SetValue(iter, (int)ComponentCol.comment, args.NewText);
 		}
 
@@ -1187,7 +1172,6 @@ namespace CupboardDesigner {
 						}
 					}
 					ComponentsStore.SetValue (iter, (int)ComponentCol.count, 0);
-					ComponentsStore.SetValue (iter, (int)ComponentCol.price_total, "0");
 					pairs.Add((int)ComponentsStore.GetValue(iter, (int)ComponentCol.nomenclature_id), iter);
 				} while (removed || ComponentsStore.IterNext (ref iter));
 			}
@@ -1206,10 +1190,7 @@ namespace CupboardDesigner {
 						price *= OrderCupboard.CubesV;
 					if (pairs.TryGetValue (DBWorks.GetInt (rdr, "item_id", -1), out iter)) {
 						ComponentsStore.SetValue (iter, (int)ComponentCol.price, price.ToString());
-						price *= count;
-						price = Math.Round(price + price / 100 * (int)ComponentsStore.GetValue (iter, (int)ComponentCol.discount), 0);
 						ComponentsStore.SetValue (iter, (int)ComponentCol.count, count);
-						ComponentsStore.SetValue (iter, (int)ComponentCol.price_total, price.ToString());
 					} 
 					else {
 						ComponentsStore.AppendValues (
@@ -1227,7 +1208,7 @@ namespace CupboardDesigner {
 							"",
 							"",
 							price.ToString (),
-							(price * count).ToString (),
+							"",
 							true,
 							true,
 							true,
@@ -1240,7 +1221,7 @@ namespace CupboardDesigner {
 					}
 				}
 			}
-			CalculateTotalCount();
+			CalculateTotalPrice();
 		}
 			
 		/// <summary>
@@ -1259,8 +1240,16 @@ namespace CupboardDesigner {
 							Counts.Remove(NomId);
 							UpdateTable(iter);
 						}
-						else if((long)ComponentsStore.GetValue(iter, (int)ComponentCol.row_id) >= 0)
+						else if((long)ComponentsStore.GetValue(iter, (int)ComponentCol.row_id) >= 0) {
 							ComponentsStore.SetValue(iter, (int)ComponentCol.count, 0);
+							TreeIter child;
+							if (ComponentsStore.IterHasChild(iter)) {
+								ComponentsStore.IterChildren(out child, iter);
+								do {
+									ComponentsStore.SetValue(child, (int)ComponentCol.count, 0);
+								} while (ComponentsStore.IterNext(ref child));
+							}
+						}
 						else
 							ComponentsStore.Remove(ref iter);
 					}
@@ -1277,7 +1266,6 @@ namespace CupboardDesigner {
 					"WHERE cubes_id = @cubes_id";
 				SqliteCommand cmd = new SqliteCommand (sql, (SqliteConnection)QSMain.ConnectionDB);
 				cmd.Parameters.AddWithValue ("@cubes_id", pair.Key);
-				Decimal costOfCube = 0;
 				using (SqliteDataReader rdr = cmd.ExecuteReader ()) {
 					while (rdr.Read ()) {
 						Decimal price = DBWorks.GetDecimal (rdr, "price", 0);
@@ -1285,10 +1273,7 @@ namespace CupboardDesigner {
 							price *= cube.CubesH;
 						else if (rdr["price_type"].ToString() == "height")
 							price *= cube.CubesV;
-
 						int count = DBWorks.GetInt(rdr, "count", 1) * pair.Value;
-						Decimal totalPrice = price * count;
-						costOfCube += totalPrice;
 						ComponentsStore.AppendValues (
 							CubeIter,
 							(long)-1,
@@ -1304,7 +1289,7 @@ namespace CupboardDesigner {
 							"",
 							"",
 							price.ToString(),
-							totalPrice.ToString(),
+							"",
 							true,
 							true,
 							false,
@@ -1315,10 +1300,9 @@ namespace CupboardDesigner {
 							false
 						);
 					}
-					ComponentsStore.SetValue (CubeIter, (int)ComponentCol.price_total, costOfCube.ToString ());
 				}
 			}
-			CalculateTotalCount();
+			CalculateTotalPrice();
 		}
 
 		private string ReplaceArticle(string text) {
@@ -1349,16 +1333,16 @@ namespace CupboardDesigner {
 						rdr.Read();
 						int newCount = DBWorks.GetInt(rdr, "count", 1) * parentCount;
 						ComponentsStore.SetValue(childIter, (int)ComponentCol.count, newCount);
-						ComponentsStore.SetValue(childIter, (int)ComponentCol.price_total, (newCount * Decimal.Parse((String)ComponentsStore.GetValue(childIter, (int)ComponentCol.price))).ToString());
 					}
 				} while(ComponentsStore.IterNext(ref childIter));
+				CalculateTotalPrice ();
 			}
 		}
 
 		/// <summary>
 		/// Calculates/corrects the total price for items on order change and for whole order too.
 		/// </summary>
-		void CalculateTotalCount()
+		void CalculateTotalPrice()
 		{
 			Decimal TempTotal;
 			TreeIter iter, childIter;
@@ -1370,7 +1354,13 @@ namespace CupboardDesigner {
 						TempTotal = 0;
 						ComponentsStore.IterChildren(out childIter, iter);
 						do {
-							TempTotal += Decimal.Parse((String)ComponentsStore.GetValue(childIter, (int)ComponentCol.price_total));
+							Decimal ComponentPrice = Decimal.Parse((String)ComponentsStore.GetValue(childIter, (int)ComponentCol.price));
+							int ComponentCount = (int)ComponentsStore.GetValue(childIter, (int)ComponentCol.count);
+							int Discount = (int)ComponentsStore.GetValue(childIter, (int)ComponentCol.discount);
+							Decimal ComponentTotal = ComponentPrice * ComponentCount;
+							ComponentTotal = Math.Round(ComponentTotal + ComponentTotal * Discount / 100, 0);
+							ComponentsStore.SetValue(childIter, (int)ComponentCol.price_total, ComponentTotal.ToString());
+							TempTotal += ComponentTotal;
 						} while (ComponentsStore.IterNext(ref childIter));
 						TotalPrice += TempTotal;
 						ComponentsStore.SetValue(iter, (int)ComponentCol.price_total, TempTotal.ToString());
@@ -1487,12 +1477,12 @@ namespace CupboardDesigner {
 				PriceCorrection = 0;
 			else 
 				PriceCorrection = spinbutton1.ValueAsInt;
-			CalculateTotalCount ();
+			CalculateTotalPrice ();
 		}
 
 		protected void OnSpinbutton1ValueChanged (object sender, EventArgs e)  {
 			PriceCorrection = spinbutton1.ValueAsInt;
-			CalculateTotalCount ();
+			CalculateTotalPrice ();
 			if (spinbutton1.ValueAsInt > 0)
 				checkbuttonDiscount.Label = "Наценка:";
 			else
@@ -1549,7 +1539,7 @@ namespace CupboardDesigner {
 				true
 			);
 			CalculateServiceCount();
-			CalculateTotalCount ();
+			CalculateTotalPrice ();
 		}
 
 		private void CalculateServiceCount()
@@ -1571,7 +1561,7 @@ namespace CupboardDesigner {
 				ComponentsStore.Remove (ref iter);
 			}
 			CalculateServiceCount();
-			CalculateTotalCount ();
+			CalculateTotalPrice ();
 		}
 	}
 }
