@@ -222,7 +222,7 @@ where order_details.order_id = @id and order_cubes_details.order_id = @id
 union
 select orders.basis_id as cube_id, basis.name as nomenclature, nomenclature.name as name, order_basis_details.count as count, order_basis_details.price as price , null as width, null as height, "1" as cube_count, null as facing, null as material, facing.name as facing_basis, materials.name as material_basis, null as cube_comment, order_basis_details.comment as comment, orders.basis_price as total_price from orders
 left join basis on orders.basis_id = basis.id
-left join order_basis_details on order_basis_details.basis_id = basis.id
+left join order_basis_details on order_basis_details.order_id = orders.id
 left join nomenclature on nomenclature.id = order_basis_details.nomenclature_id
 left join facing on order_basis_details.facing_id = facing.id
 left join materials on materials.id = order_basis_details.material_id

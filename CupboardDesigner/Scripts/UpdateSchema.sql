@@ -67,7 +67,6 @@ CREATE TABLE order_cubes_details (
 CREATE TABLE order_basis_details ( 
     id              INTEGER PRIMARY KEY AUTOINCREMENT,
     order_id        INTEGER REFERENCES orders ( id ) ON DELETE CASCADE,
-    basis_id        INTEGER REFERENCES basis ( id ) ON DELETE CASCADE,
     nomenclature_id INTEGER,
     count           INTEGER,
     price           NUMERIC,
@@ -109,8 +108,8 @@ LEFT JOIN cubes ON cubes.name = nomenclature.name
 WHERE nomenclature.type = 'cube';
 
 INSERT INTO order_basis_details
-(order_id, basis_id, nomenclature_id, facing_id, material_id, count, price, comment, discount)
-SELECT order_components.order_id, orders.basis_id, order_components.nomenclature_id, order_components.facing_id, order_components.material_id, order_components.count, 0 as price, order_components.comment, 0 as discount
+(order_id, nomenclature_id, facing_id, material_id, count, price, comment, discount)
+SELECT order_components.order_id, order_components.nomenclature_id, order_components.facing_id, order_components.material_id, order_components.count, 0 as price, order_components.comment, 0 as discount
 FROM order_components 
 LEFT JOIN nomenclature ON nomenclature.id = order_components.nomenclature_id
 LEFT JOIN orders ON orders.id = order_components.order_id
