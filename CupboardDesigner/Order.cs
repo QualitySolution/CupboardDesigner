@@ -641,7 +641,7 @@ namespace CupboardDesigner {
 						Decimal price = DBWorks.GetDecimal(rdr, "price", 0);
 						ComponentsStore.AppendValues (
 							ServiceIter,
-							DBWorks.GetLong(rdr, "id", -1),
+							copy ? -1 : DBWorks.GetLong(rdr, "id", -1),
 							Enum.Parse (typeof(Nomenclature.NomType), "other"),
 							-1,
 							"",
@@ -700,7 +700,7 @@ namespace CupboardDesigner {
 								price *= OrderCupboard.CubesV;
 						ComponentsStore.AppendValues(
 							BasisIter,
-							DBWorks.GetLong(rdr, "id", -1),
+							copy ? -1 : DBWorks.GetLong(rdr, "id", -1),
 							Enum.Parse(typeof(Nomenclature.NomType), rdr["type"].ToString()),
 							DBWorks.GetInt(rdr, "nomenclature_id", -1),
 							DBWorks.GetString(rdr, "name", ""), 
@@ -741,7 +741,7 @@ namespace CupboardDesigner {
 						TreeIter CubeIter = ComponentsStore.InsertNodeBefore(ServiceIter);
 							ComponentsStore.SetValues (
 							CubeIter,
-							DBWorks.GetLong(rdr, "id", -1), 
+							copy ? -1 : DBWorks.GetLong(rdr, "id", -1), 
 							Enum.Parse (typeof(Nomenclature.NomType), "cube"), 
 							DBWorks.GetInt(rdr, "cube_id", -1),
 							null, 
@@ -793,7 +793,7 @@ namespace CupboardDesigner {
 										NomenclaturePrice *= height;
 								ComponentsStore.AppendValues (
 									CubeIter,
-									DBWorks.GetLong(contents_rdr, "id", -1),
+									copy ? -1 : DBWorks.GetLong(contents_rdr, "id", -1),
 									Enum.Parse (typeof(Nomenclature.NomType), contents_rdr ["type"].ToString ()),
 									DBWorks.GetInt (contents_rdr, "nomenclature_id", -1),
 									DBWorks.GetString (contents_rdr, "name", "нет"),
