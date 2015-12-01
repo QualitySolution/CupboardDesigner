@@ -11,6 +11,7 @@
     <widget-library name="../../../My-FyiReporting/RdlGtkViewer/RdlGtkViewer/bin/Debug/RdlGtkViewer.exe" />
     <widget-library name="../../../QSProjects/QSWidgetLib/bin/Debug/QSWidgetLib.dll" />
     <widget-library name="../bin/Debug/CupboardDesigner.exe" internal="true" />
+    <widget-library name="../../../QSProjects/QSUpdater/bin/Debug/QSUpdater.dll" />
   </import>
   <widget class="Gtk.Window" id="MainWindow" design-size="725 465">
     <action-group name="Default">
@@ -107,6 +108,13 @@
         <property name="ShortLabel" translatable="yes">История версий</property>
         <signal name="Activated" handler="OnActionHistoryActivated" />
       </action>
+      <action id="goUpAction">
+        <property name="Type">Action</property>
+        <property name="Label" translatable="yes">Проверить обновление...</property>
+        <property name="ShortLabel" translatable="yes">Проверить обновление...</property>
+        <property name="StockId">gtk-go-up</property>
+        <signal name="Activated" handler="OnActionUpdateActivated" />
+      </action>
     </action-group>
     <property name="MemberName" />
     <property name="Title" translatable="yes">QS: Конфигуратор шкафа</property>
@@ -140,6 +148,7 @@
               <node type="Menu" action="Action16">
                 <node type="Menuitem" action="ActionSite" />
                 <node type="Menuitem" action="ActionHistory" />
+                <node type="Menuitem" action="goUpAction" />
                 <node type="Separator" />
                 <node type="Menuitem" action="aboutAction" />
               </node>

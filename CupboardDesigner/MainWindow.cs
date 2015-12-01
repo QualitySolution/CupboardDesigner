@@ -6,6 +6,7 @@ using NLog;
 using QSSupportLib;
 using System.IO;
 using Mono.Data.Sqlite;
+using QSUpdater;
 
 public partial class MainWindow: Gtk.Window
 {
@@ -27,6 +28,9 @@ public partial class MainWindow: Gtk.Window
 		PrerareOrders();
 		SetAdminMode(false); 
 		MainSupport.LoadBaseParameters ();
+
+
+
 		if (CheckBaseVersion.Check ()) { //Проверяем версию базы
 			if (CheckBaseVersion.ResultFlags.HasFlag (CheckBaseResult.BaseVersionLess)) {
 				logger.Info ("Используется база старой версии. Обновляем...");
@@ -46,10 +50,16 @@ public partial class MainWindow: Gtk.Window
 					trans.Rollback ();
 					QSMain.ErrorMessageWithLog (this, "Обновление базы закончилось с ошибкой!", logger, e);
 				}
+			} else if (CheckBaseVersion.ResultFlags.HasFlag (CheckBaseResult.BaseVersionGreater)) {
+				CheckUpdate.StartCheckUpdateThread (UpdaterFlags.None);
 			}
+
+			CheckBaseVersion.ShowErrorMessage (this);
 		}
 		else
 			logger.Info ("Обновление базы не требуется.");
+
+		CheckUpdate.StartCheckUpdateThread (UpdaterFlags.StartInThread);
 	}
 
 	protected void OnReferenceUpdate(object sender, QSMain.ReferenceUpdatedEventArgs e)
@@ -244,5 +254,10 @@ public partial class MainWindow: Gtk.Window
 	protected void OnActionHistoryActivated (object sender, EventArgs e)
 	{
 		QSMain.RunChangeLogDlg (this);
+	}
+
+	protected void OnActionUpdateActivated (object sender, EventArgs e)
+	{
+		CheckUpdate.StartCheckUpdateThread (UpdaterFlags.ShowAnyway);
 	}
 }
