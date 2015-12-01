@@ -5,6 +5,7 @@ using NLog;
 using QSProjectsLib;
 using System.Collections.Generic;
 using Nini.Config;
+using System.Threading;
 
 namespace CupboardDesigner
 {
@@ -19,10 +20,8 @@ namespace CupboardDesigner
 		public static void Main(string[] args)
 		{
 			Application.Init();
-			AppDomain.CurrentDomain.UnhandledException += delegate(object sender, UnhandledExceptionEventArgs e) 
-			{
-				QSMain.ErrorMessage(MainWin, (Exception) e.ExceptionObject);
-			};
+			QSMain.SubscribeToUnhadledExceptions ();
+			QSMain.GuiThread = Thread.CurrentThread;
 			CreateProjectParam();
 
 			CreateConnection();
@@ -171,7 +170,7 @@ namespace CupboardDesigner
 
 		private static void CreateConnection()
 		{
-			string AppName = System.Reflection.Assembly.GetExecutingAssembly().GetName().Name.ToString();
+			string AppName = System.Reflection.Assembly.GetExecutingAssembly().GetName().Name;
 			string ConfigFileName = AppName + ".ini";
 			string AppFolder;
 			if(Environment.OSVersion.Platform == PlatformID.Unix)
@@ -181,23 +180,22 @@ namespace CupboardDesigner
 			string DataBase = System.IO.Path.Combine (AppFolder, "Cupboard.db3");
 
 			string configfile = System.IO.Path.Combine (AppFolder, ConfigFileName);
-			IniConfigSource Configsource;
 			try
 			{
-				Configsource = new IniConfigSource(configfile);
-				Configsource.Reload();
-				DataBase = Configsource.Configs["Login"].Get("DataBase", DataBase);
+				QSMain.Configsource = new IniConfigSource(configfile);
+				QSMain.Configsource.Reload();
+				DataBase = QSMain.Configsource.Configs["Login"].Get("DataBase", DataBase);
 			} 
 			catch (Exception ex)
 			{
 				logger.Warn(ex, "Конфигурационный фаил не найден. Создаем новый.");
-				Configsource = new IniConfigSource();
+				QSMain.Configsource = new IniConfigSource();
 
-				IConfig config = Configsource.AddConfig("Login");
+				IConfig config = QSMain.Configsource.AddConfig("Login");
 				config.Set("DataBase", DataBase);
 				if (!System.IO.Directory.Exists(AppFolder))
 					System.IO.Directory.CreateDirectory(AppFolder);
-				Configsource.Save(configfile);
+				QSMain.Configsource.Save(configfile);
 			}
 
 			//Создаем соедиение
