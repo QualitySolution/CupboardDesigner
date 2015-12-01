@@ -11,7 +11,7 @@ public partial class MainWindow
 	
 	private global::Gtk.Action Action14;
 	
-	private global::Gtk.Action Action2;
+	private global::Gtk.Action Action16;
 	
 	private global::Gtk.Action aboutAction;
 	
@@ -30,6 +30,10 @@ public partial class MainWindow
 	private global::Gtk.Action ActionPassword;
 	
 	private global::Gtk.Action Action15;
+	
+	private global::Gtk.Action ActionSite;
+	
+	private global::Gtk.Action ActionHistory;
 	
 	private global::Gtk.VBox vbox1;
 	
@@ -76,9 +80,9 @@ public partial class MainWindow
 		this.Action14 = new global::Gtk.Action ("Action14", global::Mono.Unix.Catalog.GetString ("Справочники"), null, null);
 		this.Action14.ShortLabel = global::Mono.Unix.Catalog.GetString ("Справочники");
 		w1.Add (this.Action14, null);
-		this.Action2 = new global::Gtk.Action ("Action2", global::Mono.Unix.Catalog.GetString ("Справка"), null, null);
-		this.Action2.ShortLabel = global::Mono.Unix.Catalog.GetString ("Справка");
-		w1.Add (this.Action2, null);
+		this.Action16 = new global::Gtk.Action ("Action16", global::Mono.Unix.Catalog.GetString ("Справка"), null, null);
+		this.Action16.ShortLabel = global::Mono.Unix.Catalog.GetString ("Справка");
+		w1.Add (this.Action16, null);
 		this.aboutAction = new global::Gtk.Action ("aboutAction", global::Mono.Unix.Catalog.GetString ("_О программе"), null, "gtk-about");
 		this.aboutAction.ShortLabel = global::Mono.Unix.Catalog.GetString ("_О программе");
 		w1.Add (this.aboutAction, null);
@@ -106,6 +110,12 @@ public partial class MainWindow
 		this.Action15 = new global::Gtk.Action ("Action15", global::Mono.Unix.Catalog.GetString ("Кубы"), null, null);
 		this.Action15.ShortLabel = global::Mono.Unix.Catalog.GetString ("Кубы");
 		w1.Add (this.Action15, null);
+		this.ActionSite = new global::Gtk.Action ("ActionSite", global::Mono.Unix.Catalog.GetString ("Посетить сайт"), null, null);
+		this.ActionSite.ShortLabel = global::Mono.Unix.Catalog.GetString ("Посетить сайт");
+		w1.Add (this.ActionSite, null);
+		this.ActionHistory = new global::Gtk.Action ("ActionHistory", global::Mono.Unix.Catalog.GetString ("История версий"), null, null);
+		this.ActionHistory.ShortLabel = global::Mono.Unix.Catalog.GetString ("История версий");
+		w1.Add (this.ActionHistory, null);
 		this.UIManager.InsertActionGroup (w1, 0);
 		this.AddAccelGroup (this.UIManager.AccelGroup);
 		this.Name = "MainWindow";
@@ -117,7 +127,7 @@ public partial class MainWindow
 		this.vbox1.Name = "vbox1";
 		this.vbox1.Spacing = 6;
 		// Container child vbox1.Gtk.Box+BoxChild
-		this.UIManager.AddUiFromString ("<ui><menubar name='menubar1'><menu name='Action' action='Action'><menuitem name='dialogAuthenticationAction' action='dialogAuthenticationAction'/><menuitem name='ActionPassword' action='ActionPassword'/><separator/><menuitem name='quitAction' action='quitAction'/></menu><menu name='Action14' action='Action14'><menuitem name='Action9' action='Action9'/><menuitem name='Action15' action='Action15'/><menuitem name='Action11' action='Action11'/><separator/><menuitem name='Action10' action='Action10'/><separator/><menuitem name='Action12' action='Action12'/><menuitem name='Action13' action='Action13'/></menu><menu name='Action2' action='Action2'><menuitem name='aboutAction' action='aboutAction'/></menu></menubar></ui>");
+		this.UIManager.AddUiFromString ("<ui><menubar name='menubar1'><menu name='Action' action='Action'><menuitem name='dialogAuthenticationAction' action='dialogAuthenticationAction'/><menuitem name='ActionPassword' action='ActionPassword'/><separator/><menuitem name='quitAction' action='quitAction'/></menu><menu name='Action14' action='Action14'><menuitem name='Action9' action='Action9'/><menuitem name='Action15' action='Action15'/><menuitem name='Action11' action='Action11'/><separator/><menuitem name='Action10' action='Action10'/><separator/><menuitem name='Action12' action='Action12'/><menuitem name='Action13' action='Action13'/></menu><menu name='Action16' action='Action16'><menuitem name='ActionSite' action='ActionSite'/><menuitem name='ActionHistory' action='ActionHistory'/><separator/><menuitem name='aboutAction' action='aboutAction'/></menu></menubar></ui>");
 		this.menubar1 = ((global::Gtk.MenuBar)(this.UIManager.GetWidget ("/menubar1")));
 		this.menubar1.Name = "menubar1";
 		this.vbox1.Add (this.menubar1);
@@ -281,6 +291,8 @@ public partial class MainWindow
 		this.dialogAuthenticationAction.Toggled += new global::System.EventHandler (this.OnDialogAuthenticationActionToggled);
 		this.ActionPassword.Activated += new global::System.EventHandler (this.OnActionPasswordActivated);
 		this.Action15.Activated += new global::System.EventHandler (this.OnAction15Activated);
+		this.ActionSite.Activated += new global::System.EventHandler (this.OnActionSiteActivated);
+		this.ActionHistory.Activated += new global::System.EventHandler (this.OnActionHistoryActivated);
 		this.entrySearch.Changed += new global::System.EventHandler (this.OnEntrySearchChanged);
 		this.buttonClearSearch.Clicked += new global::System.EventHandler (this.OnButtonClearSearchClicked);
 		this.treeviewOrders.RowActivated += new global::Gtk.RowActivatedHandler (this.OnTreeviewOrdersRowActivated);

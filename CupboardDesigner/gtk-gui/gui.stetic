@@ -31,7 +31,7 @@
         <property name="Label" translatable="yes">Справочники</property>
         <property name="ShortLabel" translatable="yes">Справочники</property>
       </action>
-      <action id="Action2">
+      <action id="Action16">
         <property name="Type">Action</property>
         <property name="Label" translatable="yes">Справка</property>
         <property name="ShortLabel" translatable="yes">Справка</property>
@@ -95,6 +95,18 @@
         <property name="ShortLabel" translatable="yes">Кубы</property>
         <signal name="Activated" handler="OnAction15Activated" />
       </action>
+      <action id="ActionSite">
+        <property name="Type">Action</property>
+        <property name="Label" translatable="yes">Посетить сайт</property>
+        <property name="ShortLabel" translatable="yes">Посетить сайт</property>
+        <signal name="Activated" handler="OnActionSiteActivated" />
+      </action>
+      <action id="ActionHistory">
+        <property name="Type">Action</property>
+        <property name="Label" translatable="yes">История версий</property>
+        <property name="ShortLabel" translatable="yes">История версий</property>
+        <signal name="Activated" handler="OnActionHistoryActivated" />
+      </action>
     </action-group>
     <property name="MemberName" />
     <property name="Title" translatable="yes">QS: Конфигуратор шкафа</property>
@@ -125,7 +137,10 @@
                 <node type="Menuitem" action="Action12" />
                 <node type="Menuitem" action="Action13" />
               </node>
-              <node type="Menu" action="Action2">
+              <node type="Menu" action="Action16">
+                <node type="Menuitem" action="ActionSite" />
+                <node type="Menuitem" action="ActionHistory" />
+                <node type="Separator" />
                 <node type="Menuitem" action="aboutAction" />
               </node>
             </node>
@@ -1950,7 +1965,7 @@
           <widget class="Gtk.Notebook" id="notebook1">
             <property name="MemberName" />
             <property name="CanFocus">True</property>
-            <property name="CurrentPage">0</property>
+            <property name="CurrentPage">5</property>
             <signal name="SwitchPage" handler="OnNotebook1SwitchPage" />
             <child>
               <widget class="Gtk.HBox" id="hbox1">

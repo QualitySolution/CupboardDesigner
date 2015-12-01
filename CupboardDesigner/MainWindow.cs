@@ -235,4 +235,14 @@ public partial class MainWindow: Gtk.Window
 		winref.Run();
 		winref.Destroy();
 	}
+
+	protected void OnActionSiteActivated (object sender, EventArgs e)
+	{
+		System.Diagnostics.Process.Start ("http://develop.qsolution.ru");
+	}
+
+	protected void OnActionHistoryActivated (object sender, EventArgs e)
+	{
+		QSMain.RunChangeLogDlg (this);
+	}
 }
