@@ -26,10 +26,7 @@ public partial class MainWindow: Gtk.Window
 
 		PrerareOrders();
 		SetAdminMode(false); 
-		MainSupport.BaseParameters = new QSSupportLib.BaseParam(QSMain.ConnectionDB);
-		MainSupport.ProjectVerion = new AppVersion(System.Reflection.Assembly.GetExecutingAssembly().GetName().Name.ToString(),
-			"gpl",
-			System.Reflection.Assembly.GetExecutingAssembly().GetName().Version);
+		MainSupport.LoadBaseParameters ();
 		if (CheckBaseVersion.Check ()) { //Проверяем версию базы
 			if (CheckBaseVersion.ResultFlags.HasFlag (CheckBaseResult.BaseVersionLess)) {
 				logger.Info ("Используется база старой версии. Обновляем...");

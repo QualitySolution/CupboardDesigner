@@ -1,6 +1,5 @@
 ﻿using System;
 using System.IO;
-using System.Collections.Generic;
 using NLog;
 using Mono.Data.Sqlite;
 using QSProjectsLib;
@@ -128,8 +127,7 @@ namespace CupboardDesigner
 			}
 			catch (Exception ex)
 			{
-				logger.ErrorException("Ошибка получения информации о типе шкафа!", ex);
-				QSMain.ErrorMessage(this,ex);
+				QSMain.ErrorMessageWithLog(this, "Ошибка получения информации о типе шкафа!", logger, ex);
 			}
 			TestCanSave();
 		}
@@ -253,8 +251,7 @@ namespace CupboardDesigner
 			catch (Exception ex)
 			{
 				trans.Rollback();
-				logger.ErrorException("Ошибка записи основы!", ex);
-				QSMain.ErrorMessage(this, ex);
+				QSMain.ErrorMessageWithLog(this, "Ошибка записи основы!", logger, ex);
 			}
 		}
 

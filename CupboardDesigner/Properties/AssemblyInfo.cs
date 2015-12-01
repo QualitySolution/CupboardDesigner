@@ -5,11 +5,12 @@ using QSProjectsLib;
 // Information about this assembly is defined by the following attributes.
 // Change them to the values specific to your project.
 [assembly: AssemblyTitle("QS: Конструктор шкафов")]
+[assembly: AssemblyEdition ("gpl")]
 [assembly: AssemblyDescription("Программа позволяет создавать спецификации шкафов.")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("Quality Solution")]
 [assembly: AssemblyProduct("QS: Конструктор шкафов")]
-[assembly: AssemblyCopyright("Quality Solution 2014")]
+[assembly: AssemblyCopyright("Quality Solution 2015")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 [assembly: AssemblyLogoIcon("CupboardDesigner.icons.logo.png")]

@@ -74,7 +74,7 @@ namespace CupboardDesigner
 			}
 			catch (Exception ex)
 			{
-				logger.ErrorException("Ошибка в чтении svg!", ex);
+				logger.Error(ex, "Ошибка в чтении svg!");
 				return false;
 			}
 			logger.Debug("Закончили загрузку.");

@@ -45,8 +45,7 @@ namespace CupboardDesigner
 			}
 			catch (Exception ex)
 			{
-				logger.ErrorException("Ошибка получения информации о номенклатуре!", ex);
-				QSMain.ErrorMessage(this,ex);
+				QSMain.ErrorMessageWithLog(this, "Ошибка получения информации о номенклатуре!", logger, ex);
 			}
 			TestCanSave();
 		}
@@ -102,8 +101,7 @@ namespace CupboardDesigner
 			catch (Exception ex) 
 			{
 				trans.Rollback();
-				logger.ErrorException("Ошибка записи выставки", ex);
-				QSMain.ErrorMessage(this,ex);
+				QSMain.ErrorMessageWithLog(this, "Ошибка записи выставки", logger, ex);
 			}
 
 		}

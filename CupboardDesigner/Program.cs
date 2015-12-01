@@ -34,7 +34,6 @@ namespace CupboardDesigner
 
 		static void CreateProjectParam()
 		{
-			QSMain.AdminFieldName = "admin";
 			QSMain.ProjectPermission = new Dictionary<string, UserPermission>();
 
 			QSMain.User = new UserInfo();
@@ -191,7 +190,7 @@ namespace CupboardDesigner
 			} 
 			catch (Exception ex)
 			{
-				logger.WarnException("Конфигурационный фаил не найден. Создаем новый.", ex);
+				logger.Warn(ex, "Конфигурационный фаил не найден. Создаем новый.");
 				Configsource = new IniConfigSource();
 
 				IConfig config = Configsource.AddConfig("Login");
@@ -225,8 +224,7 @@ namespace CupboardDesigner
 			catch (Exception ex)
 			{
 				string Error = String.Format("Не получилось открыть базу данных {0}", DataBase);
-				logger.FatalException(Error, ex);
-				QSMain.ErrorMessage(null, ex);
+				QSMain.ErrorMessageWithLog(null, Error, logger, ex);
 				Environment.Exit(1);
 			}
 

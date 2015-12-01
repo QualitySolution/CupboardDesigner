@@ -1,6 +1,5 @@
 ﻿using System;
 using System.IO;
-using System.Globalization;
 using NLog;
 using Gtk;
 using Mono.Data.Sqlite;
@@ -551,8 +550,7 @@ namespace CupboardDesigner {
 			}
 			catch (Exception ex) {
 				trans.Rollback();
-				logger.ErrorException("Ошибка записи заказа!", ex);
-				QSMain.ErrorMessage(this, ex);
+				QSMain.ErrorMessageWithLog(this, "Ошибка записи заказа!", logger, ex);
 				return false;
 			}
 		}
@@ -826,8 +824,7 @@ namespace CupboardDesigner {
 				MainClass.StatusMessage("Ok");
 			}
 			catch (Exception ex) {
-				logger.ErrorException("Ошибка получения информации о заказе!", ex);
-				QSMain.ErrorMessage(this, ex);
+				QSMain.ErrorMessageWithLog(this, "Ошибка получения информации о заказе!", logger, ex);
 			}
 			TestCanSave();
 		}
@@ -845,7 +842,7 @@ namespace CupboardDesigner {
 					NewValue = int.Parse (args.NewText); 
 				ComponentsStore.SetValue(iter, (int)ComponentCol.count, NewValue);
 				CalculateTotalPrice ();
-			} catch(Exception e) { logger.WarnException ("Error occured in OnCountEdited.", e);}
+			} catch(Exception e) { logger.Warn (e, "Error occured in OnCountEdited.");}
 		}
 
 		void OnPriceEdited(object o, EditedArgs args) 
@@ -861,7 +858,7 @@ namespace CupboardDesigner {
 					NewValue = Decimal.Parse (args.NewText);
 				ComponentsStore.SetValue(iter, (int)ComponentCol.price, (NewValue).ToString());
 				CalculateTotalPrice ();
-			} catch(Exception e) { logger.WarnException ("Error occured in OnPriceEdited", e);}
+			} catch(Exception e) { logger.Warn (e, "Error occured in OnPriceEdited");}
 		}
 
 		void OnMaterialComboEdited (object o, EditedArgs args) {
