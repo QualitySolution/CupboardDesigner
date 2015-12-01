@@ -36,9 +36,6 @@
   <ItemGroup>
     <Reference Include="System" />
     <Reference Include="Mono.Posix" />
-    <Reference Include="NLog">
-      <HintPath>..\..\QSProjects\lib\NLog.dll</HintPath>
-    </Reference>
     <Reference Include="Mono.Data.Sqlite">
       <Private>True</Private>
     </Reference>
@@ -61,6 +58,9 @@
     <Reference Include="System.Drawing" />
     <Reference Include="rsvg2-sharp">
       <HintPath>..\..\Libs\rsvg2-sharp.dll</HintPath>
+    </Reference>
+    <Reference Include="NLog">
+      <HintPath>..\..\QSProjects\packages\NLog.4.2.0\lib\net40\NLog.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>
