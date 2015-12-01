@@ -30,26 +30,25 @@ public partial class MainWindow: Gtk.Window
 		MainSupport.ProjectVerion = new AppVersion(System.Reflection.Assembly.GetExecutingAssembly().GetName().Name.ToString(),
 			"gpl",
 			System.Reflection.Assembly.GetExecutingAssembly().GetName().Version);
-		if (!MainSupport.TestVersionSilent ()) { //Проверяем версию базы
-			logger.Info ("Используется база старой версии. Обновляем...");
-			SqliteTransaction trans = ((SqliteConnection)QSMain.ConnectionDB).BeginTransaction();
-			try {
-				string sql;
-				using(Stream stream = System.Reflection.Assembly.GetExecutingAssembly().GetManifestResourceStream("CupboardDesigner.Scripts.UpdateSchema.sql"))
-				{
-					StreamReader reader = new StreamReader(stream);
-					sql = reader.ReadToEnd();
-				}
+		if (CheckBaseVersion.Check ()) { //Проверяем версию базы
+			if (CheckBaseVersion.ResultFlags.HasFlag (CheckBaseResult.BaseVersionLess)) {
+				logger.Info ("Используется база старой версии. Обновляем...");
+				SqliteTransaction trans = ((SqliteConnection)QSMain.ConnectionDB).BeginTransaction ();
+				try {
+					string sql;
+					using (Stream stream = System.Reflection.Assembly.GetExecutingAssembly ().GetManifestResourceStream ("CupboardDesigner.Scripts.UpdateSchema.sql")) {
+						StreamReader reader = new StreamReader (stream);
+						sql = reader.ReadToEnd ();
+					}
 
-				SqliteCommand cmd = new SqliteCommand(sql, (SqliteConnection)QSMain.ConnectionDB, trans);
-				cmd.ExecuteNonQuery();
-				trans.Commit();
-				logger.Info ("Обновление базы ОК.");
-			}
-			catch (Exception e) {
-				trans.Rollback();
-				logger.ErrorException("Обновление базы закончилось с ошибкой!", e);
-				QSMain.ErrorMessage(this, e);
+					SqliteCommand cmd = new SqliteCommand (sql, (SqliteConnection)QSMain.ConnectionDB, trans);
+					cmd.ExecuteNonQuery ();
+					trans.Commit ();
+					logger.Info ("Обновление базы ОК.");
+				} catch (Exception e) {
+					trans.Rollback ();
+					QSMain.ErrorMessageWithLog (this, "Обновление базы закончилось с ошибкой!", logger, e);
+				}
 			}
 		}
 		else
